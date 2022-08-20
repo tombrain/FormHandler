@@ -1120,7 +1120,7 @@ class dbFormHandler extends FormHandler
 					// NULL in an nullable Field is not a unique constraint error!
 					if (isset($value) && !array_key_exists($field, $notnull) && $value == "NULL")
 					{
-					    return true; 
+					    continue; 
 					}
 					
 					$where = $this->_getWhereClause( '<>', $extra );
