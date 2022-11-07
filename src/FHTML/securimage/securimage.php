@@ -368,7 +368,7 @@ class Securimage {
    * The gd image resource.
    *
    * @access private
-   * @var resource
+   * @var GDImage
    */
   var $im;
 
@@ -376,7 +376,7 @@ class Securimage {
    * The background image resource
    *
    * @access private
-   * @var resource
+   * @var string
    */
   var $bgimg;
 
@@ -415,7 +415,7 @@ class Securimage {
    * </code>
    *
    */
-  function Securimage()
+  public function __construct()
   {
     if ( session_id() == '' ) { // no session has been started yet, which is needed for validation
       @session_start();
@@ -647,13 +647,18 @@ class Securimage {
           $r = substr($colors[$idx], 1, 2);
           $g = substr($colors[$idx], 3, 2);
           $b = substr($colors[$idx], 5, 2);
+          $r_int = hexdec($r);
+          $g_int = hexdec($g);
+          $b_int = hexdec($b);
           if($this->use_transparent_text == true) {
-            $font_color = imagecolorallocatealpha($this->im, "0x$r", "0x$g", "0x$b", $alpha);
+            $font_color = imagecolorallocatealpha($this->im, $r_int, $g_int, $b_int, $alpha);
           } else {
-            $font_color = imagecolorallocate($this->im, "0x$r", "0x$g", "0x$b");
+            $font_color = imagecolorallocate($this->im, $r_int, $g_int, $b_int);
           }
         }
-        @imagettftext($this->im, $this->font_size, $angle, $x, $y, $font_color, $this->ttf_file, $this->code{$i});
+        // Set the enviroment variable for GD
+        $font = realpath('.') . "/elephant.ttf";
+        @imagettftext($this->im, $this->font_size, $angle, $x, $y, $font_color, $font, $this->code[$i]);
 
         $x += rand($this->text_minimum_distance, $this->text_maximum_distance);
       } //for loop
@@ -693,7 +698,7 @@ class Securimage {
     $code = '';
 
     for($i = 1, $cslen = strlen($this->charset); $i <= $len; ++$i) {
-      $code .= strtoupper( $this->charset{rand(0, $cslen - 1)} );
+      $code .= strtoupper( $this->charset[rand(0, $cslen - 1)] );
     }
     return $code;
   }
@@ -784,7 +789,7 @@ class Securimage {
     }
 
     for($i = 0; $i < strlen($code); ++$i) {
-      $letters[] = $code{$i};
+      $letters[] = $code[$i];
     }
 
     return $this->generateWAV($letters);
