@@ -66,7 +66,7 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
 
     }
 
-    public function test_set_spezialfield_datefield(): void
+    public function test_set_specialfield_datefield(): void
     {
         $form = new FormHandler();
 
@@ -84,7 +84,7 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
                     "}\n");
     }
 
-    public function test_set_spezialfield_jsdatefield(): void
+    public function test_set_specialfield_jsdatefield(): void
     {
         $form = new FormHandler();
 
@@ -102,7 +102,7 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
                     "}\n");
     }
 
-    public function test_set_spezialfield_listfield(): void
+    public function test_set_specialfield_listfield(): void
     {
         $form = new FormHandler();
 
