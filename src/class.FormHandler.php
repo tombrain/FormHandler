@@ -127,6 +127,8 @@ class FormHandler
 	protected $_ajaxValidator;    // boolean: if Ajax validation must be used or not.
 	protected $_ajaxValidatorScript;	// boolean: if Ajax validation must include library or not.
 
+	private $_unittestmode = false; // boolean: only for unittesting (can only be set by reflection of uniitest)
+
 	/**
      * FormHandler::FormHandler()
      *
@@ -254,6 +256,16 @@ class FormHandler
 		$this->setTableSettings();
 	}
 
+	/**
+	 * Getter
+	 *
+	 * @return boolean
+	 */
+	public function isUnittestmode() : bool
+	{
+		return $this->_unittestmode;
+	}
+	
 	/**
 	 * Get Name Form
 	 *

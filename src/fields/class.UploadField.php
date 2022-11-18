@@ -611,6 +611,19 @@ class UploadField extends Field
 
 				return $sUpload;
 			}
+			else if ($this->_oForm->isUnittestmode())
+			{
+				if (file_exists($this->_aConfig['path']))
+				{
+					$sFilename = $this->_getFilename(false);
+					$sUpload   = $this->_aConfig['path'].$sFilename;
+
+					if (copy($aFile['tmp_name'], $sUpload))
+						return $sUpload;
+				}
+
+				return false;
+			}
 			else
 			{
 				trigger_error(
