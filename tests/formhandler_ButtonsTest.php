@@ -30,10 +30,10 @@ final class formhandler_ButtonsTest extends FormhandlerTestCase
         $form->submitButton(null, null, 'data-old="123"');
         $form->submitButton(null, null, null, false);
 
-        $this->assertFormFlushContains($form, ['<input type="submit" value="Submit" name="button1" id="button1"  onclick="this.form.submit();this.disabled=true;"  />error_button1',
-                                                '<input type="submit" value="Caption" name="button2" id="button2"  onclick="this.form.submit();this.disabled=true;"  />error_button2',
-                                                '<input type="submit" value="Submit" name="submitbutton" id="submitbutton"  onclick="this.form.submit();this.disabled=true;"  />error_submitbutton',
-                                                '<input type="submit" value="Submit" name="button3" id="button3"  onclick="this.form.submit();this.disabled=true;" data-old="123" />error_button3',
+        $this->assertFormFlushContains($form, ['<input type="submit" value="Submit" name="button1" id="button1"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_button1',
+                                                '<input type="submit" value="Caption" name="button2" id="button2"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_button2',
+                                                '<input type="submit" value="Submit" name="submitbutton" id="submitbutton"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_submitbutton',
+                                                '<input type="submit" value="Submit" name="button3" id="button3"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}" data-old="123" />error_button3',
                                                 '<input type="submit" value="Submit" name="button4" id="button4"  />error_button4']);
     }
 

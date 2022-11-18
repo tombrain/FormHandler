@@ -15,6 +15,10 @@ final class formhandler_jsDateFieldTest extends FormhandlerTestCase
 
         $form->jsDateField("Datefield", "datefield");
 
+        $year = date ("Y");
+        $disableDate1 = $year - 91;
+        $disableDate2 = $year + 1;
+
         $this->assertFormFlushContains($form, ['FHTML/js/calendar_popup.js',
                                                 'document.write(getCalendarStyles());',
                                                 'function getDateString( fldForm, fldYear, fldMonth, fldDay ) {',
@@ -32,8 +36,8 @@ final class formhandler_jsDateFieldTest extends FormhandlerTestCase
                                                 "   cal_datefield.showYearNavigation();\n" .
                                                 "   cal_datefield.showYearNavigationInput();\n" .
                                                 "   cal_datefield.setReturnFunction('setdatefieldValues');\n" .
-                                                "   cal_datefield.addDisabledDates(null,'Dec 31, 1929');\n" .
-                                                "   cal_datefield.addDisabledDates('Jan 1, 2021',null);\n" .
+                                                "   cal_datefield.addDisabledDates(null,'Dec 31, {$disableDate1}');\n" .
+                                                "   cal_datefield.addDisabledDates('Jan 1, {$disableDate2}',null);\n" .
                                                 "   function setdatefieldValues(y,m,d) {\n" .
                                                 "       document.forms['FormHandler'].elements['datefield_day'].value   = LZ(d);\n" .
                                                 "       document.forms['FormHandler'].elements['datefield_month'].value = LZ(m);\n" .
@@ -51,6 +55,10 @@ final class formhandler_jsDateFieldTest extends FormhandlerTestCase
         $this->assertFalse($form->isPosted());
 
         $form->jsDateField("Datefield", "datefield");
+
+        $year = date ("Y");
+        $disableDate1 = $year - 91;
+        $disableDate2 = $year + 1;
 
         $this->assertFormFlushContains($form, ['FHTML/js/calendar_popup.js',
                                                 'document.write(getCalendarStyles());',
@@ -70,8 +78,8 @@ final class formhandler_jsDateFieldTest extends FormhandlerTestCase
                                                 "   cal_datefield.showYearNavigationInput();\n" .
                                                 "   cal_datefield.showNavigationDropdowns();\n" .
                                                 "   cal_datefield.setReturnFunction('setdatefieldValues');\n" .
-                                                "   cal_datefield.addDisabledDates(null,'Dec 31, 1929');\n" .
-                                                "   cal_datefield.addDisabledDates('Jan 1, 2021',null);\n" .
+                                                "   cal_datefield.addDisabledDates(null,'Dec 31, {$disableDate1}');\n" .
+                                                "   cal_datefield.addDisabledDates('Jan 1, {$disableDate2}',null);\n" .
                                                 "   function setdatefieldValues(y,m,d) {\n" .
                                                 "       document.forms['FormHandler'].elements['datefield_day'].value   = LZ(d);\n" .
                                                 "       document.forms['FormHandler'].elements['datefield_month'].value = LZ(m);\n" .
@@ -90,6 +98,10 @@ final class formhandler_jsDateFieldTest extends FormhandlerTestCase
 
         $form->jsDateField("Datefield", "datefield");
 
+        $year = date ("Y");
+        $disableDate1 = $year - 91;
+        $disableDate2 = $year + 1;
+
         $this->assertFormFlushContains($form, ['FHTML/js/calendar_popup.js',
                                                 'document.write(getCalendarStyles());',
                                                 'function getDateString( fldForm, fldYear, fldMonth, fldDay ) {',
@@ -107,8 +119,8 @@ final class formhandler_jsDateFieldTest extends FormhandlerTestCase
                                                 "   cal_datefield.showYearNavigation();\n" .
                                                 "   cal_datefield.showYearNavigationInput();\n" .
                                                 "   cal_datefield.setReturnFunction('setdatefieldValues');\n" .
-                                                "   cal_datefield.addDisabledDates(null,'Dec 31, 1929');\n" .
-                                                "   cal_datefield.addDisabledDates('Jan 1, 2021',null);\n" .
+                                                "   cal_datefield.addDisabledDates(null,'Dec 31, {$disableDate1}');\n" .
+                                                "   cal_datefield.addDisabledDates('Jan 1, {$disableDate2}',null);\n" .
                                                 "   function setdatefieldValues(y,m,d) {\n" .
                                                 "       document.forms['FormHandler'].elements['datefield_day'].value   = LZ(d);\n" .
                                                 "       document.forms['FormHandler'].elements['datefield_month'].value = LZ(m);\n" .

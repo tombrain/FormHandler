@@ -29,7 +29,7 @@ final class formhandler_LookAndFeel_newPageTest extends FormhandlerTestCase
                                                 '<input type="hidden" name="q3" id="q3" value="" />',
                                                 '<input type="hidden" name="FormHandler_page" id="FormHandler_page" value="1" />',
                                                 'Question 1:<input type="text" name="q1" id="q1" value="" size="30" maxlength="50" />error_q1',
-                                                '<input type="submit" value="Next page" name="button1" id="button1"  onclick="this.form.submit();this.disabled=true;"  />error_button1'
+                                                '<input type="submit" value="Next page" name="button1" id="button1"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_button1'
                                                 ]);
     }
 
@@ -61,7 +61,7 @@ final class formhandler_LookAndFeel_newPageTest extends FormhandlerTestCase
                                                 '<input type="hidden" name="q3" id="q3" value="" />',
                                                 '<input type="hidden" name="FormHandler_page" id="FormHandler_page" value="2" />',
                                                 'Question 2:<textarea name="q2" id="q2" cols="40" rows="7"></textarea>error_q2',
-                                                '<input type="submit" value="Next Page" name="button2" id="button2"  onclick="this.form.submit();this.disabled=true;"  />error_button2'
+                                                '<input type="submit" value="Next Page" name="button2" id="button2"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_button2'
                                                 ]);
     }
 
@@ -93,7 +93,7 @@ final class formhandler_LookAndFeel_newPageTest extends FormhandlerTestCase
                                                 '<input type="hidden" name="q2" id="q2" value="answer2" />',
                                                 '<input type="hidden" name="FormHandler_page" id="FormHandler_page" value="3" />',
                                                 'Question 3:<input type="text" name="q3" id="q3" value="" size="20" />error_q3',
-                                                '<input type="submit" value="Submit" name="button3" id="button3"  onclick="this.form.submit();this.disabled=true;"  />error_button3'
+                                                '<input type="submit" value="Submit" name="button3" id="button3"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_button3'
                                                 ]);
     }
 };
