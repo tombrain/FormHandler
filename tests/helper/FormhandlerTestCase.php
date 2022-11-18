@@ -90,8 +90,12 @@ abstract class FormhandlerTestCase extends TestCase
 			$lastPos = -1;
 			foreach($expected as $e)
 			{
-				$this->assertStringContainsString($e, $t);
+				//$this->assertStringContainsString($e, $t);
 				$p = strpos($t, $e);
+				if (!$p)
+				{
+					$this->fail("missing string:\n{$e}");
+				}
 
 				$this->assertGreaterThan($lastPos, $p, "wrong order of strings '{$e}'");
 				$lastPos = $p;
