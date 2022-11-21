@@ -25,7 +25,7 @@ class jsDateTextField extends DateTextField
      * @author Thomas Branius
      * @since 16-03-2010
      */
-	public function __construct( &$oForm, $sName, $sMask = null, $bParseOtherPresentations = false, $bIncludeJS )
+	public function __construct( &$oForm, $sName, $sMask = null, $bParseOtherPresentations = false, $bIncludeJS = true )
 	{
 		parent::__construct( $oForm, $sName, $sMask, $bParseOtherPresentations);
 		
