@@ -36,7 +36,7 @@
         "jdorn/sql-formatter": "^1.2.17",
         "phan/phan": "^5.1",
 		"phpstan/phpstan": "^1.9.2",
-		"tombrain/phpunit-mock-dibi" : "^4.2",
+		"tombrain/phpunit-mock-dibi" : "master",
         "dibi/dibi": "^4.2"
     },
     "autoload": {
