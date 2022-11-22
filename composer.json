@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Interactive forms within 10 lines",
     "homepage": "http://www.formhandler.net/",
-    "license": "LGPL-2.1",
+    "license": "LGPL-2.1-only",
     "support": {
         "forum": "http://www.formhandler.net/forum_index.html",
         "docs": "http://www.formhandler.net/manual/manual.html",
