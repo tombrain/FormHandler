@@ -1,9 +1,9 @@
 {
-    "name": "formhandler/formhandler",
+    "name": "tomdabrain/formhandler",
     "type": "library",
     "description": "Interactive forms within 10 lines",
     "homepage": "http://www.formhandler.net/",
-    "license": "LGPL-2.1",
+    "license": "LGPL-2.1-only",
     "support": {
         "forum": "http://www.formhandler.net/forum_index.html",
         "docs": "http://www.formhandler.net/manual/manual.html",
@@ -36,8 +36,8 @@
         "jdorn/sql-formatter": "^1.2.17",
         "phan/phan": "^5.1",
 		"phpstan/phpstan": "^1.9.2",
-		"tombrain/phpunit-mock-dibi" : "@dev",
-        "dibi/dibi": "4.2.x-dev"
+		"tombrain/phpunit-mock-dibi" : "master",
+        "dibi/dibi": "^4.2"
     },
     "autoload": {
         "files": [
