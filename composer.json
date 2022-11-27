@@ -17,18 +17,10 @@
         }
     ],
     "repositories": [
-        {
-            "type":"package",
-            "package":{
-                "name":"tombrain/phpunit-mock-dibi",
-                "version":"master",
-                "source":{
-                    "url":"https://github.com/tombrain/phpunit-mock-dibi",
-                    "type":"git",
-                    "reference":"master"
-                }
-            }
-        }
+        	{
+      		"type": "vcs",
+      		"url": "https://github.com/tombrain/phpunit-mock-dibi.git"
+    	}	    
 	],
     "require": {
         "phpunit/phpunit": "^9.0.1",
@@ -36,7 +28,7 @@
         "jdorn/sql-formatter": "^1.2.17",
         "phan/phan": "^5.1",
 		"phpstan/phpstan": "^1.9.2",
-		"tombrain/phpunit-mock-dibi" : "master",
+		"tombrain/phpunit-mock-dibi" : "dev-master",
         "dibi/dibi": "^4.2"
     },
     "autoload": {
