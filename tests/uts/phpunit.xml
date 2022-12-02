@@ -6,7 +6,8 @@
 		processIsolation="true"
 		convertErrorsToExceptions="true"
 		convertNoticesToExceptions="true"
-		convertWarningsToExceptions="true">
+		convertWarningsToExceptions="true"
+		bootstrap="bootstrap.php">
 	<!-- <coverage> -->
 		<!-- <include> -->
 			<!-- <directory suffix=".php">../../src</directory> -->
@@ -18,7 +19,7 @@
 	<!-- </coverage> -->
 	<testsuites>
 		<testsuite name="main">
-			<directory suffix="Test.php">./</directory>
+			<directory suffix="formhandler_AutocompleteTest.php">./</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>
