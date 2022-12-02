@@ -1,4 +1,4 @@
-name: CI
+name: php 8.1.x
 
 on: [push]
 
