@@ -1,8 +1,5 @@
 <?php declare(strict_types=1);
 
-require_once 'helper/dbFormhandlerTestCase.php';
-
-
 final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
 {
     public function test_new(): void

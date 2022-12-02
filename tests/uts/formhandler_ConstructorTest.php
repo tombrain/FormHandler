@@ -1,7 +1,5 @@
 <?php declare(strict_types=1);
 
-require_once 'helper/FormhandlerTestCase.php';
-
 final class formhandler_ConstructorTest extends FormhandlerTestCase
 {
     final protected function getFormhandlerType() : string

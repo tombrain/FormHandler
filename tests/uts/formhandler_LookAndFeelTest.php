@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-require_once 'helper/formhandlerTestCase.php';
-
-
 final class formhandler_LookAndFeelTest extends FormhandlerTestCase
 {
     public function test_addHTML(): void

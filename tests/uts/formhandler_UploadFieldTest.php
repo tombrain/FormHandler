@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once 'helper/formhandlerTestCase.php';
-
 function delete_directory($dirname)
 {
     if (is_dir($dirname))

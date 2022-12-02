@@ -2,9 +2,6 @@
 
 declare(strict_types=1);
 
-require_once 'helper/formhandlerTestCase.php';
-
-
 final class formhandler_TextAreaTest extends FormhandlerTestCase
 {
     public function test_new(): void

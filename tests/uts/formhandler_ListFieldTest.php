@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once 'helper/formhandlerTestCase.php';
-
 // for fewer text in unittests
 define('FH_LISTFIELD_HORIZONTAL_MASK', "%onlabel%%offlabel%%onfield%%name%%ontitle%%offfield%%offtitle%");
 define('FH_LISTFIELD_VERTICAL_MASK', "%offlabel%%offfield%%name%%offtitle%%ontitle%%onlabel%%onfield%"); 

@@ -19,7 +19,7 @@
 	<!-- </coverage> -->
 	<testsuites>
 		<testsuite name="main">
-			<directory suffix="formhandler_AutocompleteTest.php">./</directory>
+			<directory suffix="Test.php">./</directory>
 		</testsuite>
 	</testsuites>
 </phpunit>

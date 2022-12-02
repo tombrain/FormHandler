@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-require_once 'helper/formhandlerTestCase.php';
-
 define( 'FH_TEXTSELECT_MASK', '%s-%s-%d-%s-%s-%s');
 define( 'FH_TEXTSELECT_OPTION_MASK', '%s-%s');
 
