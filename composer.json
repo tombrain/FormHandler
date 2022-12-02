@@ -40,7 +40,11 @@
         "psr-4": {
             "Cz\\PHPUnit\\MockDibi\\": "vendor\\tombrain\\phpunit-mock-dibi\\classes"
         }
-
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/uts/helper"
+        ]
     },
     "extra": {
         "dev-master": "v3.3.x-dev"

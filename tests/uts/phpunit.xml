@@ -7,7 +7,7 @@
 		convertErrorsToExceptions="true"
 		convertNoticesToExceptions="true"
 		convertWarningsToExceptions="true"
-		bootstrap="bootstrap.php">
+		bootstrap="../../vendor/autoload.php">
 	<!-- <coverage> -->
 		<!-- <include> -->
 			<!-- <directory suffix=".php">../../src</directory> -->
