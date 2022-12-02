@@ -16,7 +16,7 @@ jobs:
         env:
           TEST_NAME: Scarlett
         with:
-          php_version: 8.0.15
+          php_version: 8.0.26
           php_extensions: gd
           configuration: tests/uts/phpunit.xml
           args: --coverage-text
