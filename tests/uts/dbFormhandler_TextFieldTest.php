@@ -15,6 +15,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertTrue($form->insert);
         $this->assertFalse($form->edit);
+        $this->assertFalse($form->isPosted());
 
         $this->setConnectedTable($form, "test");
 
@@ -38,6 +39,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertFalse($form->insert);
         $this->assertTrue($form->edit);
+        $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))
@@ -61,6 +63,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertFalse($form->insert);
         $this->assertTrue($form->edit);
+        $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))
@@ -91,6 +94,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertTrue($form->insert);
         $this->assertFalse($form->edit);
+        $this->assertTrue($form->isPosted());
 
         $this->setConnectedTable($form, "test");
 
@@ -125,6 +129,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertTrue($form->insert);
         $this->assertFalse($form->edit);
+        $this->assertTrue($form->isPosted());
 
         $this->setConnectedTable($form, "test");
 
@@ -158,6 +163,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertFalse($form->insert);
         $this->assertTrue($form->edit);
+        $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))
@@ -198,6 +204,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
 
         $this->assertFalse($form->insert);
         $this->assertTrue($form->edit);
+        $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))

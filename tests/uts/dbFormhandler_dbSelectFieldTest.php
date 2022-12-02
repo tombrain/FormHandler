@@ -48,6 +48,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
 
         $this->assertFalse($form->insert);
         $this->assertTrue($form->edit);
+        $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))
@@ -96,6 +97,8 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
 
         $this->setConnectedTable($form, "test");
         $this->createMocksForTable();
+
+        $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->once())
@@ -190,6 +193,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
 
         $this->assertFalse($form->insert);
         $this->assertTrue($form->edit);
+        $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))
@@ -238,6 +242,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $form = new dbFormHandler();
 
         $this->setConnectedTable($form, "test");
+        $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->once())
@@ -326,6 +331,8 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         
         $form = new dbFormHandler();
 
+        $this->assertTrue($form->isPosted());
+
         $this->setConnectedTable($form, "test");
         $this->createMocksForTable();
 
@@ -370,6 +377,8 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $_GET['id'] = "123";
         
         $form = new dbFormHandler();
+
+        $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
                 ->expects($this->exactly(1))
