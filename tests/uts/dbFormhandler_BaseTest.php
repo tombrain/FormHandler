@@ -35,6 +35,7 @@ final class dbFormhandler_BaseTest extends dbFormhandlerTestCase
 
         $this->assertTrue($form->insert);
         $this->assertFalse($form->edit);
+        $this->assertFalse($form->isPosted());
     }
 
     public function test_SetConnectionResource(): void
