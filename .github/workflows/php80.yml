@@ -21,7 +21,3 @@ jobs:
           configuration: tests/uts/phpunit.xml
           args: --coverage-text
 
-      - name: PHPStan Static Analysis
-        uses: php-actions/phpstan@v3
-        with:
-          configuration: phpstan.neon
