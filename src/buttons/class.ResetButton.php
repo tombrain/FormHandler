@@ -25,7 +25,7 @@ class ResetButton extends Button
     {
         parent::__construct($oForm, $sName);
 
-        $this->setCaption( $oForm->_text( 27 ) );
+        $this->setCaption($oForm->_text(27));
     }
 
     /**
@@ -40,13 +40,11 @@ class ResetButton extends Button
     public function getButton()
     {
         return sprintf(
-          '<input type="reset" value="%s" name="%s" id="%2$s"%s '. FH_XHTML_CLOSE .'>',
-          $this->_sCaption,
-          $this->_sName,
-          (isset($this->_sExtra) ? ' '.$this->_sExtra:'').
-          (isset($this->_iTabIndex) ? ' tabindex="'.$this->_iTabIndex.'"' : '')
+            '<input type="reset" value="%s" name="%s" id="%2$s"%s ' . FH_XHTML_CLOSE . '>',
+            $this->_sCaption,
+            $this->_sName,
+            (isset($this->_sExtra) ? ' ' . $this->_sExtra : '') .
+                (isset($this->_iTabIndex) ? ' tabindex="' . $this->_iTabIndex . '"' : '')
         );
     }
 }
-
-?>

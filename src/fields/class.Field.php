@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class Field
  *
@@ -12,24 +13,24 @@
 
 class Field
 {
-	/**
-	 * owning Form
-	 *
-	 * @var FormHandler
-	 */
-	protected $_oForm;         // object: the form where the field is located in
-	protected $_sName;         // string: name of the field
-	protected $_sValidator;    // string: callback function to validate the value of the field
-	protected $_mValue;        // mixed: the value of the field
-	public $_sError;        // string: if the field is not valid, this var contains the error message
-	protected $_sExtra;        // string: extra data which should be added into the HTML tag (like CSS or JS)
-	protected $_iTabIndex;     // int: tabindex or null when no tabindex is set
-	protected $_sExtraAfter;   // string: extra data which should be added AFTER the HTML tag
-	public $_viewMode;      // boolean: should we only display the value instead of the field ?
-	protected $_isValid;      // boolean: field is valid 
+    /**
+     * owning Form
+     *
+     * @var FormHandler
+     */
+    protected $_oForm;          // object: the form where the field is located in
+    protected $_sName;          // string: name of the field
+    protected $_sValidator;     // string: callback function to validate the value of the field
+    protected $_mValue;         // mixed: the value of the field
+    public $_sError;            // string: if the field is not valid, this var contains the error message
+    protected $_sExtra;         // string: extra data which should be added into the HTML tag (like CSS or JS)
+    protected $_iTabIndex;      // int: tabindex or null when no tabindex is set
+    protected $_sExtraAfter;    // string: extra data which should be added AFTER the HTML tag
+    public $_viewMode;          // boolean: should we only display the value instead of the field ?
+    protected $_isValid;        // boolean: field is valid 
 
 
-	/**
+    /**
      * Field::Field()
      *
      * Public abstract constructor: Create a new field
@@ -40,98 +41,97 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function __construct( &$oForm, $sName )
-	{
-		// save the form and nome of the field
-		$this->_oForm = &$oForm;
-		$this->_sName = $sName;
-		$this->_isValid = null;
+    public function __construct(&$oForm, $sName)
+    {
+        // save the form and nome of the field
+        $this->_oForm = &$oForm;
+        $this->_sName = $sName;
+        $this->_isValid = null;
 
-		// check if there are spaces in the fieldname
-		if(strpos($sName,' ') !== false)
-		{
-			trigger_error('Warning: There are spaces in the field name "'.$sName.'"!', E_USER_WARNING );
-		}
+        // check if there are spaces in the fieldname
+        if (strpos($sName, ' ') !== false)
+        {
+            trigger_error('Warning: There are spaces in the field name "' . $sName . '"!', E_USER_WARNING);
+        }
 
-		// get the value of the field
-		if( $oForm->isPosted() )
-		{
-			// get the value if it exists in the $_POST array
-			if( isset( $_POST[$sName] ) )
-			{
-				// is the posted value a string
-				if( is_string( $_POST[$sName] ) )
-				{
-					// save the value...
-					$this->setValue(
-						$_POST[$sName]
-					);
-				}
-				// the posted value is an array
-				else if( is_array( $_POST[$sName] ) )
-				{
-					// escape the incoming data if needed and pass it to the field
-					$item = array();
-					foreach ( $_POST[$sName] as $key => $value )
-					{
-						$item[$key] = $value;
-					}
-					$this->setValue($item);
-				}
-			}
+        // get the value of the field
+        if ($oForm->isPosted())
+        {
+            // get the value if it exists in the $_POST array
+            if (isset($_POST[$sName]))
+            {
+                // is the posted value a string
+                if (is_string($_POST[$sName]))
+                {
+                    // save the value...
+                    $this->setValue(
+                        $_POST[$sName]
+                    );
+                }
+                // the posted value is an array
+                else if (is_array($_POST[$sName]))
+                {
+                    // escape the incoming data if needed and pass it to the field
+                    $item = array();
+                    foreach ($_POST[$sName] as $key => $value)
+                    {
+                        $item[$key] = $value;
+                    }
+                    $this->setValue($item);
+                }
+            }
 
-			/*
-			* When the form is posted but this field is not found in the $_POST array,
-			* keep the data from the db
-			* (This happens when the DISABLED attribute in the field's tag is used)
-			* Problem is that datefield's are never in the post array (because
-			* they have 3 fields: {name}_day, etc.). Because of this, the old value always
-			* will be kept...
-			*
-			* see (dutch topics!):
-			* http://www.formhandler.net/FH3/index.php?pg=12&id=1333#1333
-			* http://www.formhandler.net/FH3/index.php?pg=12&id=1296#1296
-			*
-			* TODO!!
-			*/
-			/*
-			elseif ( $oForm->edit )
-			{
-			if( isset( $oForm->_dbData[$sName] ) )
-			{
-			$this->setValue( $oForm->_dbData[$sName] );
-			}
-			}*/
+            /*
+            * When the form is posted but this field is not found in the $_POST array,
+            * keep the data from the db
+            * (This happens when the DISABLED attribute in the field's tag is used)
+            * Problem is that datefield's are never in the post array (because
+            * they have 3 fields: {name}_day, etc.). Because of this, the old value always
+            * will be kept...
+            *
+            * see (dutch topics!):
+            * http://www.formhandler.net/FH3/index.php?pg=12&id=1333#1333
+            * http://www.formhandler.net/FH3/index.php?pg=12&id=1296#1296
+            *
+            * TODO!!
+            */
+            /*
+            elseif ( $oForm->edit )
+            {
+            if( isset( $oForm->_dbData[$sName] ) )
+            {
+            $this->setValue( $oForm->_dbData[$sName] );
+            }
+            }*/
+        }
+        // The form is not posted, load database value if exists
+        else if (isset($oForm->edit) && $oForm->edit)
+        {
+            // does a db value exists for this field ?
+            if (isset($oForm->_dbData[$sName]))
+            {
+                // load the value into the field
+                $this->setValue($oForm->_dbData[$sName]);
+            }
+        }
 
-		}
-		// The form is not posted, load database value if exists
-		else if( isset( $oForm->edit) && $oForm -> edit )
-		{
-			// does a db value exists for this field ?
-			if( isset( $oForm->_dbData[$sName] ) )
-			{
-				// load the value into the field
-				$this->setValue( $oForm->_dbData[$sName] );
-			}
-		}
+        // check if the user got another value for this field.
+        if (isset($oForm->_buffer[$sName]))
+        {
+            list($bOverwrite, $sValue) = $oForm->_buffer[$sName];
 
-		// check if the user got another value for this field.
-		if( isset($oForm ->_buffer[ $sName ] ) )
-		{
-			list( $bOverwrite, $sValue ) = $oForm->_buffer[ $sName ];
+            // if the field does not exists in the database
+            if ($bOverwrite || (!isset($oForm->_dbData[$sName]) && !$oForm->isPosted()))
+            {
+                $this->setValue($sValue);
+            }
 
-			// if the field does not exists in the database
-			if($bOverwrite || (!isset($oForm->_dbData[$sName]) && !$oForm->isPosted() ))
-			{
-				$this->setValue( $sValue );
-			}
+            // remove the value from the buffer..
+            unset($oForm->_buffer[$sName]);
+        }
+    }
 
-			// remove the value from the buffer..
-			unset( $oForm->_buffer[ $sName ] );
-		}
-	}
-
-	/**
+    /**
      * Field::isValid()
      *
      * Check if the value of the field is valid. If not,
@@ -143,147 +143,145 @@ class Field
      * @since 11-04-2008 ADDED POSSIBILITY TO USE MULTIPLE VALIDATORS 
      * @author Remco van Arkelen & Johan Wiegel
      */
-	public function isValid()
-	{
-		// done this function before... return the prefious value
-		if( isset( $this->_isValid ) )
-		{
-			return $this->_isValid;
-		}
+    public function isValid()
+    {
+        // done this function before... return the prefious value
+        if (isset($this->_isValid))
+        {
+            return $this->_isValid;
+        }
 
-		// field in view mode?
-		if( $this -> getViewMode() )
-		{
-			$this->_isValid = true;
-			return $this->_isValid;
-		}
+        // field in view mode?
+        if ($this->getViewMode())
+        {
+            $this->_isValid = true;
+            return $this->_isValid;
+        }
 
-		// is a validator set?
-		if(isset($this->_sValidator) && $this->_sValidator != null)
-		{
-			// if it's an array, it's a method
-			if (!is_array($this->_sValidator))
-			{
-				// Is there an | , there are more validators
-				if( strpos( $this->_sValidator, '|' ) > 0 )
-				{
-					$aValidator = explode( '|', $this->_sValidator );
-					foreach( $aValidator AS $val )
-					{
-						// is the validator a user-specified function?
-						if( function_exists($this->_sValidator) )
-						{
-							$value = $this->getValue();
-							$v = is_string($value) ? trim( $value) : $value;
-							$error = call_user_func( $this->_sValidator, $v, $this->_oForm );
-						}
-						else
-						{
-							$v = new Validator();
-							// is this a defined function? translate it to the correct function
-							if( defined( $val ) )
-							{
-								$aVal = get_defined_constants();
-								$val = $aVal[ $val ];
-							}
+        // is a validator set?
+        if (isset($this->_sValidator) && $this->_sValidator != null)
+        {
+            // if it's an array, it's a method
+            if (!is_array($this->_sValidator))
+            {
+                // Is there an | , there are more validators
+                if (strpos($this->_sValidator, '|') > 0)
+                {
+                    $aValidator = explode('|', $this->_sValidator);
+                    foreach ($aValidator as $val)
+                    {
+                        // is the validator a user-specified function?
+                        if (function_exists($this->_sValidator))
+                        {
+                            $value = $this->getValue();
+                            $v = is_string($value) ? trim($value) : $value;
+                            $error = call_user_func($this->_sValidator, $v, $this->_oForm);
+                        }
+                        else
+                        {
+                            $v = new Validator();
+                            // is this a defined function? translate it to the correct function
+                            if (defined($val))
+                            {
+                                $aVal = get_defined_constants();
+                                $val = $aVal[$val];
+                            }
 
-							if( is_object( $v ) && method_exists($v, $val ) )
-							{
-								// call the build in  validator function
-								$value = $this->getValue();
-								if( is_string( $value) )
-								$value = trim( $value );
-								$error = $v->{$val}( $value );
-							}
-							else
-							{
-								trigger_error('Unknown validator: "'.$val.'" used in field "'.$this->_sName.'"');
-								$error = false;
-							}
-							unset( $v );
-						}
-						// Stop processing validators if 1 fails.
-						if( true !== $error )
-						{
-							break;
-						}
-					}
-				}
-				else
-				{
-					// is the validator a user-spicified function?
-					if( function_exists($this->_sValidator) )
-					{
-							$value = $this->getValue();
-							$v = is_string($value) ? trim( $value) : $value;
-							$error = call_user_func( $this->_sValidator, $v, $this->_oForm );
-					}
-					else
-					{
-						$v = new Validator();
-						if( is_object( $v ) && method_exists($v, $this->_sValidator) )
-						{
-							// call the build in  validator function
-							$value = $this->getValue();
-							if( is_string( $value) )
-							$value = trim( $value );
-							$error = $v->{$this->_sValidator}( $value );
-						}
-						else
-						{
-							trigger_error('Unknown validator: "'.$this->_sValidator.'" used in field "'.$this->_sName.'"');
-							$error = false;
-						}
-						unset( $v );
-					}
-				}
-			}
-			// method given
-			else
-			{
-				if( method_exists( $this->_sValidator[0], $this->_sValidator[1] ) )
-				{
-					$value = $this->getValue();
-					$value = (is_array ($value)) ? $value : trim ($value);
-					$error = call_user_func(array(&$this->_sValidator[0], $this->_sValidator[1]), $value );
-				}
-				else
-				{
-					trigger_error(
-					"Error, the validator method '".$this->_sValidator[1]."' does not exists ".
-					"in object '".get_class($this->_sValidator[0])."'!",
-					E_USER_ERROR
-					);
-				}
-			}
+                            if (is_object($v) && method_exists($v, $val))
+                            {
+                                // call the build in  validator function
+                                $value = $this->getValue();
+                                if (is_string($value))
+                                    $value = trim($value);
+                                $error = $v->{$val}($value);
+                            }
+                            else
+                            {
+                                trigger_error('Unknown validator: "' . $val . '" used in field "' . $this->_sName . '"');
+                                $error = false;
+                            }
+                            unset($v);
+                        }
+                        // Stop processing validators if 1 fails.
+                        if (true !== $error)
+                        {
+                            break;
+                        }
+                    }
+                }
+                else
+                {
+                    // is the validator a user-spicified function?
+                    if (function_exists($this->_sValidator))
+                    {
+                        $value = $this->getValue();
+                        $v = is_string($value) ? trim($value) : $value;
+                        $error = call_user_func($this->_sValidator, $v, $this->_oForm);
+                    }
+                    else
+                    {
+                        $v = new Validator();
+                        if (is_object($v) && method_exists($v, $this->_sValidator))
+                        {
+                            // call the build in  validator function
+                            $value = $this->getValue();
+                            if (is_string($value))
+                                $value = trim($value);
+                            $error = $v->{$this->_sValidator}($value);
+                        }
+                        else
+                        {
+                            trigger_error('Unknown validator: "' . $this->_sValidator . '" used in field "' . $this->_sName . '"');
+                            $error = false;
+                        }
+                        unset($v);
+                    }
+                }
+            }
+            // method given
+            else
+            {
+                if (method_exists($this->_sValidator[0], $this->_sValidator[1]))
+                {
+                    $value = $this->getValue();
+                    $value = (is_array($value)) ? $value : trim($value);
+                    $error = call_user_func(array(&$this->_sValidator[0], $this->_sValidator[1]), $value);
+                }
+                else
+                {
+                    trigger_error(
+                        "Error, the validator method '" . $this->_sValidator[1] . "' does not exists " .
+                            "in object '" . get_class($this->_sValidator[0]) . "'!",
+                        E_USER_ERROR
+                    );
+                }
+            }
 
-			// set the error message
-			$this->_sError =
-			is_string($error) ? $error :
-			(!$error ? $this->_oForm->_text( 14 ) :
-			(isset($this->_sError) ? $this->_sError : ''));
-		}
+            // set the error message
+            $this->_sError =
+                is_string($error) ? $error : (!$error ? $this->_oForm->_text(14) : (isset($this->_sError) ? $this->_sError : ''));
+        }
 
-		$this->_isValid = empty( $this->_sError );
-		return $this->_isValid;
-	}
-	/**
-	 * Field::getValidator()
-	 * 
-	 * Returns the validator fromm this field
-	 * Added in order to use ajax validation
-	 * 
-	 * @return string
-	 * @access public
-	 * @author Johan Wiegel
-	 * @since 04-12-2008
-	 */
-	public function getValidator( )
-	{
-		return $this->_sValidator;
-	}
+        $this->_isValid = empty($this->_sError);
+        return $this->_isValid;
+    }
+    /**
+     * Field::getValidator()
+     * 
+     * Returns the validator fromm this field
+     * Added in order to use ajax validation
+     * 
+     * @return string
+     * @access public
+     * @author Johan Wiegel
+     * @since 04-12-2008
+     */
+    public function getValidator()
+    {
+        return $this->_sValidator;
+    }
 
-	/**
+    /**
      * Field::setValidator()
      *
      * Set the validator which is used to validate the value of the field
@@ -296,23 +294,22 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function setValidator( $sValidator )
-	{
-		$this->_sValidator = $sValidator;
+    public function setValidator($sValidator)
+    {
+        $this->_sValidator = $sValidator;
 
-		/*
-		if( $this->_oForm->_ajaxValidator === true )
-		{
-		echo 'JAJA';
-		require_once( FH_INCLUDE_DIR . 'includes/class.AjaxValidator.php' );
-		$oAjaxValidator = new AjaxValidator( $this );
-		$oAjaxValidator->AjaxValidator( $this );
-		}
-		*/
+        /*
+        if( $this->_oForm->_ajaxValidator === true )
+        {
+        echo 'JAJA';
+        require_once( FH_INCLUDE_DIR . 'includes/class.AjaxValidator.php' );
+        $oAjaxValidator = new AjaxValidator( $this );
+        $oAjaxValidator->AjaxValidator( $this );
+        }
+        */
+    }
 
-	}
-
-	/**
+    /**
      * Field::setTabIndex()
      *
      * Set the tabindex of the field
@@ -322,12 +319,12 @@ class Field
      * @author Teye Heimans
      * @access public
      */
-	public function setTabIndex( $iIndex )
-	{
-		$this->_iTabIndex = $iIndex;
-	}
+    public function setTabIndex($iIndex)
+    {
+        $this->_iTabIndex = $iIndex;
+    }
 
-	/**
+    /**
      * Field::setExtraAfter()
      *
      * Set some extra HTML, JS or something like that (to use after the html tag)
@@ -337,12 +334,12 @@ class Field
      * @author Teye Heimans
      * @access public
      */
-	public function setExtraAfter( $sExtraAfter )
-	{
-		$this->_sExtraAfter = $sExtraAfter;
-	}
+    public function setExtraAfter($sExtraAfter)
+    {
+        $this->_sExtraAfter = $sExtraAfter;
+    }
 
-	/**
+    /**
      * Field::setError()
      *
      * Set a custom error
@@ -352,12 +349,12 @@ class Field
      * @access public
      * @author Filippo Toso - filippotoso@libero.it
      */
-	public function setError( $sError )
-	{
-		$this->_sError = $sError;
-	}
+    public function setError($sError)
+    {
+        $this->_sError = $sError;
+    }
 
-	/**
+    /**
      * Field::getValue()
      *
      * Return the value of the field
@@ -366,12 +363,12 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function getValue()
-	{
-		return isset( $this->_mValue ) ? $this->_mValue : '';
-	}
+    public function getValue()
+    {
+        return isset($this->_mValue) ? $this->_mValue : '';
+    }
 
-	/**
+    /**
      * Field::getError()
      *
      * Return the error of the field (if the field-value is not valid)
@@ -380,12 +377,12 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function getError()
-	{
-		return isset( $this->_sError ) && strlen($this->_sError) > 0 ? sprintf( FH_ERROR_MASK, $this->_sName ,$this->_sError): '';
-	}
+    public function getError()
+    {
+        return isset($this->_sError) && strlen($this->_sError) > 0 ? sprintf(FH_ERROR_MASK, $this->_sName, $this->_sError) : '';
+    }
 
-	/**
+    /**
      * Field::setValue()
      *
      * Set the value of the field
@@ -395,24 +392,24 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function setValue( $mValue )
-	{
-		$this->_mValue = $mValue;
-	}
+    public function setValue($mValue)
+    {
+        $this->_mValue = $mValue;
+    }
 
-	/**
-	 * Field::getExtra()
-	 * 
-	 * Get extra of the Field
-	 *
-	 * @return string|null
-	 */
-	public function getExtra() : ?string
-	{
-		return $this->_sExtra;
-	}
+    /**
+     * Field::getExtra()
+     * 
+     * Get extra of the Field
+     *
+     * @return string|null
+     */
+    public function getExtra(): ?string
+    {
+        return $this->_sExtra;
+    }
 
-	/**
+    /**
      * Field::setExtra()
      *
      * Set some extra CSS, JS or something like that (to use in the html tag)
@@ -422,12 +419,12 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function setExtra( $sExtra )
-	{
-		$this->_sExtra = $sExtra;
-	}
+    public function setExtra($sExtra)
+    {
+        $this->_sExtra = $sExtra;
+    }
 
-	/**
+    /**
      * Field::getField()
      *
      * Return the HTML of the field.
@@ -437,13 +434,13 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function getField()
-	{
-		trigger_error('Error, getField has not been overwritten!', E_USER_WARNING);
-		return '';
-	}
+    public function getField()
+    {
+        trigger_error('Error, getField has not been overwritten!', E_USER_WARNING);
+        return '';
+    }
 
-	/**
+    /**
      * Field::getViewMode()
      *
      * Return if this field is set to view mode
@@ -452,13 +449,13 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function getViewMode()
-	{
-		return (isset( $this -> _viewMode) && $this -> _viewMode) ||
-		$this -> _oForm -> isViewMode();
-	}
+    public function getViewMode()
+    {
+        return (isset($this->_viewMode) && $this->_viewMode) ||
+            $this->_oForm->isViewMode();
+    }
 
-	/**
+    /**
      * Field::setViewMode()
      *
      * Enable or disable viewMode for this field
@@ -468,12 +465,12 @@ class Field
      * @access public
      * @author Teye Heimans
      */
-	public function setViewMode( $mode = true )
-	{
-		$this -> _viewMode = (bool) $mode;
-	}
+    public function setViewMode($mode = true)
+    {
+        $this->_viewMode = (bool) $mode;
+    }
 
-	/**
+    /**
      * Field::setInvalid()
      *
      * Invalids this field
@@ -481,87 +478,86 @@ class Field
      * @return void
      * @access public
      */
-	public function setInvalid()
-	{
-		$this ->_isValid = false;
-	}
+    public function setInvalid()
+    {
+        $this->_isValid = false;
+    }
 
-	/**
-	 * Field::_getViewValue()
-	 *
-	 * Return the value of the field
-	 *
-	 * @return mixed: the value of the field
-	 * @access protected
-	 * @author Teye Heimans
-	 */
-	protected function _getViewValue()
-	{
-		// edit form and posted ? then first get the database value!
-		if( isset( $this -> _oForm -> edit ) && $this -> _oForm -> edit && $this -> _oForm -> isPosted() )
-		{
-			if (isset($this -> _oForm -> _dbData))
-			{
-				$this -> setValue( $this -> _oForm -> _dbData[ $this -> _sName ] );
-			}
-		}
+    /**
+     * Field::_getViewValue()
+     *
+     * Return the value of the field
+     *
+     * @return mixed: the value of the field
+     * @access protected
+     * @author Teye Heimans
+     */
+    protected function _getViewValue()
+    {
+        // edit form and posted ? then first get the database value!
+        if (isset($this->_oForm->edit) && $this->_oForm->edit && $this->_oForm->isPosted())
+        {
+            if (isset($this->_oForm->_dbData))
+            {
+                $this->setValue($this->_oForm->_dbData[$this->_sName]);
+            }
+        }
 
-		// get the value for the field
-		$val = $this->getValue();
+        // get the value for the field
+        $val = $this->getValue();
 
-		// implode arrays
-		$save = is_array( $val) ? implode( ',', $val) : $val;
+        // implode arrays
+        $save = is_array($val) ? implode(',', $val) : $val;
 
-		// are there mulitple options ?
-		if( isset( $this->_aOptions ) )
-		{
-			// is the key returned while we should show the "label" to the user ?
-			if( isset($this->_bUseArrayKeyAsValue) && $this->_bUseArrayKeyAsValue )
-			{
-				// is the value an array?
-				if( is_array( $val) )
-				{
-					// save the labels instead of the index keys as view value
-					foreach ( $val as $key => $value )
-					{
-						$val[$key] = $this->_aOptions[$value];
-					}
-				}
-				// is there a "label" for this value ?
-				else if( array_key_exists( $val, $this->_aOptions ) )
-				{
-					// get the "label" instead of the index
-					$val = $this->_aOptions[$val];
-				}
-			}
-		}
+        // are there mulitple options ?
+        if (isset($this->_aOptions))
+        {
+            // is the key returned while we should show the "label" to the user ?
+            if (isset($this->_bUseArrayKeyAsValue) && $this->_bUseArrayKeyAsValue)
+            {
+                // is the value an array?
+                if (is_array($val))
+                {
+                    // save the labels instead of the index keys as view value
+                    foreach ($val as $key => $value)
+                    {
+                        $val[$key] = $this->_aOptions[$value];
+                    }
+                }
+                // is there a "label" for this value ?
+                else if (array_key_exists($val, $this->_aOptions))
+                {
+                    // get the "label" instead of the index
+                    $val = $this->_aOptions[$val];
+                }
+            }
+        }
 
-		// when the value is an array
-		if( is_array($val) )
-		{
-			// is there only one item?
-			if( sizeof($val) == 1 )
-			{
-				$result = $val[0];
-			}
-			else
-			{
-				// make a list of the selected items
-				$result = "\t<ul>\n";
-				foreach($val as $item )
-				{
-					$result .= "\t  <li>".$item."</li>\n";
-				}
-				$result .= "\t</ul>\n";
-			}
-		}
-		else
-		{
-			$result = $val;
-		}
+        // when the value is an array
+        if (is_array($val))
+        {
+            // is there only one item?
+            if (sizeof($val) == 1)
+            {
+                $result = $val[0];
+            }
+            else
+            {
+                // make a list of the selected items
+                $result = "\t<ul>\n";
+                foreach ($val as $item)
+                {
+                    $result .= "\t  <li>" . $item . "</li>\n";
+                }
+                $result .= "\t</ul>\n";
+            }
+        }
+        else
+        {
+            $result = $val;
+        }
 
-		// return the value
-		return $result;
-	}
+        // return the value
+        return $result;
+    }
 }
-?>

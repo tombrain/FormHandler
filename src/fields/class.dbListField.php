@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class dbListField
  *
@@ -27,56 +28,54 @@ class dbListField extends ListField
      * @access public
      * @author Teye Heimans
      */
-    public function __construct( &$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null )
+    public function __construct(&$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null)
     {
-		// make sure that the fields are set in an array
-		$aFields = !is_array($mFields) ? array( $mFields ) : $mFields;
+        // make sure that the fields are set in an array
+        $aFields = !is_array($mFields) ? array($mFields) : $mFields;
 
-		// generate the query to retrieve the records
-		$sQuery =
-		  'SELECT '. implode(', ', $aFields).
-		  ' FROM '. $oDb->quote( $sTable).' '.$sExtraSQL;
+        // generate the query to retrieve the records
+        $sQuery =
+            'SELECT ' . implode(', ', $aFields) .
+            ' FROM ' . $oDb->quote($sTable) . ' ' . $sExtraSQL;
 
-		// get the records and load the options
-		$aOptions = array();
+        // get the records and load the options
+        $aOptions = array();
 
-		// execute the query
-		$sql = $oDb->query( $sQuery );
+        // execute the query
+        $sql = $oDb->query($sQuery);
 
-		// query succeeded?
-		if( $sql )
-		{
-		    // fetch the results
-    		while( $row = $oDb->getRecord( $sql ) )
-    		{
+        // query succeeded?
+        if ($sql)
+        {
+            // fetch the results
+            while ($row = $oDb->getRecord($sql))
+            {
 
-    			if( sizeof( $row ) == 1 )
-    			{
-    				$aOptions[] = array_shift( $row );
-    			}
-    			else
-    			{
-    		        $aOptions[array_shift( $row )] = array_shift( $row );
-    		    }
-    		}
-		}
-		// query failed
-		else
-		{
-		    trigger_error(
-		      "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n".
-		      "Error message: ". $oDb->getError()."<br '. FH_XHTML_CLOSE .'>\n".
-		      "Query: ". $sQuery,
-		      E_USER_WARNING
-		    );
-		}
+                if (sizeof($row) == 1)
+                {
+                    $aOptions[] = array_shift($row);
+                }
+                else
+                {
+                    $aOptions[array_shift($row)] = array_shift($row);
+                }
+            }
+        }
+        // query failed
+        else
+        {
+            trigger_error(
+                "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Error message: " . $oDb->getError() . "<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Query: " . $sQuery,
+                E_USER_WARNING
+            );
+        }
 
-		// call the constructor of the listfield with the new options
-		parent::__construct( $oForm, $sName, $aOptions );
+        // call the constructor of the listfield with the new options
+        parent::__construct($oForm, $sName, $aOptions);
 
-		// if two fields are given, use the first field as value
-		$this->useArrayKeyAsValue( sizeof( $aFields) == 2 );
+        // if two fields are given, use the first field as value
+        $this->useArrayKeyAsValue(sizeof($aFields) == 2);
     }
 }
-
-?>

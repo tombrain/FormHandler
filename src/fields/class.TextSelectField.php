@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class TextSelectField
  *
@@ -11,10 +12,10 @@
  */
 class TextSelectField extends TextField
 {
-	protected $_iSize;         // int: the size of the field
-	private $_sOptions;
-	
-	/**
+    protected $_iSize;         // int: the size of the field
+    private $_sOptions;
+
+    /**
      * TextSelectField::TextSelectField()
      *
      * Constructor: Create a new textfield object
@@ -26,61 +27,59 @@ class TextSelectField extends TextField
      * @access public
      */
 
-	public function __construct( &$oForm, $sName, $aOptions )
-	{
-		parent::__construct($oForm, $sName);
-		
-		static $bSetJS = false;
+    public function __construct(&$oForm, $sName, $aOptions)
+    {
+        parent::__construct($oForm, $sName);
 
-    	// needed javascript included yet ?
-        if(!$bSetJS)
+        static $bSetJS = false;
+
+        // needed javascript included yet ?
+        if (!$bSetJS)
         {
             $bSetJS = true;
 
             // add the needed javascript
             $oForm->_setJS(
-             "function FH_CLOSE_TEXTSELECT( id )"."\n".
-             "{"."\n".
-             "  setTimeout( 'document.getElementById(\"'+id+'\").style.display=\"none\"', 110 );"."\n".
-             "}"."\n\n".
-             "function FH_SET_TEXTSELECT( id, waarde )"."\n".
-             "{"."\n".
-             "  document.getElementById(id).value=waarde;"."\n".
-             "  FH_CLOSE_TEXTSELECT( 'FHSpan_'+id );return false;"."\n".
-             "}"."\n\n"             
+                "function FH_CLOSE_TEXTSELECT( id )" . "\n" .
+                    "{" . "\n" .
+                    "  setTimeout( 'document.getElementById(\"'+id+'\").style.display=\"none\"', 110 );" . "\n" .
+                    "}" . "\n\n" .
+                    "function FH_SET_TEXTSELECT( id, waarde )" . "\n" .
+                    "{" . "\n" .
+                    "  document.getElementById(id).value=waarde;" . "\n" .
+                    "  FH_CLOSE_TEXTSELECT( 'FHSpan_'+id );return false;" . "\n" .
+                    "}" . "\n\n"
             );
         }
-   
-		foreach( $aOptions as $key => $value )
-		{	
-			$this->_sOptions .= sprintf( FH_TEXTSELECT_OPTION_MASK, $sName, $value );
-		}
-		
-		$this->setSize( 20 );
-		$this->setMaxlength( 0 );
-	}
 
-	public function getField()
-	{
-		// view mode enabled ?
-		if( $this -> getViewMode() )
-		{
-			// get the view value..
-			return $this -> _getViewValue();
-		}
-		
-		return sprintf(
-		FH_TEXTSELECT_MASK,
-		$this->_sName,
-		(isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING):''),
-		$this->_iSize,
-		(!empty($this->_iMaxlength) ? 'maxlength="'.$this->_iMaxlength.'" ':'').
-		(isset($this->_iTabIndex) ? 'tabindex="'.$this->_iTabIndex.'" ' : '').
-		(isset($this->_sExtra) ? ' '.$this->_sExtra.' ' :''),
-		(isset($this->_sExtraAfter) ? $this->_sExtraAfter :''),
-		$this->_sOptions
-		);
-	}
+        foreach ($aOptions as $key => $value)
+        {
+            $this->_sOptions .= sprintf(FH_TEXTSELECT_OPTION_MASK, $sName, $value);
+        }
+
+        $this->setSize(20);
+        $this->setMaxlength(0);
+    }
+
+    public function getField()
+    {
+        // view mode enabled ?
+        if ($this->getViewMode())
+        {
+            // get the view value..
+            return $this->_getViewValue();
+        }
+
+        return sprintf(
+            FH_TEXTSELECT_MASK,
+            $this->_sName,
+            (isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING) : ''),
+            $this->_iSize,
+            (!empty($this->_iMaxlength) ? 'maxlength="' . $this->_iMaxlength . '" ' : '') .
+                (isset($this->_iTabIndex) ? 'tabindex="' . $this->_iTabIndex . '" ' : '') .
+                (isset($this->_sExtra) ? ' ' . $this->_sExtra . ' ' : ''),
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : ''),
+            $this->_sOptions
+        );
+    }
 }
-
-?>

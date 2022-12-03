@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class dbCheckBox
  *
@@ -12,7 +13,7 @@
 
 class dbCheckBox extends CheckBox
 {
-     /**
+    /**
      * dbCheckBox::dbCheckBox()
      *
      * Public constructor: create a new db CheckBox object
@@ -27,58 +28,56 @@ class dbCheckBox extends CheckBox
      * @access public
      * @author Johan Wiegel
      */
-	public function __construct( &$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null )
-	{
-	    // call the constructor of the selectfield
-		parent::__construct( $oForm, $sName, array() );
+    public function __construct(&$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null)
+    {
+        // call the constructor of the selectfield
+        parent::__construct($oForm, $sName, array());
 
-		if (is_string($this->_aOptions))
-        	{
-            		$this->_aOptions = array();
-        	}
-		
-		// make sure that the fields are set in an array
-		$aFields = !is_array($mFields) ? array( $mFields ) : $mFields;
-		$this -> useArrayKeyAsValue( sizeof( $aFields) == 2 );
+        if (is_string($this->_aOptions))
+        {
+            $this->_aOptions = array();
+        }
 
-		// generate the query to retrieve the records
-		$sQuery =
-		  'SELECT '. implode(', ', $aFields).
-		  ' FROM '. $oDb->quote( $sTable).' '.$sExtraSQL;
+        // make sure that the fields are set in an array
+        $aFields = !is_array($mFields) ? array($mFields) : $mFields;
+        $this->useArrayKeyAsValue(sizeof($aFields) == 2);
 
-		// get the records and load the options
-		//$this->_aOptions = is_array($aMergeArray) ? $aMergeArray : array();
+        // generate the query to retrieve the records
+        $sQuery =
+            'SELECT ' . implode(', ', $aFields) .
+            ' FROM ' . $oDb->quote($sTable) . ' ' . $sExtraSQL;
 
-		
-		// execute the query
-		$sql = $oDb->query( $sQuery );
+        // get the records and load the options
+        //$this->_aOptions = is_array($aMergeArray) ? $aMergeArray : array();
 
-		// query succeeded
-		if( $sql )
-		{
-    		while( $row = $oDb->getRecord( $sql ) )
-    		{
-    			if( sizeof( $row ) == 1 )
-    			{
-    				$this->_aOptions[] = array_shift( $row );
-    			}
-    			else
-    			{
-    		       	$this->_aOptions[array_shift( $row )] = array_shift( $row );
-    		    }
-    		}
-		}
-		// query failed
-		else
-		{
-		    trigger_error(
-		      "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n".
-		      "Error message: ". $oDb->getError()."<br '. FH_XHTML_CLOSE .'>\n".
-		      "Query: ". $sQuery,
-		      E_USER_WARNING
-		    );
-		}
- 	}
+
+        // execute the query
+        $sql = $oDb->query($sQuery);
+
+        // query succeeded
+        if ($sql)
+        {
+            while ($row = $oDb->getRecord($sql))
+            {
+                if (sizeof($row) == 1)
+                {
+                    $this->_aOptions[] = array_shift($row);
+                }
+                else
+                {
+                    $this->_aOptions[array_shift($row)] = array_shift($row);
+                }
+            }
+        }
+        // query failed
+        else
+        {
+            trigger_error(
+                "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Error message: " . $oDb->getError() . "<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Query: " . $sQuery,
+                E_USER_WARNING
+            );
+        }
+    }
 }
-
-?>

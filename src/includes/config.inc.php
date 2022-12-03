@@ -1,4 +1,5 @@
 <?php
+
 /**
  * config.inc.php
  *
@@ -21,9 +22,9 @@
  */
 
 // Get the location where formhandler is located
-if( !empty($_SERVER['DOCUMENT_ROOT']) )
+if (!empty($_SERVER['DOCUMENT_ROOT']))
 {
-    $__fh_root = str_replace( $_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', realpath( dirname(__FILE__).'/../' ))).'/';
+    $__fh_root = str_replace($_SERVER['DOCUMENT_ROOT'], '', str_replace('\\', '/', realpath(dirname(__FILE__) . '/../'))) . '/';
 }
 // could not fetch the location of the FH3 directory!
 else
@@ -32,11 +33,11 @@ else
     // like: /engineering/FH3/
     $__fh_root = 'D:/PHP-Entwicklung/Formhandler';
 
-    if( empty( $__fh_root ) )
+    if (empty($__fh_root))
     {
         trigger_error(
-          "Please set the location to the FH3 directory in the config file!!",
-          E_USER_WARNING
+            "Please set the location to the FH3 directory in the config file!!",
+            E_USER_WARNING
         );
     }
 }
@@ -47,105 +48,113 @@ fh_conf('FH_DEFAULT_FORM_NAME', 'FormHandler');
 
 // The default mask used to parse the fields
 // The mask can be changed with the function setMask()
-fh_conf('FH_DEFAULT_ROW_MASK',"  <tr>\n".
-  "    <td valign='top' align='right'>%title%</td>\n".
-  "    <td valign='top'>%seperator%</td>\n".
-  "    <td valign='top'>%field% %help% <span id='%error_id%' class='error'>%error%</span></td>\n".
-  "  </tr>\n"
+fh_conf(
+    'FH_DEFAULT_ROW_MASK',
+    "  <tr>\n" .
+        "    <td valign='top' align='right'>%title%</td>\n" .
+        "    <td valign='top'>%seperator%</td>\n" .
+        "    <td valign='top'>%field% %help% <span id='%error_id%' class='error'>%error%</span></td>\n" .
+        "  </tr>\n"
 );
 
 // When addLine() is used, this line is used to set the data in
 // (%s is going to be replaced with the value!)
-fh_conf('FH_LINE_MASK',
-  "  <tr><td>&nbsp;</td><td>&nbsp;</td><td>%s</td></tr>\n"
+fh_conf(
+    'FH_LINE_MASK',
+    "  <tr><td>&nbsp;</td><td>&nbsp;</td><td>%s</td></tr>\n"
 );
 
 // Default for use table, can be overwritten by useTable
 //since 08-10-2009 JW
-fh_conf( 'FH_USE_TABLE', true );
+fh_conf('FH_USE_TABLE', true);
 
 // Default for Set focus, can be overwritten by setFocus
 //since 14-01-2010 JW
-fh_conf( 'FH_SET_FOCUS', true );
+fh_conf('FH_SET_FOCUS', true);
 
 // When borderStart() and borderEnd() are used, this fieldset is inserted
-fh_conf('FH_FIELDSET_MASK',
-  "  <tr>\n".
-  "    <td valign='top' colspan='3'>\n".
-  "      <br />\n".
-  "      <fieldset id='%name%' %extra%>\n".
-  "      <legend>%caption%</legend>\n".
-  "      <!-- content of fieldset %name%  -->\n".
-  "      <table cellspacing='0' cellpadding='3' id='%name%'>\n".
-  "        %content%\n".
-  "      </table>\n".
-  "      <!-- end of fieldset %name% -->\n".
-  "      </fieldset>\n".
-  "    </td>\n".
-  "  </tr>\n"
+fh_conf(
+    'FH_FIELDSET_MASK',
+    "  <tr>\n" .
+        "    <td valign='top' colspan='3'>\n" .
+        "      <br />\n" .
+        "      <fieldset id='%name%' %extra%>\n" .
+        "      <legend>%caption%</legend>\n" .
+        "      <!-- content of fieldset %name%  -->\n" .
+        "      <table cellspacing='0' cellpadding='3' id='%name%'>\n" .
+        "        %content%\n" .
+        "      </table>\n" .
+        "      <!-- end of fieldset %name% -->\n" .
+        "      </fieldset>\n" .
+        "    </td>\n" .
+        "  </tr>\n"
 );
 
 // The error mask used to surround the error messages
-fh_conf('FH_ERROR_MASK',
-  '<span id="error_%s" class="error">%s</span>'
+fh_conf(
+    'FH_ERROR_MASK',
+    '<span id="error_%s" class="error">%s</span>'
 );
 
 // The mask used for the horizontal listfield
-fh_conf('FH_LISTFIELD_HORIZONTAL_MASK',
-  "  <table border='0' cellspacing='0' cellpadding='0'>\n".
-  "    <tr>\n".
-  "      <td align='center'><strong>%onlabel%</strong></td>\n".
-  "      <td align='center'></td>\n".
-  "      <td align='center'><strong>%offlabel%</strong></td>\n".
-  "    </tr>\n".
-  "    <tr>\n".
-  "      <td rowspan='2' align='right'>\n".
-  "        %onfield%\n".
-  "      </td>\n".
-  "      <td width='30' align='center' valign='bottom'>\n".
-  "        <input type='button' value=' &gt; ' onclick=\"changeValue('%name%', false)\" ondblclick=\"moveAll('%name%', false)\" title='%ontitle%' />\n".
-  "      </td>\n".
-  "      <td rowspan='2'>\n".
-  "        %offfield%\n".
-  "      </td>\n".
-  "    </tr>\n".
-  "    <tr>\n".
-  "      <td align='center' valign='top'>\n".
-  "        <input type='button' value=' &lt; ' onclick=\"changeValue('%name%', true)\" ondblclick=\"moveAll('%name%', true)\" title='%offtitle%' />\n".
-  "      </td>\n".
-  "    </tr>\n".
-  "  </table>"
+fh_conf(
+    'FH_LISTFIELD_HORIZONTAL_MASK',
+    "  <table border='0' cellspacing='0' cellpadding='0'>\n" .
+        "    <tr>\n" .
+        "      <td align='center'><strong>%onlabel%</strong></td>\n" .
+        "      <td align='center'></td>\n" .
+        "      <td align='center'><strong>%offlabel%</strong></td>\n" .
+        "    </tr>\n" .
+        "    <tr>\n" .
+        "      <td rowspan='2' align='right'>\n" .
+        "        %onfield%\n" .
+        "      </td>\n" .
+        "      <td width='30' align='center' valign='bottom'>\n" .
+        "        <input type='button' value=' &gt; ' onclick=\"changeValue('%name%', false)\" ondblclick=\"moveAll('%name%', false)\" title='%ontitle%' />\n" .
+        "      </td>\n" .
+        "      <td rowspan='2'>\n" .
+        "        %offfield%\n" .
+        "      </td>\n" .
+        "    </tr>\n" .
+        "    <tr>\n" .
+        "      <td align='center' valign='top'>\n" .
+        "        <input type='button' value=' &lt; ' onclick=\"changeValue('%name%', true)\" ondblclick=\"moveAll('%name%', true)\" title='%offtitle%' />\n" .
+        "      </td>\n" .
+        "    </tr>\n" .
+        "  </table>"
 );
 
 // The mask used for the vertical listfield
-fh_conf('FH_LISTFIELD_VERTICAL_MASK',
-  "  <table border='0' cellspacing='0' cellpadding='0'>\n".
-  "    <tr>\n".
-  "      <td align='right' valign='middle'><strong>%offlabel%</strong></td>\n".
-  "      <td valign='top' align='left'>\n".
-  "        %offfield%\n".
-  "      </td>\n".
-  "    </tr>\n".
-  "    <tr>\n".
-  "      <td colspan='2' height='30' align='center' valign='middle'>\n".
-  "        <input type='button' value=' &darr; ' onclick=\"changeValue('%name%', true)\" ondblclick=\"moveAll('%name%', true)\" title='%offtitle%' />&nbsp;\n".
-  "        &nbsp;<input type='button' value=' &uarr; ' onclick=\"changeValue('%name%', false)\" ondblclick=\"moveAll('%name%', false)\" title='%ontitle%' />\n".
-  "      </td>\n".
-  "    </tr>\n".
-  "    <tr>\n".
-  "      <td align='right' valign='middle'><strong>%onlabel%</strong></td>\n".
-  "      <td valign='top' align='left'>\n".
-  "        %onfield%\n".
-  "      </td>\n".
-  "    </tr>\n".
-  "  </table>"
-); 
+fh_conf(
+    'FH_LISTFIELD_VERTICAL_MASK',
+    "  <table border='0' cellspacing='0' cellpadding='0'>\n" .
+        "    <tr>\n" .
+        "      <td align='right' valign='middle'><strong>%offlabel%</strong></td>\n" .
+        "      <td valign='top' align='left'>\n" .
+        "        %offfield%\n" .
+        "      </td>\n" .
+        "    </tr>\n" .
+        "    <tr>\n" .
+        "      <td colspan='2' height='30' align='center' valign='middle'>\n" .
+        "        <input type='button' value=' &darr; ' onclick=\"changeValue('%name%', true)\" ondblclick=\"moveAll('%name%', true)\" title='%offtitle%' />&nbsp;\n" .
+        "        &nbsp;<input type='button' value=' &uarr; ' onclick=\"changeValue('%name%', false)\" ondblclick=\"moveAll('%name%', false)\" title='%ontitle%' />\n" .
+        "      </td>\n" .
+        "    </tr>\n" .
+        "    <tr>\n" .
+        "      <td align='right' valign='middle'><strong>%onlabel%</strong></td>\n" .
+        "      <td valign='top' align='left'>\n" .
+        "        %onfield%\n" .
+        "      </td>\n" .
+        "    </tr>\n" .
+        "  </table>"
+);
 
 // Should Overlib javascript be included for help messages?
-fh_conf('FH_USE_OVERLIB', true); 
+fh_conf('FH_USE_OVERLIB', true);
 
 // The help mask used to surround the help messages
-fh_conf('FH_HELP_MASK',
+fh_conf(
+    'FH_HELP_MASK',
     '<img src="%helpicon%" border="0" onmouseover="return overlib(\'%helptext%\', DELAY, \'400\', FGCOLOR, \'#CCCCCC\', BGCOLOR, \'#666666\', TEXTCOLOR, \'#666666\', TEXTFONT, \'Verdana\', TEXTSIZE, \'12px\', CELLPAD, 8, BORDER, 1, CAPTION, \'&nbsp;%helptitle%\', CAPTIONSIZE, \'12px\');" onmouseout="return nd();" style="color:333333;cursor:help;" />'
 );
 
@@ -162,9 +171,9 @@ fh_conf('FH_DEFAULT_TABLE_CELLSPACING', 0);
 fh_conf('FH_DEFAULT_TABLE_CELLPADDING', 3);
 
 // The default number of caracters used in the captcha
-fh_conf( 'FH_CAPTCHA_LENGTH',6 );
+fh_conf('FH_CAPTCHA_LENGTH', 6);
 // The width of a captcha image
-fh_conf( 'FH_CAPTCHA_WIDTH',200 );
+fh_conf('FH_CAPTCHA_WIDTH', 200);
 
 
 // Does formhandler has to detect the language atomatically?
@@ -183,7 +192,7 @@ fh_conf('FH_AUTO_INSERT', false);
 // Or:      fh_conf('FH_FHTML_DIR', '/dir/to/FHTML/');
 
 // here we try to get the dir automatically
-fh_conf('FH_FHTML_DIR', $__fh_root . 'FHTML/' );
+fh_conf('FH_FHTML_DIR', $__fh_root . 'FHTML/');
 
 // This config var has to point to the FCKeditor directory.
 // Default this dir is located in the FH3 directory. If you put it
@@ -192,13 +201,15 @@ fh_conf('FH_FHTML_DIR', $__fh_root . 'FHTML/' );
 fh_conf('FH_FHTML_INCLUDE_DIR', FH_INCLUDE_DIR . 'FHTML/');
 
 // mask for a TextSelectField
-fh_conf( 'FH_TEXTSELECT_MASK',
-  '<input type="text" name="%s" id="%1$s" value="%s" size="%d" %s onblur="FH_CLOSE_TEXTSELECT(\'FHSpan_%1$s\');" onkeyup="FH_CLOSE_TEXTSELECT(\'FHSpan_%1$s\');" onclick="document.getElementById(\'FHSpan_%1$s\').style.display=\'block\';" style="background: #FFF url('.$__fh_root . 'FHTML/images/arrow_down.gif) no-repeat right;" />%s<br /><div style="position:absolute;height:70px;overflow-y:scroll; width:150px; display:none; background-color:#FFF;" id="FHSpan_%1$s">%s</div>'."\n"
+fh_conf(
+    'FH_TEXTSELECT_MASK',
+    '<input type="text" name="%s" id="%1$s" value="%s" size="%d" %s onblur="FH_CLOSE_TEXTSELECT(\'FHSpan_%1$s\');" onkeyup="FH_CLOSE_TEXTSELECT(\'FHSpan_%1$s\');" onclick="document.getElementById(\'FHSpan_%1$s\').style.display=\'block\';" style="background: #FFF url(' . $__fh_root . 'FHTML/images/arrow_down.gif) no-repeat right;" />%s<br /><div style="position:absolute;height:70px;overflow-y:scroll; width:150px; display:none; background-color:#FFF;" id="FHSpan_%1$s">%s</div>' . "\n"
 );
 
 // mask for the TextSelectField options
-fh_conf( 'FH_TEXTSELECT_OPTION_MASK',
-  '<a style="display:block;padding-left:5px;margin:0px;width:auto;color:black;text-decoration:none;" href="#" onmouseover="this.style.background=\'#C0C0C0\';" onmouseout="this.style.background=\'#FFFFFF\';" onblur="FH_CLOSE_TEXTSELECT(\'FHSpan_%s\')" onfocus="FH_SET_TEXTSELECT( \'%1$s\', this.innerHTML );" onclick="FH_SET_TEXTSELECT( \'%1$s\',this.innerHTML );" >%s</a>'."\n"
+fh_conf(
+    'FH_TEXTSELECT_OPTION_MASK',
+    '<a style="display:block;padding-left:5px;margin:0px;width:auto;color:black;text-decoration:none;" href="#" onmouseover="this.style.background=\'#C0C0C0\';" onmouseout="this.style.background=\'#FFFFFF\';" onblur="FH_CLOSE_TEXTSELECT(\'FHSpan_%s\')" onfocus="FH_SET_TEXTSELECT( \'%1$s\', this.innerHTML );" onclick="FH_SET_TEXTSELECT( \'%1$s\',this.innerHTML );" >%s</a>' . "\n"
 );
 
 // This config var has to point to the YADAL directory.
@@ -243,18 +254,19 @@ fh_conf('FH_DEFAULT_USEARRAYKEY', true);
 // - if the field is required (so that visitors must upload a file),
 // - what to do if the uploaded file already exists.
 // - the allowed dimensions of the uploaded image
-fh_conf('FH_DEFAULT_UPLOAD_CONFIG',
-  serialize(array (
-    'path'     => realpath( '.' ).'/uploads', // <-- dir where the requested script is located
-    'type'     => 'jpg jpeg png gif doc txt bmp tif tiff pdf',
-    'mime'     => '', // <-- use the mime types which are known by FH for these extensions
-    'size'     => '', // <-- max upload size
-    'name'     => '', // <-- keep the original name
-    'width'    => '', // <-- all widths are permitted! (only used for images)
-    'height'   => '', // <-- all heights are permitted! (only used for images)
-    'required' => false,
-    'exists'   => 'alert' // possible values: alert, overwrite, rename
-  ))
+fh_conf(
+    'FH_DEFAULT_UPLOAD_CONFIG',
+    serialize(array(
+        'path'     => realpath('.') . '/uploads', // <-- dir where the requested script is located
+        'type'     => 'jpg jpeg png gif doc txt bmp tif tiff pdf',
+        'mime'     => '', // <-- use the mime types which are known by FH for these extensions
+        'size'     => '', // <-- max upload size
+        'name'     => '', // <-- keep the original name
+        'width'    => '', // <-- all widths are permitted! (only used for images)
+        'height'   => '', // <-- all heights are permitted! (only used for images)
+        'required' => false,
+        'exists'   => 'alert' // possible values: alert, overwrite, rename
+    ))
 );
 
 // Do we have to check the upload file with JS?
@@ -368,7 +380,7 @@ function fh_conf()
     static $define = array();
 
     // is a value set?
-    if (func_num_args()==2)
+    if (func_num_args() == 2)
     {
         $define[func_get_arg(0)] = func_get_arg(1);
     }
@@ -378,32 +390,32 @@ function fh_conf()
         // walk all values and define them if they dont exists yet
         foreach ($define as $name => $value)
         {
-            if(!defined($name))
+            if (!defined($name))
             {
                 define($name, $value);
             }
         }
-        unset( $define );
+        unset($define);
     }
 }
 
 // make sure that array_key_exists exists! :D
-if( !function_exists('array_key_exists') )
+if (!function_exists('array_key_exists'))
 {
-	function array_key_exists($sKey, $aArray)
-	{
-		return in_array($sKey, array_keys($aArray));
-	}
+    function array_key_exists($sKey, $aArray)
+    {
+        return in_array($sKey, array_keys($aArray));
+    }
 }
 
 // making sure we dont get notices on this in PHP versions < 5.4
-if( !defined( 'ENT_HTML401' ) )
+if (!defined('ENT_HTML401'))
 {
-	define( 'ENT_HTML401', '' );
+    define('ENT_HTML401', '');
 }
 
 // For PHP version < 4.2.0 missing the array_fill function..
-if(!function_exists('array_fill'))
+if (!function_exists('array_fill'))
 {
     function array_fill($iStart, $iLen, $vValue)
     {
@@ -415,5 +427,3 @@ if(!function_exists('array_fill'))
         return $aResult;
     }
 }
-
-?>

@@ -11,7 +11,7 @@
  */
 class ImageButton extends Button
 {
-	private $_sImage;
+    private $_sImage;
 
     /**
      * ImageButton::ImageButton()
@@ -24,7 +24,7 @@ class ImageButton extends Button
      * @access public
      * @author Teye Heimans
      */
-    public function __construct( &$oForm, $sName, $sImage)
+    public function __construct(&$oForm, $sName, $sImage)
     {
         parent::__construct($oForm, $sName);
 
@@ -45,13 +45,11 @@ class ImageButton extends Button
     {
         // return the button
         return sprintf(
-          '<input type="image" src="%s" name="%s" id="%2$s"%s '. FH_XHTML_CLOSE .'>',
-          $this->_sImage,
-          $this->_sName,
-          (isset($this->_sExtra) ? ' '.$this->_sExtra:'').
-          (isset($this->_iTabIndex) ? ' tabindex="'.$this->_iTabIndex.'"' : '')
+            '<input type="image" src="%s" name="%s" id="%2$s"%s ' . FH_XHTML_CLOSE . '>',
+            $this->_sImage,
+            $this->_sName,
+            (isset($this->_sExtra) ? ' ' . $this->_sExtra : '') .
+                (isset($this->_iTabIndex) ? ' tabindex="' . $this->_iTabIndex . '"' : '')
         );
     }
 }
-
-?>

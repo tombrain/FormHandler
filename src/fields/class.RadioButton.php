@@ -27,15 +27,15 @@ class RadioButton extends Field
      * @return RadioButton
      * @author Teye Heimans
      */
-    public function __construct( &$oForm, $sName, $aOptions )
+    public function __construct(&$oForm, $sName, $aOptions)
     {
         // call the constructor of the Field class
-        parent::__construct( $oForm, $sName );
+        parent::__construct($oForm, $sName);
 
         $this->_aOptions = $aOptions;
 
-        $this->setMask           ( FH_DEFAULT_GLUE_MASK );
-        $this->useArrayKeyAsValue( FH_DEFAULT_USEARRAYKEY );
+        $this->setMask(FH_DEFAULT_GLUE_MASK);
+        $this->useArrayKeyAsValue(FH_DEFAULT_USEARRAYKEY);
     }
 
     /**
@@ -48,7 +48,7 @@ class RadioButton extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function useArrayKeyAsValue( $bMode )
+    public function useArrayKeyAsValue($bMode)
     {
         $this->_bUseArrayKeyAsValue = $bMode;
     }
@@ -63,10 +63,10 @@ class RadioButton extends Field
      * @author Teye Heimans
      * @access public
      */
-    public function setMask( $sMask )
+    public function setMask($sMask)
     {
         // when there is no %field% used, put it in front of the mask/glue
-        if( strpos( $sMask, '%field%' ) === false )
+        if (strpos($sMask, '%field%') === false)
         {
             $sMask = '%field%' . $sMask;
         }
@@ -86,44 +86,44 @@ class RadioButton extends Field
     public function getField()
     {
         // view mode enabled ?
-        if( $this -> getViewMode() )
+        if ($this->getViewMode())
         {
             // get the view value..
-            return $this -> _getViewValue();
+            return $this->_getViewValue();
         }
 
-		if( is_array( $this->_aOptions ) && count( $this->_aOptions )>0 )
+        if (is_array($this->_aOptions) && count($this->_aOptions) > 0)
         {
             $sResult = '';
-            foreach( $this->_aOptions as $iKey => $sValue )
-            {            
-                if(!$this->_bUseArrayKeyAsValue)
+            foreach ($this->_aOptions as $iKey => $sValue)
+            {
+                if (!$this->_bUseArrayKeyAsValue)
                 {
                     $iKey = $sValue;
                 }
-				
-                $sResult .= $this->_getRadioButton( $iKey, $sValue, true );
+
+                $sResult .= $this->_getRadioButton($iKey, $sValue, true);
             }
         }
-        
-        elseif( $this->_aOptions == '' || count( $this->_aOptions )===0 )
+
+        elseif ($this->_aOptions == '' || count($this->_aOptions) === 0)
         {
-        	$sResult = ' '; 
+            $sResult = ' ';
         }
-        
+
         else
         {
-            $sResult = $this->_getRadioButton( $this->_aOptions, '' );
+            $sResult = $this->_getRadioButton($this->_aOptions, '');
         }
 
         // when we still got nothing, the mask is not filled yet.
         // get the mask anyway
-        if( empty( $sResult ) )
+        if (empty($sResult))
         {
-            $sResult = $this -> _oLoader -> fill();
+            $sResult = $this->_oLoader->fill();
         }
 
-        return $sResult . (isset($this->_sExtraAfter) ? $this->_sExtraAfter :'');
+        return $sResult . (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '');
     }
 
     /**
@@ -138,39 +138,38 @@ class RadioButton extends Field
      * @access Private
      * @author Teye Heimans
      */
-    private function _getRadioButton( $sValue, $sTitle, $bUseMask = false )
+    private function _getRadioButton($sValue, $sTitle, $bUseMask = false)
     {
-        
+
         static $counter = 1;
 
-        $sValue = trim( $sValue );
-        $sTitle = trim( $sTitle );
+        $sValue = trim($sValue);
+        $sTitle = trim($sTitle);
 
-        if( !isset( $this -> _oLoader ) ||is_null( $this -> _oLoader ) )
-        {        
-            $this -> _oLoader = new MaskLoader();
-            $this -> _oLoader -> setMask( $this->_sMask );
-            $this -> _oLoader -> setSearch( '/%field%/' );
+        if (!isset($this->_oLoader) || is_null($this->_oLoader))
+        {
+            $this->_oLoader = new MaskLoader();
+            $this->_oLoader->setMask($this->_sMask);
+            $this->_oLoader->setSearch('/%field%/');
         }
 
         $sField = sprintf(
-          '<input type="radio" name="%s" id="%1$s_%d" value="%s" %s'. FH_XHTML_CLOSE .'><label for="%1$s_%2$d" class="noStyle">%s</label>',
-          $this->_sName,
-          $counter++,
-          htmlspecialchars($sValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING),
-          (isset($this->_mValue) && $sValue == $this->_mValue ? 'checked="checked" ':'').
-          (isset($this->_iTabIndex) ? 'tabindex="'.$this->_iTabIndex.'" ' : '').
-          (!empty($this->_sExtra) ? $this->_sExtra.' ':''),
-          $sTitle
+            '<input type="radio" name="%s" id="%1$s_%d" value="%s" %s' . FH_XHTML_CLOSE . '><label for="%1$s_%2$d" class="noStyle">%s</label>',
+            $this->_sName,
+            $counter++,
+            htmlspecialchars($sValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING),
+            (isset($this->_mValue) && $sValue == $this->_mValue ? 'checked="checked" ' : '') .
+                (isset($this->_iTabIndex) ? 'tabindex="' . $this->_iTabIndex . '" ' : '') .
+                (!empty($this->_sExtra) ? $this->_sExtra . ' ' : ''),
+            $sTitle
         );
 
         // do we have to use the mask ?
-        if( $bUseMask )
+        if ($bUseMask)
         {
-            $sField = $this -> _oLoader -> fill( $sField );
+            $sField = $this->_oLoader->fill($sField);
         }
 
         return $sField;
     }
 }
-?>

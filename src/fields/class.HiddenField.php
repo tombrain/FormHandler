@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class HiddenField
  *
@@ -9,7 +10,8 @@
  * @subpackage Fields
  */
 
-class HiddenField extends Field {
+class HiddenField extends Field
+{
 
     /**
      * HiddenField::getField()
@@ -23,13 +25,11 @@ class HiddenField extends Field {
     function getField()
     {
         return sprintf(
-          '<input type="hidden" name="%s" id="%1$s" value="%s" %s'. FH_XHTML_CLOSE .'>%s',
-          $this->_sName,
-          (isset( $this->_mValue ) ? htmlspecialchars( $this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING ) : ''),
-          (isset($this->_sExtra) ? $this->_sExtra.' ' :''),
-          (isset($this->_sExtraAfter) ? $this->_sExtraAfter :'')
+            '<input type="hidden" name="%s" id="%1$s" value="%s" %s' . FH_XHTML_CLOSE . '>%s',
+            $this->_sName,
+            (isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING) : ''),
+            (isset($this->_sExtra) ? $this->_sExtra . ' ' : ''),
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '')
         );
     }
 }
-
-?>

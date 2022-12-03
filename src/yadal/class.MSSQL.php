@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Yadal interface for the MSSQL (Microsoft SQL Server) Database type
  *
@@ -25,10 +26,10 @@ class MSSQL extends Yadal
      *
      * @author Teye Heimans
      */
-    public function __construct( $db )
+    public function __construct($db)
     {
-        parent::__construct( $db );
-        $this->_nameQuote = array('[',']');
+        parent::__construct($db);
+        $this->_nameQuote = array('[', ']');
     }
 
     /**
@@ -44,25 +45,25 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function connect( $servername = '', $username = '', $password = '' )
+    public function connect($servername = '', $username = '', $password = '')
     {
-    	// try to connect
-    	$this->_conn = mssql_connect( $servername, $username, $password );
-    	if( ! $this->_conn )
-    	{
-    		return false;
-    	}
+        // try to connect
+        $this->_conn = mssql_connect($servername, $username, $password);
+        if (!$this->_conn)
+        {
+            return false;
+        }
 
-    	// select the database
-    	if( mssql_select_db( $this->_db, $this->_conn ) )
-    	{
-	    	$this->_isConnected = true;
+        // select the database
+        if (mssql_select_db($this->_db, $this->_conn))
+        {
+            $this->_isConnected = true;
 
-	    	// return the connection resource
-	        return $this->_conn;
-    	}
+            // return the connection resource
+            return $this->_conn;
+        }
 
-    	return false;
+        return false;
     }
 
     /**
@@ -76,10 +77,10 @@ class MSSQL extends Yadal
      */
     public function close()
     {
-        if( $this->_isConnected )
+        if ($this->_isConnected)
         {
             $this->_isConnected = false;
-            return mssql_close( $this->_conn );
+            return mssql_close($this->_conn);
         }
     }
 
@@ -93,12 +94,12 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function query( $query )
+    public function query($query)
     {
-    	$this->_lastQuery = $query;
+        $this->_lastQuery = $query;
 
-    	// execute the query
-        $sql =  mssql_query( $query );
+        // execute the query
+        $sql =  mssql_query($query);
 
         return $sql;
     }
@@ -115,9 +116,9 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function result( $result, $row = 0, $field = null )
+    public function result($result, $row = 0, $field = null)
     {
-    	return mssql_result( $result, $row, $field);
+        return mssql_result($result, $row, $field);
     }
 
     /**
@@ -130,27 +131,27 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getInsertId( $table )
+    public function getInsertId($table)
     {
-    	$sql = mssql_query( "SELECT IDENT_CURRENT('".$table."')" );
+        $sql = mssql_query("SELECT IDENT_CURRENT('" . $table . "')");
 
-    	if( $sql )
-    	{
-    		list($id) = mssql_fetch_row($sql);
+        if ($sql)
+        {
+            list($id) = mssql_fetch_row($sql);
 
-       		return $id;
-    	}
-    	else
-    	{
-    		trigger_error(
-    		  "Could not fetch the last inserted id for the table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
+            return $id;
+        }
+        else
+        {
+            trigger_error(
+                "Could not fetch the last inserted id for the table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
 
-    		return false;
-    	}
+            return false;
+        }
     }
 
     /**
@@ -164,11 +165,11 @@ class MSSQL extends Yadal
      */
     public function getError()
     {
-    	$error = mssql_get_last_message();
-		if ($error == '')
-		{
-			$error = "General Error (The MS-SQL interface did not return a detailed error message).";
-		}
+        $error = mssql_get_last_message();
+        if ($error == '')
+        {
+            $error = "General Error (The MS-SQL interface did not return a detailed error message).";
+        }
 
         return $error;
     }
@@ -183,9 +184,9 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function recordCount( $sql)
+    public function recordCount($sql)
     {
-        return mssql_num_rows( $sql );
+        return mssql_num_rows($sql);
     }
 
     /**
@@ -197,9 +198,9 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getRecord( $sql )
+    public function getRecord($sql)
     {
-        return mssql_fetch_assoc( $sql );
+        return mssql_fetch_assoc($sql);
     }
 
     /**
@@ -212,49 +213,50 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getFieldNames( $table )
+    public function getFieldNames($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['fields'][$t] ) )
+        if (isset($this->_cache['fields'][$t]))
         {
             return $this->_cache['fields'][$t];
         }
 
         // get the field names
-    	$sql = $this->query("
-    	  SELECT column_name fld
-    	  FROM information_schema.columns
-          WHERE table_name = '".$table."'
+        $sql = $this->query(
+            "
+          SELECT column_name fld
+          FROM information_schema.columns
+          WHERE table_name = '" . $table . "'
           ORDER BY ordinal_position"
-    	);
+        );
 
-    	// query failed ?
-		if( ! $sql )
-		{
-			trigger_error(
-    		  "Could not fetch fieldnames of the table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
-		}
+        // query failed ?
+        if (!$sql)
+        {
+            trigger_error(
+                "Could not fetch fieldnames of the table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
+        }
 
-		// save the fields in an array and return it
-		$result = array();
-		while ( $row = $this->getRecord( $sql) )
-		{
-			$result[] = $row['fld'];
-		}
+        // save the fields in an array and return it
+        $result = array();
+        while ($row = $this->getRecord($sql))
+        {
+            $result[] = $row['fld'];
+        }
 
-		mssql_free_result($sql);
+        mssql_free_result($sql);
 
-		// save the result in the cache
+        // save the result in the cache
         $this->_cache['fields'][$t] = $result;
 
-		return $result;
+        return $result;
     }
 
     /**
@@ -270,15 +272,16 @@ class MSSQL extends Yadal
     public function getTables($showViews = true)
     {
         // return the data from the cache if it exists
-        if( isset( $this->_cache['tables'] ) )
+        if (isset($this->_cache['tables']))
         {
             return $this->_cache['tables'];
         }
 
-        $sql = $this->query("
+        $sql = $this->query(
+            "
           SELECT name
           FROM sysobjects
-          WHERE type='U' ".($showViews ? " OR type='V' ":"")." AND
+          WHERE type='U' " . ($showViews ? " OR type='V' " : "") . " AND
           (name not in
             ('sysallocations','syscolumns','syscomments','sysdepends',
              'sysfilegroups','sysfiles','sysfiles1','sysforeignkeys','dtproperties',
@@ -294,27 +297,27 @@ class MSSQL extends Yadal
         );
 
         // query failed ?
-        if( !$sql )
+        if (!$sql)
         {
             trigger_error(
-    		  "Could not retrieve the tables from the database!\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
+                "Could not retrieve the tables from the database!\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
         }
 
         // save the table names in an array and return them
         $result = array();
-        $num = $this->recordCount( $sql );
-        for( $i = 0; $i < $num; $i++ )
+        $num = $this->recordCount($sql);
+        for ($i = 0; $i < $num; $i++)
         {
-            $result[] = $this->result( $sql, $i);
+            $result[] = $this->result($sql, $i);
         }
 
         // save the result in the cache
-    	$this->_cache['tables'] = $result;
+        $this->_cache['tables'] = $result;
 
         return $result;
     }
@@ -329,52 +332,53 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getNotNullFields ( $table )
+    public function getNotNullFields($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['notnull'][$t] ) )
+        if (isset($this->_cache['notnull'][$t]))
         {
             return $this->_cache['notnull'][$t];
         }
 
-    	// get the not null fields
-    	$sql = $this->query("
-    	  SELECT
-    	    column_name fld
-    	  FROM
-    	    information_schema.columns
+        // get the not null fields
+        $sql = $this->query(
+            "
+          SELECT
+            column_name fld
+          FROM
+            information_schema.columns
           WHERE
-            table_name = '".$table."' AND
+            table_name = '" . $table . "' AND
             is_nullable = 'No'"
-    	);
+        );
 
-    	// query failed ?
-		if( ! $sql )
-		{
-			trigger_error(
-    		  "Could not fetch the not nullable fields of the table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
-		}
+        // query failed ?
+        if (!$sql)
+        {
+            trigger_error(
+                "Could not fetch the not nullable fields of the table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
+        }
 
-		// save the fields in an array and return it
-		$result = array();
-		while ( $row = $this->getRecord( $sql) )
-		{
-			$result[] = $row['fld'];
-		}
+        // save the fields in an array and return it
+        $result = array();
+        while ($row = $this->getRecord($sql))
+        {
+            $result[] = $row['fld'];
+        }
 
-		mssql_free_result($sql);
+        mssql_free_result($sql);
 
-		// save the result in the cache
-    	$this->_cache['notnull'][$t] = $result;
+        // save the result in the cache
+        $this->_cache['notnull'][$t] = $result;
 
-		return $result;
+        return $result;
     }
 
     /**
@@ -387,18 +391,19 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getFieldTypes( $table )
+    public function getFieldTypes($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['fieldtypes'][$t] ) )
+        if (isset($this->_cache['fieldtypes'][$t]))
         {
             return $this->_cache['fieldtypes'][$t];
         }
 
         // get the meta data
-        $sql = $this->query("
+        $sql = $this->query(
+            "
           SELECT
             c.name fld,
             t.name type,
@@ -406,37 +411,37 @@ class MSSQL extends Yadal
           FROM syscolumns c
           JOIN systypes t ON t.xusertype = c.xusertype
           JOIN sysobjects o ON o.id = c.id
-          WHERE o.name='".$table."'"
+          WHERE o.name='" . $table . "'"
         );
 
         // query failed ?
-        if( !$sql )
+        if (!$sql)
         {
             trigger_error(
-    		  "Could not fetch the meta data of the columns for table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
+                "Could not fetch the meta data of the columns for table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
         }
 
         // save the result in an array
         // TODO: load the default values in the 3rd place in the array
         $result = array();
-        while( $row = $this->getRecord( $sql ) )
+        while ($row = $this->getRecord($sql))
         {
-            $result[ $row['fld'] ] = array(
-              $row['type'],
-              $row['length'],
-              null // default value
+            $result[$row['fld']] = array(
+                $row['type'],
+                $row['length'],
+                null // default value
             );
         }
 
         // save the result in the cache
-    	$this->_cache['fieldtypes'][$t] = $result;
+        $this->_cache['fieldtypes'][$t] = $result;
 
-		return $result;
+        return $result;
     }
 
 
@@ -450,9 +455,9 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function escapeString( $string )
+    public function escapeString($string)
     {
-        return preg_replace("'","''",$string);
+        return preg_replace("'", "''", $string);
     }
 
     /**
@@ -465,54 +470,55 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getPrKeys( $table )
+    public function getPrKeys($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['keys'][$t] ) )
+        if (isset($this->_cache['keys'][$t]))
         {
             return $this->_cache['keys'][$t];
         }
 
-    	// get the primary keys
-		$sql = $this->query("
-		  SELECT
-		    k.column_name fld
-		  FROM
-		    information_schema.key_column_usage k,
-		    information_schema.table_constraints tc
-		  WHERE
-		    tc.constraint_name = k.constraint_name AND
-		    tc.constraint_type = 'PRIMARY KEY' AND
-		    k.table_name = '".$table."'"
-		);
+        // get the primary keys
+        $sql = $this->query(
+            "
+          SELECT
+            k.column_name fld
+          FROM
+            information_schema.key_column_usage k,
+            information_schema.table_constraints tc
+          WHERE
+            tc.constraint_name = k.constraint_name AND
+            tc.constraint_type = 'PRIMARY KEY' AND
+            k.table_name = '" . $table . "'"
+        );
 
-		// query failed ?
-		if( ! $sql )
-		{
-			trigger_error(
-    		  "Could not fetch the primary keys for the table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
-		}
+        // query failed ?
+        if (!$sql)
+        {
+            trigger_error(
+                "Could not fetch the primary keys for the table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
+        }
 
-		// get the fields, put them into an array and return them
-		$result = array();
-		while( $row = $this->getRecord( $sql ) )
-		{
-			$result[] = $row['fld'];
-		}
+        // get the fields, put them into an array and return them
+        $result = array();
+        while ($row = $this->getRecord($sql))
+        {
+            $result[] = $row['fld'];
+        }
 
-		mssql_free_result($sql);
+        mssql_free_result($sql);
 
-		// save the result in the cache
+        // save the result in the cache
         $this->_cache['keys'][$t] = $result;
 
-		return $result;
+        return $result;
     }
 
     /**
@@ -525,47 +531,48 @@ class MSSQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getUniqueFields( $table )
+    public function getUniqueFields($table)
     {
-        $t = strtolower( $table );
+        $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['unique'][$t] ) )
+        if (isset($this->_cache['unique'][$t]))
         {
             return $this->_cache['unique'][$t];
         }
 
         // fetch the unique fields
-    	$sql = $this->query("
+        $sql = $this->query(
+            "
           SELECT
             t1.constraint_name con,
             t2.column_name fld
-		  FROM
-		    information_schema.table_constraints t1,
-		    information_schema.constraint_column_usage t2
-		  WHERE
-		    t1.table_name = t2.table_name AND
-		    t1.constraint_name = t2.constraint_name AND
-		    (t1.constraint_type = 'UNIQUE' OR
-		     t1.constraint_type = 'PRIMARY KEY') AND
-		    t1.table_name = '".$table."'"
+          FROM
+            information_schema.table_constraints t1,
+            information_schema.constraint_column_usage t2
+          WHERE
+            t1.table_name = t2.table_name AND
+            t1.constraint_name = t2.constraint_name AND
+            (t1.constraint_type = 'UNIQUE' OR
+             t1.constraint_type = 'PRIMARY KEY') AND
+            t1.table_name = '" . $table . "'"
         );
 
         // query failed ?
-		if( ! $sql )
-		{
-			trigger_error(
-    		  "Could not fetch the unique fields for the table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
-		}
+        if (!$sql)
+        {
+            trigger_error(
+                "Could not fetch the unique fields for the table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
+        }
 
         // put the unique fields into an array and return them
         $result = array();
-        while( $row = $this->getRecord( $sql ) )
+        while ($row = $this->getRecord($sql))
         {
             $result[$row['con']][] = $row['fld'];
         }
@@ -578,5 +585,3 @@ class MSSQL extends Yadal
         return $result;
     }
 }
-
-?>

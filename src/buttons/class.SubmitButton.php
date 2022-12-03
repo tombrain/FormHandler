@@ -25,12 +25,12 @@ class SubmitButton extends Button
      */
     public function __construct(&$oForm, $sName)
     {
-        parent::__construct( $oForm, $sName );
+        parent::__construct($oForm, $sName);
 
-        $this->disableOnSubmit( FH_DEFAULT_DISABLE_SUBMIT_BTN );
+        $this->disableOnSubmit(FH_DEFAULT_DISABLE_SUBMIT_BTN);
 
         // set the default submit caption
-        $this->setCaption( $oForm->_text( 26 ) );
+        $this->setCaption($oForm->_text(26));
     }
 
     /**
@@ -44,7 +44,7 @@ class SubmitButton extends Button
      * @access public
      * @author Teye Heimans
      */
-    public function disableOnSubmit( $bStatus )
+    public function disableOnSubmit($bStatus)
     {
         $this->_bDisableOnSubmit = (bool) $bStatus;
     }
@@ -61,10 +61,10 @@ class SubmitButton extends Button
     public function getButton()
     {
         // set the javascript disable dubble submit option if wanted
-        if( $this->_bDisableOnSubmit )
+        if ($this->_bDisableOnSubmit)
         {
             // check if the user set a onclick event
-            if(isset($this->_sExtra) && preg_match("/onclick *= *('|\")(.*)$/i", $this->_sExtra))
+            if (isset($this->_sExtra) && preg_match("/onclick *= *('|\")(.*)$/i", $this->_sExtra))
             {
                 // put the function into a onchange tag if set
                 $this->_sExtra = preg_replace("/onclick *= *('|\")(.*)$/i", "onclick=\\1this.form.submit();this.disabled=true;\\2", $this->_sExtra);
@@ -72,19 +72,17 @@ class SubmitButton extends Button
             // no onclick event defined.. just add the js code
             else
             {
-           		$this->_sExtra = "onclick=\" if (this.form.querySelector(':invalid') == null) { this.form.submit();this.disabled=true;}\" ".(isset($this->_sExtra) ? $this->_sExtra : '');
+                $this->_sExtra = "onclick=\" if (this.form.querySelector(':invalid') == null) { this.form.submit();this.disabled=true;}\" " . (isset($this->_sExtra) ? $this->_sExtra : '');
             }
         }
 
         // return the button
         return sprintf(
-          '<input type="submit" value="%s" name="%s" id="%2$s" %s '. FH_XHTML_CLOSE .'>',
-          $this->_sCaption,
-          $this->_sName,
-          (isset($this->_sExtra) ? ' '.$this->_sExtra:'').
-          (isset($this->_iTabIndex) ? ' tabindex="'.$this->_iTabIndex.'"' : '')
+            '<input type="submit" value="%s" name="%s" id="%2$s" %s ' . FH_XHTML_CLOSE . '>',
+            $this->_sCaption,
+            $this->_sName,
+            (isset($this->_sExtra) ? ' ' . $this->_sExtra : '') .
+                (isset($this->_iTabIndex) ? ' tabindex="' . $this->_iTabIndex . '"' : '')
         );
     }
 }
-
-?>

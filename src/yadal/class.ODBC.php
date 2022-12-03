@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Yadal interface for ODBC
  *
@@ -21,8 +22,9 @@
  * @author Teye Heimans
  * @package Yadal
  */
-class ODBC extends Yadal {
-    private $_dsn;		// dsn
+class ODBC extends Yadal
+{
+    private $_dsn;        // dsn
 
     /**
      * ODBC::ODBC()
@@ -33,8 +35,9 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function __construct( $db ) {
-        parent::__construct( $db );
+    public function __construct($db)
+    {
+        parent::__construct($db);
         $this->_nameQuote = "'";
     }
 
@@ -51,19 +54,21 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function connect( $dsn = '', $username = '', $password = '' ) {
-    	// connect with odbc
-    	$this->_conn = odbc_connect( $dsn, $username, $password );
-    	$this->_dsn  = $dsn;
+    public function connect($dsn = '', $username = '', $password = '')
+    {
+        // connect with odbc
+        $this->_conn = odbc_connect($dsn, $username, $password);
+        $this->_dsn  = $dsn;
 
-    	if( $this->_conn ) {
-    	   $this->_isConnected = true;
+        if ($this->_conn)
+        {
+            $this->_isConnected = true;
 
-    	   // return the connection resource
-    	   return $this->_conn;
-    	}
+            // return the connection resource
+            return $this->_conn;
+        }
 
-    	return false;
+        return false;
     }
 
     /**
@@ -76,11 +81,12 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function query( $query ) {
-    	$this->_lastQuery = $query;
+    public function query($query)
+    {
+        $this->_lastQuery = $query;
 
         // execute the query
-        return odbc_exec( $this->_conn, $query );
+        return odbc_exec($this->_conn, $query);
     }
 
     /**
@@ -92,7 +98,8 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function getInsertId() {
+    public function getInsertId()
+    {
         //
     }
 
@@ -105,8 +112,9 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function getError() {
-        return odbc_errormsg( $this->_conn );
+    public function getError()
+    {
+        return odbc_errormsg($this->_conn);
     }
 
     /**
@@ -119,8 +127,9 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function recordCount( $sql) {
-        return odbc_num_rows( $sql );
+    public function recordCount($sql)
+    {
+        return odbc_num_rows($sql);
     }
 
     /**
@@ -133,8 +142,9 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function getRecord( $sql ) {
-        return mysql_fetch_assoc( $sql );
+    public function getRecord($sql)
+    {
+        return mysql_fetch_assoc($sql);
     }
 
     /**
@@ -147,24 +157,27 @@ class ODBC extends Yadal {
      * @access public
      * @author Teye Heimans
      */
-    public function getFieldNames( $table  ) {
+    public function getFieldNames($table)
+    {
 
-    	$sql = odbc_columns( $this->_conn );
+        $sql = odbc_columns($this->_conn);
 
         $result = array();
 
-        $num = odbc_num_fields( $sql );
-		for ( $i = 1; $i <= $num; $i++ ) {
-		  	$result[$i-1] = odbc_field_name($sql, $i);
-		}
+        $num = odbc_num_fields($sql);
+        for ($i = 1; $i <= $num; $i++)
+        {
+            $result[$i - 1] = odbc_field_name($sql, $i);
+        }
 
-		$num = odbc_num_rows( $sql );
-		echo "Aantal rows: $num<br />\n";
-		for( $i = 0; $i <= $num; $i++ ) {
-			echo odbc_result( $sql, 4) ."<br >\n";
-		}
+        $num = odbc_num_rows($sql);
+        echo "Aantal rows: $num<br />\n";
+        for ($i = 0; $i <= $num; $i++)
+        {
+            echo odbc_result($sql, 4) . "<br >\n";
+        }
 
-		return $result;
+        return $result;
     }
 
 
@@ -176,8 +189,9 @@ class ODBC extends Yadal {
      * @param string $string
      * @return string
      */
-    public function escapeString( $string ) {
-        return mysql_real_escape_string( $string );
+    public function escapeString($string)
+    {
+        return mysql_real_escape_string($string);
     }
 
     /**
@@ -187,20 +201,25 @@ class ODBC extends Yadal {
      *
      * @return array of the keys which are found
      */
-    public function fetchKeys( $table = null) {
+    public function fetchKeys($table = null)
+    {
         $table = is_null($table) ? $this->_table : $table;
 
         $tmp = $this->_sql;
 
         //odbc_primarykeys( $this->_sql
 
-        $sql = $this->query("SHOW KEYS FROM `".$table."`");
+        $sql = $this->query("SHOW KEYS FROM `" . $table . "`");
         $keys = array();
-        while( $r = $this->getRecord() ) {
-            if ( $r['Key_name'] == 'PRIMARY' ) {
+        while ($r = $this->getRecord())
+        {
+            if ($r['Key_name'] == 'PRIMARY')
+            {
                 $keys['PR'][] = $r['Column_name'];
-            } else {
-            	$keys[$r['Key_name']][] = $r['Column_name'];
+            }
+            else
+            {
+                $keys[$r['Key_name']][] = $r['Column_name'];
             }
         }
 
@@ -208,22 +227,26 @@ class ODBC extends Yadal {
         $this->_sql = $tmp;
 
         // if no keys are found...
-        if(sizeof($keys) == 0) {
+        if (sizeof($keys) == 0)
+        {
             trigger_error(
-              "Error, could not fetch the indexes from table '".$table."'! ".
-              "If you didn't define a primary key or another index type, ".
-              "please set the name of the field (which should be used for indexing) ".
-              "manually in the dbinfo() function!",
-              E_USER_WARNING
+                "Error, could not fetch the indexes from table '" . $table . "'! " .
+                    "If you didn't define a primary key or another index type, " .
+                    "please set the name of the field (which should be used for indexing) " .
+                    "manually in the dbinfo() function!",
+                E_USER_WARNING
             );
             return null;
         }
 
-        if(isset($keys['PR'])) {
-        	return $keys['PR'];
-        } else {
-        	$d = each( $keys );
-        	return $d[1];
+        if (isset($keys['PR']))
+        {
+            return $keys['PR'];
+        }
+        else
+        {
+            $d = each($keys);
+            return $d[1];
         }
     }
 
@@ -235,15 +258,18 @@ class ODBC extends Yadal {
      * @param string $table
      * @return array
      */
-    public function fetchUniqueFields( $table = null ) {
+    public function fetchUniqueFields($table = null)
+    {
         $table = is_null($table) ? $this->_table : $table;
 
         $tmp = $this->_sql;
 
-        $sql = $this->query("SHOW KEYS FROM `".$table."`");
+        $sql = $this->query("SHOW KEYS FROM `" . $table . "`");
         $unique = array();
-        while( $r = $this->getRecord() ) {
-            if ( $r['Non_unique'] == 0) {
+        while ($r = $this->getRecord())
+        {
+            if ($r['Non_unique'] == 0)
+            {
                 $unique[] = $r['Column_name'];
             }
         }
@@ -251,12 +277,13 @@ class ODBC extends Yadal {
         mysql_free_result($sql);
         $this->_sql = $tmp;
 
-        if(sizeof($unique) > 0) {
-        	return $unique;
-        } else {
-        	return array();
+        if (sizeof($unique) > 0)
+        {
+            return $unique;
+        }
+        else
+        {
+            return array();
         }
     }
 }
-
-?>

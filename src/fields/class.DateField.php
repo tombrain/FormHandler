@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class DateField
  *
@@ -30,16 +31,16 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function __construct( &$oForm, $sName, $sMask = null, $bRequired = null, $sInterval = null )
+    public function __construct(&$oForm, $sName, $sMask = null, $bRequired = null, $sInterval = null)
     {
         // set the default date display
-        $this -> setMask( !is_null( $sMask ) ? $sMask : FH_DATEFIELD_DEFAULT_DISPLAY );
+        $this->setMask(!is_null($sMask) ? $sMask : FH_DATEFIELD_DEFAULT_DISPLAY);
 
         // set the default interval
-        $this -> setInterval( !is_null( $sInterval ) ? $sInterval : FH_DATEFIELD_DEFAULT_DATE_INTERVAL);
+        $this->setInterval(!is_null($sInterval) ? $sInterval : FH_DATEFIELD_DEFAULT_DATE_INTERVAL);
 
         // set if the field is required
-        $this->setRequired( !is_null( $bRequired ) ? $bRequired : FH_DATEFIELD_DEFAULT_REQUIRED );
+        $this->setRequired(!is_null($bRequired) ? $bRequired : FH_DATEFIELD_DEFAULT_REQUIRED);
 
         // d = selectfield day
         // m = selectfield month
@@ -49,33 +50,34 @@ class DateField extends Field
         // Y = textfield year
 
         // generate the objects for the fields
-        $fields = $this -> _getFieldsFromMask();
-        $len = strlen( $fields );
+        $fields = $this->_getFieldsFromMask();
+        $len = strlen($fields);
 
-        for( $x = 0; $x < $len; $x++ )
+        for ($x = 0; $x < $len; $x++)
         {
             $c = $fields[$x];
 
-            switch ( $c ) {
-                // year selectfield
-            	case 'y':
-            	    $this -> _oYear = new SelectField( $oForm, $sName.'_year');
+            switch ($c)
+            {
+                    // year selectfield
+                case 'y':
+                    $this->_oYear = new SelectField($oForm, $sName . '_year');
 
                     // get the year interval
-                	list( $iStart, $iEnd ) = $this->_getYearInterval();
-                	$iEnd   = intval($iEnd);
-                    $iStart = intval( $iStart );
+                    list($iStart, $iEnd) = $this->_getYearInterval();
+                    $iEnd   = intval($iEnd);
+                    $iStart = intval($iStart);
                     $iYear = date('Y');
 
                     // set the years
                     $aYears = array();
-                    if(!$bRequired) $aYears[''] = ''; // was 0000
+                    if (!$bRequired) $aYears[''] = ''; // was 0000
 
                     // calculate the difference between the years
                     $iDiff = ($iYear + $iEnd) - ($iYear - $iStart);
 
                     $iCounter = 0;
-                    while( $iDiff != $iCounter )
+                    while ($iDiff != $iCounter)
                     {
                         $i = ($iYear + $iEnd) - $iCounter;
 
@@ -85,81 +87,81 @@ class DateField extends Field
                     }
 
                     // set the options
-                    $this -> _oYear -> setOptions( $aYears );
+                    $this->_oYear->setOptions($aYears);
 
-            		break;
-
-                // year textfield
-            	case 'Y':
-            	    $this -> _oYear = new TextField ( $oForm, $sName.'_year');
-                    $this -> _oYear -> setSize( 4 );
-                    $this -> _oYear -> setMaxlength( 4 );
-                    $this -> _oYear -> setValidator( _FH_DIGIT );
                     break;
 
-                // month selectfield
+                    // year textfield
+                case 'Y':
+                    $this->_oYear = new TextField($oForm, $sName . '_year');
+                    $this->_oYear->setSize(4);
+                    $this->_oYear->setMaxlength(4);
+                    $this->_oYear->setValidator(_FH_DIGIT);
+                    break;
+
+                    // month selectfield
                 case 'm':
-                    $this -> _oMonth = new SelectField( $oForm, $sName.'_month');
+                    $this->_oMonth = new SelectField($oForm, $sName . '_month');
                     // set the months in the field
                     $aMonths = array(
-                      '01' => $oForm->_text( 1 ),
-                      '02' => $oForm->_text( 2 ),
-                      '03' => $oForm->_text( 3 ),
-                      '04' => $oForm->_text( 4 ),
-                      '05' => $oForm->_text( 5 ),
-                      '06' => $oForm->_text( 6 ),
-                      '07' => $oForm->_text( 7 ),
-                      '08' => $oForm->_text( 8 ),
-                      '09' => $oForm->_text( 9 ),
-                      '10' => $oForm->_text( 10 ),
-                      '11' => $oForm->_text( 11 ),
-                      '12' => $oForm->_text( 12 )
+                        '01' => $oForm->_text(1),
+                        '02' => $oForm->_text(2),
+                        '03' => $oForm->_text(3),
+                        '04' => $oForm->_text(4),
+                        '05' => $oForm->_text(5),
+                        '06' => $oForm->_text(6),
+                        '07' => $oForm->_text(7),
+                        '08' => $oForm->_text(8),
+                        '09' => $oForm->_text(9),
+                        '10' => $oForm->_text(10),
+                        '11' => $oForm->_text(11),
+                        '12' => $oForm->_text(12)
                     );
-                    if(!$bRequired )
+                    if (!$bRequired)
                     {
                         $aMonths[''] = ''; // was 00
                         ksort($aMonths);
                     }
 
                     // set the options
-                    $this -> _oMonth -> setOptions( $aMonths );
+                    $this->_oMonth->setOptions($aMonths);
                     break;
 
-                // month textfield
+                    // month textfield
                 case 'M':
-                    $this -> _oMonth = new TextField ( $oForm, $sName.'_month' );
-                    $this -> _oMonth -> setSize( 2 );
-                    $this -> _oMonth -> setMaxlength( 2 );
-                    $this -> _oMonth -> setValidator( _FH_DIGIT );
+                    $this->_oMonth = new TextField($oForm, $sName . '_month');
+                    $this->_oMonth->setSize(2);
+                    $this->_oMonth->setMaxlength(2);
+                    $this->_oMonth->setValidator(_FH_DIGIT);
                     break;
 
-                // day selectfield
+                    // day selectfield
                 case 'd':
-                    $this -> _oDay = new SelectField( $oForm, $sName.'_day');
+                    $this->_oDay = new SelectField($oForm, $sName . '_day');
 
                     // get the days
                     $aDays = array();
-                    if(!$bRequired) $aDays[''] = ''; // was 00
+                    if (!$bRequired) $aDays[''] = ''; // was 00
 
-                    for($i = 1; $i <= 31; $i++)
+                    for ($i = 1; $i <= 31; $i++)
                     {
                         $aDays[sprintf('%02d', $i)] = sprintf('%02d', $i);
                     }
-                    $this -> _oDay -> setOptions( $aDays );
+                    $this->_oDay->setOptions($aDays);
                     break;
 
-                // day textfield
+                    // day textfield
                 case 'D':
-                    $this -> _oDay = new TextField( $oForm, $sName.'_day' );
-                    $this -> _oDay -> setSize( 2 );
-                    $this -> _oDay -> setMaxlength( 2 );
-                    $this -> _oDay -> setValidator( _FH_DIGIT );
+                    $this->_oDay = new TextField($oForm, $sName . '_day');
+                    $this->_oDay->setSize(2);
+                    $this->_oDay->setMaxlength(2);
+                    $this->_oDay->setValidator(_FH_DIGIT);
                     break;
             }
         }
 
         // call the Field constructor
-        parent::__construct( $oForm, $sName );
+        parent::__construct($oForm, $sName);
     }
 
     /**
@@ -173,18 +175,18 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setRequired( $bStatus )
+    public function setRequired($bStatus)
     {
         $this->_bRequired = $bStatus;
 
-        if( isset( $this -> _oYear ) && is_object( $this -> _oYear ) )
-          $this -> _oYear -> setValidator( $bStatus ? FH_DIGIT : _FH_DIGIT );
+        if (isset($this->_oYear) && is_object($this->_oYear))
+            $this->_oYear->setValidator($bStatus ? FH_DIGIT : _FH_DIGIT);
 
-        if( isset( $this -> _oMonth ) && is_object( $this -> _oMonth ) )
-          $this -> _oMonth -> setValidator( $bStatus ? FH_DIGIT : _FH_DIGIT );
+        if (isset($this->_oMonth) && is_object($this->_oMonth))
+            $this->_oMonth->setValidator($bStatus ? FH_DIGIT : _FH_DIGIT);
 
-        if( isset( $this -> _oDay ) && is_object( $this -> _oDay ) )
-          $this -> _oDay -> setValidator( $bStatus ? FH_DIGIT : _FH_DIGIT );
+        if (isset($this->_oDay) && is_object($this->_oDay))
+            $this->_oDay->setValidator($bStatus ? FH_DIGIT : _FH_DIGIT);
     }
 
     /**
@@ -198,9 +200,9 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setMask( $sMask )
+    public function setMask($sMask)
     {
-        $this->_sMask = $sMask ;
+        $this->_sMask = $sMask;
     }
 
     /**
@@ -216,7 +218,7 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setInterval( $sInterval )
+    public function setInterval($sInterval)
     {
         $this->_sInterval = $sInterval;
     }
@@ -231,16 +233,16 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setExtra( $sExtra )
+    public function setExtra($sExtra)
     {
-    	if( isset( $this -> _oYear ) && is_object( $this -> _oYear ) )
-    	  $this -> _oYear -> setExtra ( $sExtra );
+        if (isset($this->_oYear) && is_object($this->_oYear))
+            $this->_oYear->setExtra($sExtra);
 
-    	if( isset( $this -> _oMonth ) && is_object( $this -> _oMonth ) )
-    	  $this -> _oMonth -> setExtra ( $sExtra );
+        if (isset($this->_oMonth) && is_object($this->_oMonth))
+            $this->_oMonth->setExtra($sExtra);
 
-    	if( isset( $this -> _oDay ) && is_object( $this -> _oDay ) )
-    	  $this -> _oDay -> setExtra ( $sExtra );
+        if (isset($this->_oDay) && is_object($this->_oDay))
+            $this->_oDay->setExtra($sExtra);
     }
 
     /**
@@ -253,46 +255,46 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function getValue( $fld = null)
+    public function getValue($fld = null)
     {
         // when no specific field is requested..
-        if( $fld == null )
+        if ($fld == null)
         {
             // get the values of all fields
-            $d = $this -> getValue('d');
-            $m = $this -> getValue('m');
-            $y = $this -> getValue('y');
+            $d = $this->getValue('d');
+            $m = $this->getValue('m');
+            $y = $this->getValue('y');
 
             // return the value of the datefield
-            if( $d == '' && $m == '' && $y == '')
+            if ($d == '' && $m == '' && $y == '')
             {
                 return '';
             }
             else
             {
-                return $this->_fillMask( $d, $m, $y );
+                return $this->_fillMask($d, $m, $y);
             }
         }
         // a specific field is requested
         else
         {
             // which field is requested ?
-            switch ( strtolower( $fld ) )
+            switch (strtolower($fld))
             {
                 case 'y':
-                    if( isset( $this -> _oYear ) && is_object( $this -> _oYear ) )
-    	            return $this -> _oYear -> getValue();
-    	            break;
+                    if (isset($this->_oYear) && is_object($this->_oYear))
+                        return $this->_oYear->getValue();
+                    break;
 
-    	        case 'm':
-    	            if( isset( $this -> _oMonth ) && is_object( $this -> _oMonth ) )
-    	            return $this -> _oMonth -> getValue();
-    	            break;
+                case 'm':
+                    if (isset($this->_oMonth) && is_object($this->_oMonth))
+                        return $this->_oMonth->getValue();
+                    break;
 
-    	        case 'd':
-    	            if( isset( $this -> _oDay ) && is_object( $this -> _oDay ) )
-    	            return $this -> _oDay -> getValue();
-    	            break;
+                case 'd':
+                    if (isset($this->_oDay) && is_object($this->_oDay))
+                        return $this->_oDay->getValue();
+                    break;
             }
 
             // no field matched. Return an empty value
@@ -312,11 +314,11 @@ class DateField extends Field
      */
     public function getAsArray()
     {
-        $d = $this -> getValue('d');
-        $m = $this -> getValue('m');
-        $y = $this -> getValue('y');
+        $d = $this->getValue('d');
+        $m = $this->getValue('m');
+        $y = $this->getValue('y');
 
-        return array( $y, $m, $d );
+        return array($y, $m, $d);
     }
 
     /**
@@ -330,83 +332,85 @@ class DateField extends Field
      */
     public function isValid()
     {
-    	// the result has been requested before..
-    	if( isset($this->_isValid))
-    	{
-    		return $this->_isValid;
-    	}
-
-    	// check if the year field is valid
-        if( isset( $this -> _oYear ) && is_object( $this->_oYear) )
+        // the result has been requested before..
+        if (isset($this->_isValid))
         {
-            if( ! $this -> _oYear -> isValid() )
+            return $this->_isValid;
+        }
+
+        // check if the year field is valid
+        if (isset($this->_oYear) && is_object($this->_oYear))
+        {
+            if (!$this->_oYear->isValid())
             {
                 // get the error
-                $this -> _sError = $this -> _oYear -> getError();
+                $this->_sError = $this->_oYear->getError();
                 return false;
             }
         }
 
         // check if the month field is valid
-        if( isset( $this -> _oMonth ) && is_object( $this->_oMonth) )
+        if (isset($this->_oMonth) && is_object($this->_oMonth))
         {
-            if( ! $this -> _oMonth -> isValid() )
+            if (!$this->_oMonth->isValid())
             {
                 // get the error
-                $this -> _sError = $this -> _oMonth -> getError();
+                $this->_sError = $this->_oMonth->getError();
                 return false;
             }
         }
 
         // check if the day field is valid
-        if( isset( $this -> _oDay ) && is_object( $this->_oDay) )
+        if (isset($this->_oDay) && is_object($this->_oDay))
         {
-            if( ! $this -> _oDay -> isValid() )
+            if (!$this->_oDay->isValid())
             {
                 // get the error
-                $this -> _sError = $this -> _oDay -> getError();
+                $this->_sError = $this->_oDay->getError();
                 return false;
             }
         }
 
-        $d = $this -> getValue('d');
-        $m = $this -> getValue('m');
-        $y = $this -> getValue('y');
-        $mask = strtolower( $this->_sMask );
+        $d = $this->getValue('d');
+        $m = $this->getValue('m');
+        $y = $this->getValue('y');
+        $mask = strtolower($this->_sMask);
 
-        if( $y != '' && strlen( $y ) != 4 )
+        if ($y != '' && strlen($y) != 4)
         {
-            $this->_sError = $this->_oForm->_text( 13 );
+            $this->_sError = $this->_oForm->_text(13);
             return false;
         }
 
-    	// first of al check if the date is right when a valid date is submitted
-    	// (but only when all fields are displayed (d m and y or t in the display string!)
-    	if( strpos( $mask, 'd') !== false &&
-    	    strpos( $mask, 'm') !== false &&
-    	    strpos( $mask, 'y') !== false &&
-    	    ($d != '00' && $d != '') &&
-    	    ($m != '00' && $m != '') &&
-    	    ($y != '0000' && $y != '') &&
-            !checkdate( $m, $d, $y ))
+        // first of al check if the date is right when a valid date is submitted
+        // (but only when all fields are displayed (d m and y or t in the display string!)
+        if (
+            strpos($mask, 'd') !== false &&
+            strpos($mask, 'm') !== false &&
+            strpos($mask, 'y') !== false &&
+            ($d != '00' && $d != '') &&
+            ($m != '00' && $m != '') &&
+            ($y != '0000' && $y != '') &&
+            !checkdate($m, $d, $y)
+        )
         {
-        	$this->_sError = $this->_oForm->_text( 13 );
+            $this->_sError = $this->_oForm->_text(13);
             $this->_isValid = false;
             return $this->_isValid;
         }
 
         // if validator given, check the value with the validator
-    	if(isset($this->_sValidator) && !empty($this->_sValidator))
-    	{
-    		$this->_isValid = parent::isValid();
-    	}
-    	// no validator is given.. value is always valid
-    	else
-    	{
-    		$this->_isValid = true;
-    	}
+        if (isset($this->_sValidator) && !empty($this->_sValidator))
+        {
+            $this->_isValid = parent::isValid();
+        }
+        // no validator is given.. value is always valid
+        else
+        {
+            $this->_isValid = true;
+        }
 
-    	return $this->_isValid;
+        return $this->_isValid;
     }
 
     /**
@@ -422,46 +426,48 @@ class DateField extends Field
     {
         // set the date when:
         // - the field is empty
-    	// - its not an edit form
-    	// - the form is not posted
-    	// - the field is required
-    	// - there is no value set...
-    	if( !$this->_oForm->isPosted() && # not posted
-    	    (!isset($this->_oForm->edit) || !$this->_oForm->edit) &&       # no edit form
-    	    ($this->getValue() == $this->_fillMask() || # empty values
-    	     $this->getValue() == '') &&  # there is no value
-    	     $this->_bRequired )          # field is required
-    	{
-    		// set the current date if wanted
-    		if( FH_DATEFIELD_SET_CUR_DATE )
-    		{
-    			$this->setValue( date('d-m-Y') );
-    		}
-    	}
-
-    	// view mode enabled ?
-        if( $this -> getViewMode() )
+        // - its not an edit form
+        // - the form is not posted
+        // - the field is required
+        // - there is no value set...
+        if (
+            !$this->_oForm->isPosted() && # not posted
+            (!isset($this->_oForm->edit) || !$this->_oForm->edit) &&       # no edit form
+            ($this->getValue() == $this->_fillMask() || # empty values
+                $this->getValue() == '') &&  # there is no value
+            $this->_bRequired
+        )          # field is required
         {
-            // get the view value..
-            return $this -> _getViewValue();
+            // set the current date if wanted
+            if (FH_DATEFIELD_SET_CUR_DATE)
+            {
+                $this->setValue(date('d-m-Y'));
+            }
         }
 
-    	$year = isset( $this -> _oYear ) && is_object( $this -> _oYear ) ?
-    	  $this -> _oYear -> getField() : '';
+        // view mode enabled ?
+        if ($this->getViewMode())
+        {
+            // get the view value..
+            return $this->_getViewValue();
+        }
 
-        $month = isset( $this -> _oMonth ) && is_object( $this -> _oMonth ) ?
-          $this -> _oMonth -> getField() : '';
+        $year = isset($this->_oYear) && is_object($this->_oYear) ?
+            $this->_oYear->getField() : '';
 
-        $day = isset( $this -> _oDay ) && is_object( $this -> _oDay ) ?
-    	  $this -> _oDay -> getField() : '';
+        $month = isset($this->_oMonth) && is_object($this->_oMonth) ?
+            $this->_oMonth->getField() : '';
+
+        $day = isset($this->_oDay) && is_object($this->_oDay) ?
+            $this->_oDay->getField() : '';
 
         // replace the values by the fields..
         return $this->_fillMask(
-          ' '.$day.' ', #day
-          ' '.$month.' ', #month
-          ' '.$year.' ' #year
+            ' ' . $day . ' ', #day
+            ' ' . $month . ' ', #month
+            ' ' . $year . ' ' #year
         ) .
-        (isset($this->_sExtraAfter) ? $this->_sExtraAfter :'');
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '');
     }
 
     /**
@@ -478,76 +484,76 @@ class DateField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setValue( $sValue )
+    public function setValue($sValue)
     {
         // remove the time part if the date is coming from a datetime field
-    	$aMatch = array();
-    	if( preg_match('/^([0-9]{4}-[0-9]{2}-[0-9]{2}) [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $sValue, $aMatch) )
-    	{
-    		$sValue = $aMatch[1];
-    	}
+        $aMatch = array();
+        if (preg_match('/^([0-9]{4}-[0-9]{2}-[0-9]{2}) [0-9]{2}:[0-9]{2}:[0-9]{2}$/', $sValue, $aMatch))
+        {
+            $sValue = $aMatch[1];
+        }
 
-    	// replace the d, m and y values
-    	$regex = $this->_fillMask( '%%2%%', '%%2%%', '%%4%%' );
+        // replace the d, m and y values
+        $regex = $this->_fillMask('%%2%%', '%%2%%', '%%4%%');
 
-       	// next, escape dangerous characters for the regex
-    	$metachar = array( '\\',   '/',  '^',  '$',  '.',  '[',  ']',  '|',  '(',  ')',  '?',  '*',  '+',  '{',  '}' );
-    	$escape   = array( '\\\\', '\/', '\^', '\$', '\.', '\[', '\]', '\|', '\(', '\)', '\?', '\*', '\+', '\{', '\}' );
-    	$regex    = str_replace( $metachar, $escape, $regex );
+        // next, escape dangerous characters for the regex
+        $metachar = array('\\',   '/',  '^',  '$',  '.',  '[',  ']',  '|',  '(',  ')',  '?',  '*',  '+',  '{',  '}');
+        $escape   = array('\\\\', '\/', '\^', '\$', '\.', '\[', '\]', '\|', '\(', '\)', '\?', '\*', '\+', '\{', '\}');
+        $regex    = str_replace($metachar, $escape, $regex);
 
-    	// now add the (\d+) for matching the day, month and year values
-    	$regex = str_replace('%%2%%', '(\d+){1,2}', $regex );
-    	$regex = str_replace('%%4%%', '(\d{4})', $regex );
-    	$regex = '/'.$regex.'/';
+        // now add the (\d+) for matching the day, month and year values
+        $regex = str_replace('%%2%%', '(\d+){1,2}', $regex);
+        $regex = str_replace('%%4%%', '(\d{4})', $regex);
+        $regex = '/' . $regex . '/';
 
-    	// now find the results
-    	$match = array();
-    	if( preg_match($regex, $sValue, $match ) )
-    	{
-    	    // get the fields from the mask
-    	    $str = $this->_getFieldsFromMask();
+        // now find the results
+        $match = array();
+        if (preg_match($regex, $sValue, $match))
+        {
+            // get the fields from the mask
+            $str = $this->_getFieldsFromMask();
 
-    	    // get the length of the buffer (containing the dmy order)
-    	    $len = strlen( $str );
+            // get the length of the buffer (containing the dmy order)
+            $len = strlen($str);
 
-    	    // save the results in the vars $d, $m and $y
-    	    for( $i = 0; $i < $len; $i++ )
-    	    {
-    	        $c  = $str[$i];
-    	        $$c = $match[$i+1];
-    	    }
-    	}
-    	// the given value does not match the mask... is it dd-mm-yyyy style ?
-    	elseif( preg_match( '/^(\d{2})-(\d{2})-(\d{4})$/', $sValue, $match ) )
-    	{
-    	    $d = $match[1];
-    	    $m = $match[2];
-    	    $y = $match[3];
-    	}
-    	// is the given value in yyyy-mm-dd style ?
-    	elseif( preg_match( '/^(\d{4})-(\d{2})-(\d{2})$/', $sValue, $match ) )
-    	{
-    	    $d = $match[3];
-    	    $m = $match[2];
-    	    $y = $match[1];
-    	}
-    	// is the given value a timestamp ?
-    	elseif( strlen( $sValue ) >= 8 && Validator::IsDigit($sValue) )
-    	{
-    	    $d = date('d', $sValue );
-    	    $m = date('m', $sValue );
-    	    $y = date('Y', $sValue );
-    	}
+            // save the results in the vars $d, $m and $y
+            for ($i = 0; $i < $len; $i++)
+            {
+                $c  = $str[$i];
+                $$c = $match[$i + 1];
+            }
+        }
+        // the given value does not match the mask... is it dd-mm-yyyy style ?
+        elseif (preg_match('/^(\d{2})-(\d{2})-(\d{4})$/', $sValue, $match))
+        {
+            $d = $match[1];
+            $m = $match[2];
+            $y = $match[3];
+        }
+        // is the given value in yyyy-mm-dd style ?
+        elseif (preg_match('/^(\d{4})-(\d{2})-(\d{2})$/', $sValue, $match))
+        {
+            $d = $match[3];
+            $m = $match[2];
+            $y = $match[1];
+        }
+        // is the given value a timestamp ?
+        elseif (strlen($sValue) >= 8 && Validator::IsDigit($sValue))
+        {
+            $d = date('d', $sValue);
+            $m = date('m', $sValue);
+            $y = date('Y', $sValue);
+        }
 
-    	// save the dates for the fields
-    	if( isset( $this -> _oYear ) && is_object( $this -> _oYear ) && isset( $y ) )
-    	  $this -> _oYear -> setValue( $y );
+        // save the dates for the fields
+        if (isset($this->_oYear) && is_object($this->_oYear) && isset($y))
+            $this->_oYear->setValue($y);
 
-	    if( isset( $this -> _oMonth ) && is_object( $this -> _oMonth ) && isset( $m ) )
-	      $this -> _oMonth -> setValue( $m );
+        if (isset($this->_oMonth) && is_object($this->_oMonth) && isset($m))
+            $this->_oMonth->setValue($m);
 
-        if( isset( $this -> _oDay ) && is_object( $this -> _oDay ) && isset( $d ))
-          $this -> _oDay -> setValue( $d );
+        if (isset($this->_oDay) && is_object($this->_oDay) && isset($d))
+            $this->_oDay->setValue($d);
     }
 
 
@@ -563,47 +569,47 @@ class DateField extends Field
      * @access protected
      * @author Teye Heimans
      */
-    protected function _getFieldsFromMask( $mask = null)
+    protected function _getFieldsFromMask($mask = null)
     {
         // when no mask is given, use the default mask
-        if( is_null( $mask ) )
+        if (is_null($mask))
         {
             $mask = $this->_sMask;
         }
 
         // buffer
-	    $str = '';
-	    $len = strlen( $mask );
-	    $placeholders = array( 'd', 'D', 'm', 'M', 'y', 'Y' );
+        $str = '';
+        $len = strlen($mask);
+        $placeholders = array('d', 'D', 'm', 'M', 'y', 'Y');
 
-	    // walk each character in the mask
-	    for( $i = 0; $i < $len; $i++ )
-	    {
-	        // get the character
-	        $c = $mask[ $i ];
+        // walk each character in the mask
+        for ($i = 0; $i < $len; $i++)
+        {
+            // get the character
+            $c = $mask[$i];
 
-	        // day, month or year ?
-    	    if( in_array( $c, $placeholders ) )
-    	    {
-	           // not the first char ?
-	           if( $i != 0 )
-	           {
-	               // was the char not escaped?
-	               if( $mask[ $i - 1 ] != '\\' )
-	               {
-	                   $str .= $c;
-	               }
-	           }
-	           // the first char
-	           else
-	           {
-	               // just add it to the buffer
-	               $str .= $c;
-	           }
-    	    }
-	    }
+            // day, month or year ?
+            if (in_array($c, $placeholders))
+            {
+                // not the first char ?
+                if ($i != 0)
+                {
+                    // was the char not escaped?
+                    if ($mask[$i - 1] != '\\')
+                    {
+                        $str .= $c;
+                    }
+                }
+                // the first char
+                else
+                {
+                    // just add it to the buffer
+                    $str .= $c;
+                }
+            }
+        }
 
-	    return $str;
+        return $str;
     }
 
     /**
@@ -618,44 +624,44 @@ class DateField extends Field
      * @access protected
      * @author Teye Heimans
      */
-    protected function _fillMask( $d = '', $m = '', $y = '', $mask = null )
+    protected function _fillMask($d = '', $m = '', $y = '', $mask = null)
     {
         // when no mask is given, use the default mask
-        if( is_null( $mask ) )
+        if (is_null($mask))
         {
             $mask = $this->_sMask;
         }
 
-        $placeholders = array( 'd', 'D', 'm', 'M', 'y', 'Y' );
+        $placeholders = array('d', 'D', 'm', 'M', 'y', 'Y');
 
         // make sure that the fields are not replacing other fields characters
         // and that escaped chars are possible, like "the \da\y is: d"
-        $len = strlen( $mask );
+        $len = strlen($mask);
         $str = '';
-        for( $i = 0; $i < $len; $i++ )
+        for ($i = 0; $i < $len; $i++)
         {
             $c = $mask[$i];
 
             // field char ?
-            if( in_array( $c, $placeholders))
+            if (in_array($c, $placeholders))
             {
                 // first char ?
-                if( $i == 0 )
+                if ($i == 0)
                 {
-                    $str .= '%__'.strtolower($c).'__%';
+                    $str .= '%__' . strtolower($c) . '__%';
                 }
                 else
                 {
                     // check if the char is escaped.
-                    if( $mask[$i - 1] == '\\' )
+                    if ($mask[$i - 1] == '\\')
                     {
                         // the char is escaped, display the char without slash
-                        $str = substr($str, 0, -1).$c;
+                        $str = substr($str, 0, -1) . $c;
                     }
                     // the char is not escaped
                     else
                     {
-                        $str .= '%__'.strtolower($c).'__%';
+                        $str .= '%__' . strtolower($c) . '__%';
                     }
                 }
             }
@@ -667,9 +673,9 @@ class DateField extends Field
 
         // replace the values by the new values
         return str_replace(
-          array('%__d__%', '%__m__%', '%__y__%' ),
-          array( $d, $m, $y ),
-          $str
+            array('%__d__%', '%__m__%', '%__y__%'),
+            array($d, $m, $y),
+            $str
         );
     }
 
@@ -682,17 +688,17 @@ class DateField extends Field
      * @access protected
      * @author Teye Heimans
      */
-    protected function _getYearInterval ()
+    protected function _getYearInterval()
     {
-    	$sInterval = $this->_sInterval;
+        $sInterval = $this->_sInterval;
 
         // get the year interval for the dates in the field
-        if( strpos($sInterval, ':') )
+        if (strpos($sInterval, ':'))
         {
-             list( $iStart, $iEnd ) = explode( ':', $sInterval, 2 );
+            list($iStart, $iEnd) = explode(':', $sInterval, 2);
         }
         // no splitter found, just change the start interval
-        elseif( is_string($sInterval) || is_integer($sInterval) && !empty($sInterval) )
+        elseif (is_string($sInterval) || is_integer($sInterval) && !empty($sInterval))
         {
             $iStart = $sInterval;
             $iEnd = 0;
@@ -704,8 +710,6 @@ class DateField extends Field
             $iEnd = 0;
         }
 
-        return array( $iStart, $iEnd );
+        return array($iStart, $iEnd);
     }
 }
-
-?>

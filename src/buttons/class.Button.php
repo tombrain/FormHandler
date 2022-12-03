@@ -44,7 +44,7 @@ class Button
      * @access public
      * @author Teye Heimans
      */
-    public function setTabIndex( $iIndex )
+    public function setTabIndex($iIndex)
     {
         $this->_iTabIndex = $iIndex;
     }
@@ -77,11 +77,11 @@ class Button
     public function getButton()
     {
         return sprintf(
-          '<input type="button" name="%s" id="%1$s" value="%s"%s '. FH_XHTML_CLOSE .'>',
-          $this->_sName,
-          $this->_sCaption,
-          (isset($this->_sExtra) ? ' '.$this->_sExtra:'').
-          (isset($this->_iTabIndex) ? ' tabindex="'.$this->_iTabIndex.'"' : '')
+            '<input type="button" name="%s" id="%1$s" value="%s"%s ' . FH_XHTML_CLOSE . '>',
+            $this->_sName,
+            $this->_sCaption,
+            (isset($this->_sExtra) ? ' ' . $this->_sExtra : '') .
+                (isset($this->_iTabIndex) ? ' tabindex="' . $this->_iTabIndex . '"' : '')
         );
     }
 
@@ -100,5 +100,3 @@ class Button
         $this->_sExtra = $sExtra;
     }
 }
-
-?>

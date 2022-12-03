@@ -36,7 +36,7 @@ class Access extends Yadal
      */
     public function __construct( $db )
     {
-    	parent::__construct( $db );
+        parent::__construct( $db );
         $this->_nameQuote = array('[',']');
     }
 
@@ -55,7 +55,7 @@ class Access extends Yadal
      */
     public function connect( $connStr = '', $username = '', $password = '' )
     {
-    	// make connection with the database
+        // make connection with the database
         $this->_conn = new COM('ADODB.Connection');
         if( !$this->_conn ) {
             die(
@@ -117,8 +117,8 @@ class Access extends Yadal
      */
     public function query( $query )
     {
-    	// save the last query...
-    	$this->_lastQuery = $query;
+        // save the last query...
+        $this->_lastQuery = $query;
 
         $this->_cursor = 0;
 
@@ -131,12 +131,12 @@ class Access extends Yadal
         }
         else
         {
-	        // request numer of columns (otherwise delete wont work :-S )
-	        if(!strtoupper(substr(trim($query), 0, 6)) == 'SELECT') {
-	            $rs->Fields->Count;
-	        }
+            // request numer of columns (otherwise delete wont work :-S )
+            if(!strtoupper(substr(trim($query), 0, 6)) == 'SELECT') {
+                $rs->Fields->Count;
+            }
 
-	        return $rs;
+            return $rs;
         }
     }
 
@@ -176,18 +176,18 @@ class Access extends Yadal
      */
     public function getError()
     {
-    	// are there errors?
+        // are there errors?
         $errc = $this->_conn->Errors;
 
         if ($errc->Count == 0)
-		{
-			return '';
-		}
-		// get the last error message
-		$err = $errc->Item( $errc->Count-1 );
+        {
+            return '';
+        }
+        // get the last error message
+        $err = $errc->Item( $errc->Count-1 );
 
-		// return the description
-		return $err->Description;
+        // return the description
+        return $err->Description;
     }
 
     /**
@@ -205,7 +205,7 @@ class Access extends Yadal
         // go to the first record
         if( !$rs->BOF )
         {
-        	$rs->MoveFirst();
+            $rs->MoveFirst();
         }
 
         // count the records
@@ -255,13 +255,13 @@ class Access extends Yadal
     {
         // are we at the end of the records ?
         if( $rs->EOF ) {
-        	//$rs->Close();
+            //$rs->Close();
             //$rs->Release();
             return false;
         }
         else
         {
-        	// save the record data in an array
+            // save the record data in an array
             $result = array();
             for( $i = 0; $i < $rs->Fields->Count; $i++ )
             {
@@ -271,19 +271,19 @@ class Access extends Yadal
                 switch( $type )
                 {
                   case 1: // null value
-    				$value = null;
-    				break;
-    			  case 6: // currency is not supported properly;
-    				echo '<br /><b>'.$rs->Fields[$i]->Name.': currency type not supported by PHP</b><br />';
-    				$value = (float) $value;
-    				break;
-    		      case 7: // adDate
-    				$value = date('Y-m-d H:i',(integer)$rs->Fields[$i]->Value);
-    				break;
+                    $value = null;
+                    break;
+                  case 6: // currency is not supported properly;
+                    echo '<br /><b>'.$rs->Fields[$i]->Name.': currency type not supported by PHP</b><br />';
+                    $value = (float) $value;
+                    break;
+                  case 7: // adDate
+                    $value = date('Y-m-d H:i',(integer)$rs->Fields[$i]->Value);
+                    break;
                   case 133:// A date value (yyyymmdd)
-    				$value = substr($value,0,4).'-'.substr($value,4,2).'-'.substr($value,6,2);
-    				break;
-    			}
+                    $value = substr($value,0,4).'-'.substr($value,4,2).'-'.substr($value,6,2);
+                    break;
+                }
 
                 $result[ $rs->Fields[$i]->Name ] = trim( $value );
             }
@@ -297,57 +297,57 @@ class Access extends Yadal
     }
 
     /**
-	 * Access::getFieldNames()
-	 *
-	 * retrieve the field names used in the table
-	 *
-	 * @param string $table: table to retrieve the field names from
-	 * @return array of field names
-	 * @access public
+     * Access::getFieldNames()
+     *
+     * retrieve the field names used in the table
+     *
+     * @param string $table: table to retrieve the field names from
+     * @return array of field names
+     * @access public
      * @author Teye Heimans
-	 */
-	public function getFieldNames( $table )
-	{
-		$table = strtolower( $table );
+     */
+    public function getFieldNames( $table )
+    {
+        $table = strtolower( $table );
 
-		// return the data from the cache if it exists
+        // return the data from the cache if it exists
         if( isset( $this->_cache['fields'][$table] ) )
         {
             return $this->_cache['fields'][$table];
         }
 
-		// open schema 4: adSchemaColumns
-	    $rs = $this->_conn->OpenSchema( 4 );
+        // open schema 4: adSchemaColumns
+        $rs = $this->_conn->OpenSchema( 4 );
 
-	    // get the fields..
-		$tbl = $rs->Fields( 2 );
-		$fld = $rs->Fields( 3 );
-	    $idx = $rs->Fields( 6 );
+        // get the fields..
+        $tbl = $rs->Fields( 2 );
+        $fld = $rs->Fields( 3 );
+        $idx = $rs->Fields( 6 );
 
-	    // save the field names
-		$result = array();
-		while( !$rs->EOF )
-		{
-			if (strtolower($tbl->Value) == $table)
-			{
-				$result[$idx->Value-1] = $fld->Value;
-			}
-			$rs->MoveNext();
-		}
-		// close the schema
-		$rs->Close();
+        // save the field names
+        $result = array();
+        while( !$rs->EOF )
+        {
+            if (strtolower($tbl->Value) == $table)
+            {
+                $result[$idx->Value-1] = $fld->Value;
+            }
+            $rs->MoveNext();
+        }
+        // close the schema
+        $rs->Close();
 
-		// sort the field names and return them
-		ksort( $result );
+        // sort the field names and return them
+        ksort( $result );
 
-		// save the result in the cache
+        // save the result in the cache
         $this->_cache['fields'][$table] = $result;
 
-		return $result;
-	}
+        return $result;
+    }
 
 
-	/**
+    /**
      * Access::getNotNullFields()
      *
      * Retrieve the fields that can not contain NULL
@@ -359,9 +359,9 @@ class Access extends Yadal
      */
     public function getNotNullFields ( $table )
     {
-    	$table = strtolower($table);
+        $table = strtolower($table);
 
-    	// return the data from the cache if it exists
+        // return the data from the cache if it exists
         if( isset( $this->_cache['notnull'][$table] ) )
         {
             return $this->_cache['notnull'][$table];
@@ -371,38 +371,38 @@ class Access extends Yadal
         $rs = $this->_conn->OpenSchema( 4 );
 
         // the fields we are using
-		$tbl  = $rs->Fields( 2 );
-		$null = $rs->Fields( 10 );
+        $tbl  = $rs->Fields( 2 );
+        $null = $rs->Fields( 10 );
 
-		// save the primary key fields in an array
-		$result = array();
-		while(!$rs->EOF)
-		{
-			// primary field data of the table we want to have ?
-			if (strtolower($tbl->Value) == $table && (bool)$null->Value == false )
-			{
-				// get the field and index of the field
-				$fld  = $rs->Fields( 3 );
-				$idx  = $rs->Fields( 6 );
+        // save the primary key fields in an array
+        $result = array();
+        while(!$rs->EOF)
+        {
+            // primary field data of the table we want to have ?
+            if (strtolower($tbl->Value) == $table && (bool)$null->Value == false )
+            {
+                // get the field and index of the field
+                $fld  = $rs->Fields( 3 );
+                $idx  = $rs->Fields( 6 );
 
-				$result[$idx->Value-1] = $fld->Value;
-			}
-			// go to the next record
-			$rs->MoveNext();
-		}
-		// close the recordset
-		$rs->Close();
+                $result[$idx->Value-1] = $fld->Value;
+            }
+            // go to the next record
+            $rs->MoveNext();
+        }
+        // close the recordset
+        $rs->Close();
 
-		// sort the result and return it
-		ksort( $result );
+        // sort the result and return it
+        ksort( $result );
 
-		// save the result in the cache
+        // save the result in the cache
         $this->_cache['notnull'][$table] = $result;
 
-		return $result;
+        return $result;
     }
 
-	/**
+    /**
      * Access::getPrKeys()
      *
      * Get the primary keys from the table
@@ -422,38 +422,38 @@ class Access extends Yadal
             return $this->_cache['keys'][$table];
         }
 
-    	// open schema adSchemaPrimaryKeys
+        // open schema adSchemaPrimaryKeys
         $rs = $this->_conn->OpenSchema( 28 );
 
         // the fields we are using
-		$tbl  = $rs->Fields( 2 );
-		$type = $rs->Fields( 7 );
+        $tbl  = $rs->Fields( 2 );
+        $type = $rs->Fields( 7 );
 
-		// save the primary key fields in an array
-		$result = array();
-		while(!$rs->EOF)
-		{
-			// primary field data of the table we want to have ?
-			if (strtolower($tbl->Value) == $table && strtolower(substr($type->Value, 0, 10)) == 'primarykey')
-			{
-				// get the field and index of the field
-				$fld  = $rs->Fields( 3 );
-				$idx  = $rs->Fields( 6 );
-				$result[$idx->Value-1] = $fld->Value;
-			}
-			// go to the next record
-			$rs->MoveNext();
-		}
-		// close the recordset
-		$rs->Close();
+        // save the primary key fields in an array
+        $result = array();
+        while(!$rs->EOF)
+        {
+            // primary field data of the table we want to have ?
+            if (strtolower($tbl->Value) == $table && strtolower(substr($type->Value, 0, 10)) == 'primarykey')
+            {
+                // get the field and index of the field
+                $fld  = $rs->Fields( 3 );
+                $idx  = $rs->Fields( 6 );
+                $result[$idx->Value-1] = $fld->Value;
+            }
+            // go to the next record
+            $rs->MoveNext();
+        }
+        // close the recordset
+        $rs->Close();
 
-		// sort the result and return it
-		ksort( $result );
+        // sort the result and return it
+        ksort( $result );
 
-		// save the result in the cache
+        // save the result in the cache
         $this->_cache['keys'][$table] = $result;
 
-		return $result;
+        return $result;
     }
 
    /**
@@ -470,7 +470,7 @@ class Access extends Yadal
      */
     public function dbDate( $y, $m, $d )
     {
-    	return " # $d-$m-$y # ";
+        return " # $d-$m-$y # ";
     }
 
     /**
@@ -518,96 +518,96 @@ class Access extends Yadal
     /*
     function displaySchemas( $schema = null) {
 
-	    for( $x = 1; $x <= 38; $x++ )
-	    {
-	    	if (is_null($schema) || $schema == $x )
-	    	{
-	    		print_Var( $schema, $x );
-		        echo "SCHEMA $x\n";
-	    	    echo "<table border='1' style='border: 1px solid black'>\n";
+        for( $x = 1; $x <= 38; $x++ )
+        {
+            if (is_null($schema) || $schema == $x )
+            {
+                print_Var( $schema, $x );
+                echo "SCHEMA $x\n";
+                echo "<table border='1' style='border: 1px solid black'>\n";
 
-    	    	for( $i = 0; $i <= 50; $i++ ) {
-					try {
-	    	        	$rs = $this->_conn->OpenSchema( $x );
+                for( $i = 0; $i <= 50; $i++ ) {
+                    try {
+                        $rs = $this->_conn->OpenSchema( $x );
 
-	    	        	echo
-						"  <tr>\n".
-						"    <td>".$i ."</td>\n";
+                        echo
+                        "  <tr>\n".
+                        "    <td>".$i ."</td>\n";
 
-						if($rs) {
-						    $record = @$rs->Fields ( $i );
-						    if($record) {
-							    while( !$rs->EOF ) {
-							        echo "    <td>".($record->Value==''?'&nbsp;':$record->Value)."</td>\n";
-							        flush();
-							        $rs->MoveNext();
-							    }
-						    } else {
-						        break;
-						    }
-						    $rs->Close();
-						    $rs->Release();
-						} else {
-						    echo "<td>Error.. $x failure</td>\n";
-						    break;
-						}
-						echo "  </tr>";
-					} catch ( Exception  $e) {
-						echo 'Caught exception: ',  $e;
-						break;
-					}
-	    	    }
-	    	    echo "</table> <br />";
-    	    }
+                        if($rs) {
+                            $record = @$rs->Fields ( $i );
+                            if($record) {
+                                while( !$rs->EOF ) {
+                                    echo "    <td>".($record->Value==''?'&nbsp;':$record->Value)."</td>\n";
+                                    flush();
+                                    $rs->MoveNext();
+                                }
+                            } else {
+                                break;
+                            }
+                            $rs->Close();
+                            $rs->Release();
+                        } else {
+                            echo "<td>Error.. $x failure</td>\n";
+                            break;
+                        }
+                        echo "  </tr>";
+                    } catch ( Exception  $e) {
+                        echo 'Caught exception: ',  $e;
+                        break;
+                    }
+                }
+                echo "</table> <br />";
+            }
 
-	    }
+        }
 
-	    return;
-	}
-	*/
+        return;
+    }
+    */
 
 
 }
 
 /*
-	adSchemaCatalogs	= 1,
-	adSchemaCharacterSets	= 2,
-	adSchemaCollations	= 3,
-	adSchemaColumns	= 4,
-	adSchemaCheckConstraints	= 5,
-	adSchemaConstraintColumnUsage	= 6,
-	adSchemaConstraintTableUsage	= 7,
-	adSchemaKeyColumnUsage	= 8,
-	adSchemaReferentialContraints	= 9,
-	adSchemaTableConstraints	= 10,
-	adSchemaColumnsDomainUsage	= 11,
-	adSchemaIndexes	= 12,
-	adSchemaColumnPrivileges	= 13,
-	adSchemaTablePrivileges	= 14,
-	adSchemaUsagePrivileges	= 15,
-	adSchemaProcedures	= 16,
-	adSchemaSchemata	= 17,
-	adSchemaSQLLanguages	= 18,
-	adSchemaStatistics	= 19,
-	adSchemaTables	= 20,
-	adSchemaTranslations	= 21,
-	adSchemaProviderTypes	= 22,
-	adSchemaViews	= 23,
-	adSchemaViewColumnUsage	= 24,
-	adSchemaViewTableUsage	= 25,
-	adSchemaProcedureParameters	= 26,
-	adSchemaForeignKeys	= 27,
-	adSchemaPrimaryKeys	= 28,
-	adSchemaProcedureColumns	= 29,
-	adSchemaDBInfoKeywords	= 30,
-	adSchemaDBInfoLiterals	= 31,
-	adSchemaCubes	= 32,
-	adSchemaDimensions	= 33,
-	adSchemaHierarchies	= 34,
-	adSchemaLevels	= 35,
-	adSchemaMeasures	= 36,
-	adSchemaProperties	= 37,
-	adSchemaMembers	= 38
+    adSchemaCatalogs	= 1,
+    adSchemaCharacterSets	= 2,
+    adSchemaCollations	= 3,
+    adSchemaColumns	= 4,
+    adSchemaCheckConstraints	= 5,
+    adSchemaConstraintColumnUsage	= 6,
+    adSchemaConstraintTableUsage	= 7,
+    adSchemaKeyColumnUsage	= 8,
+    adSchemaReferentialContraints	= 9,
+    adSchemaTableConstraints	= 10,
+    adSchemaColumnsDomainUsage	= 11,
+    adSchemaIndexes	= 12,
+    adSchemaColumnPrivileges	= 13,
+    adSchemaTablePrivileges	= 14,
+    adSchemaUsagePrivileges	= 15,
+    adSchemaProcedures	= 16,
+    adSchemaSchemata	= 17,
+    adSchemaSQLLanguages	= 18,
+    adSchemaStatistics	= 19,
+    adSchemaTables	= 20,
+    adSchemaTranslations	= 21,
+    adSchemaProviderTypes	= 22,
+    adSchemaViews	= 23,
+    adSchemaViewColumnUsage	= 24,
+    adSchemaViewTableUsage	= 25,
+    adSchemaProcedureParameters	= 26,
+    adSchemaForeignKeys	= 27,
+    adSchemaPrimaryKeys	= 28,
+    adSchemaProcedureColumns	= 29,
+    adSchemaDBInfoKeywords	= 30,
+    adSchemaDBInfoLiterals	= 31,
+    adSchemaCubes	= 32,
+    adSchemaDimensions	= 33,
+    adSchemaHierarchies	= 34,
+    adSchemaLevels	= 35,
+    adSchemaMeasures	= 36,
+    adSchemaProperties	= 37,
+    adSchemaMembers	= 38
 
 */
 

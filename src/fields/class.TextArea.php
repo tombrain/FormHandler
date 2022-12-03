@@ -9,7 +9,8 @@
  * @package FormHandler
  * @subpackage Fields
  */
-class TextArea extends Field {
+class TextArea extends Field
+{
 
     private $_iCols;        // int: number of colums which the textarea should get
     private $_iRows;        // int: number of rows which the textarea should get
@@ -27,13 +28,13 @@ class TextArea extends Field {
      * @author Teye Heimans
      * @access public
      */
-    public function __construct( &$oform, $sName )
+    public function __construct(&$oform, $sName)
     {
         // call the constructor of the Field class
-        parent::__construct( $oform, $sName );
+        parent::__construct($oform, $sName);
 
-        $this->setCols( 40 );
-        $this->setRows( 7 );
+        $this->setCols(40);
+        $this->setRows(7);
     }
 
     /**
@@ -46,7 +47,7 @@ class TextArea extends Field {
      * @author Teye Heimans
      * @access public
      */
-    public function setCols( $iCols )
+    public function setCols($iCols)
     {
         $this->_iCols = $iCols;
     }
@@ -61,10 +62,10 @@ class TextArea extends Field {
      * @access public
      * @author Teye Heimans
      */
-    public function setMaxLength( $iMaxLength, $bDisplay )
+    public function setMaxLength($iMaxLength, $bDisplay)
     {
-        $this -> _iMaxLength   = $iMaxLength;
-        $this -> _bShowMessage = $bDisplay;
+        $this->_iMaxLength   = $iMaxLength;
+        $this->_bShowMessage = $bDisplay;
     }
 
     /**
@@ -79,18 +80,18 @@ class TextArea extends Field {
     public function isValid()
     {
         // is a max length set ?
-        if( isset( $this -> _iMaxLength ) && $this -> _iMaxLength > 0 )
+        if (isset($this->_iMaxLength) && $this->_iMaxLength > 0)
         {
             // is there to many data submitted ?
-            $iLen = strlen( $this -> _mValue );
-            if( $iLen > $this -> _iMaxLength )
+            $iLen = strlen($this->_mValue);
+            if ($iLen > $this->_iMaxLength)
             {
                 // set the error message
-                $this -> _sError = sprintf(
-                  $this -> _oForm -> _text( 40 ),
-                  $this -> _iMaxLength,
-                  $iLen,
-                  abs($iLen - $this->_iMaxLength)
+                $this->_sError = sprintf(
+                    $this->_oForm->_text(40),
+                    $this->_iMaxLength,
+                    $iLen,
+                    abs($iLen - $this->_iMaxLength)
                 );
 
                 // return false because the value is not valid
@@ -112,7 +113,7 @@ class TextArea extends Field {
      * @author Teye Heimans
      * @access public
      */
-    public function setRows( $iRows )
+    public function setRows($iRows)
     {
         $this->_iRows = $iRows;
     }
@@ -129,66 +130,63 @@ class TextArea extends Field {
     public function getField()
     {
         // view mode enabled ?
-        if( $this -> getViewMode() )
+        if ($this->getViewMode())
         {
             // get the view value..
-            return $this -> _getViewValue();
+            return $this->_getViewValue();
         }
 
         // is a limit set ?
-        if( isset( $this -> _iMaxLength ) && $this -> _iMaxLength > 0  )
+        if (isset($this->_iMaxLength) && $this->_iMaxLength > 0)
         {
             // the message
-            $sMessage = $this-> _oForm -> _text( 36 );
+            $sMessage = $this->_oForm->_text(36);
 
             // set the event
-            $this -> _sExtra .=
-              sprintf(
-                " onkeyup=\"displayLimit('%s', '%s', %d, %s, '%s');\"",
-                $this -> _oForm -> getFormName(),
-                $this -> _sName,
-                $this -> _iMaxLength,
-                ( $this -> _bShowMessage ? 'true' : 'false'),
-                htmlspecialchars( $sMessage, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING )
-              )
-            ;
+            $this->_sExtra .=
+                sprintf(
+                    " onkeyup=\"displayLimit('%s', '%s', %d, %s, '%s');\"",
+                    $this->_oForm->getFormName(),
+                    $this->_sName,
+                    $this->_iMaxLength,
+                    ($this->_bShowMessage ? 'true' : 'false'),
+                    htmlspecialchars($sMessage, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING)
+                );
 
             // should the message be displayed ?
-            if( $this -> _bShowMessage )
+            if ($this->_bShowMessage)
             {
                 // add the javascript to the fields "extra" argument
-                $this -> setExtraAfter(
-                  "<br ". FH_XHTML_CLOSE ."><div id='". $this -> _sName."_limit'></div>\n"
+                $this->setExtraAfter(
+                    "<br " . FH_XHTML_CLOSE . "><div id='" . $this->_sName . "_limit'></div>\n"
                 );
             }
 
             // make sure that when the page is loaded, the message is displayed
-            $this -> _oForm -> _setJS(
-              sprintf(
-                "displayLimit('%s', '%s', %d, %s, '%s');\n",
-                $this -> _oForm -> getFormName(),
-                $this -> _sName,
-                $this -> _iMaxLength,
-                ( $this -> _bShowMessage ? 'true' : 'false'),
-                $sMessage
-              ),
-              false,
-              false
+            $this->_oForm->_setJS(
+                sprintf(
+                    "displayLimit('%s', '%s', %d, %s, '%s');\n",
+                    $this->_oForm->getFormName(),
+                    $this->_sName,
+                    $this->_iMaxLength,
+                    ($this->_bShowMessage ? 'true' : 'false'),
+                    $sMessage
+                ),
+                false,
+                false
             );
         }
 
         // return the field
         return sprintf(
-          '<textarea name="%s" id="%1$s" cols="%d" rows="%d"%s>%s</textarea>%s',
-          $this->_sName,
-          $this->_iCols,
-          $this->_iRows,
-          (isset($this->_iTabIndex) ? ' tabindex="'.$this->_iTabIndex.'" ' : '').
-          (isset($this->_sExtra) ? ' '.$this->_sExtra :''),
-          (isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING) : ''),
-          (isset($this->_sExtraAfter) ? $this->_sExtraAfter :'')
+            '<textarea name="%s" id="%1$s" cols="%d" rows="%d"%s>%s</textarea>%s',
+            $this->_sName,
+            $this->_iCols,
+            $this->_iRows,
+            (isset($this->_iTabIndex) ? ' tabindex="' . $this->_iTabIndex . '" ' : '') .
+                (isset($this->_sExtra) ? ' ' . $this->_sExtra : ''),
+            (isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING) : ''),
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '')
         );
     }
 }
-
-?>

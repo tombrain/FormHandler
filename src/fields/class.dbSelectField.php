@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class dbSelectField
  *
@@ -27,52 +28,50 @@ class dbSelectField extends SelectField
      * @access public
      * @author Teye Heimans
      */
-	public function __construct( &$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null, $aMergeArray = array() )
-	{
-	    // call the constructor of the selectfield
-		parent::__construct( $oForm, $sName );
+    public function __construct(&$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null, $aMergeArray = array())
+    {
+        // call the constructor of the selectfield
+        parent::__construct($oForm, $sName);
 
-		// make sure that the fields are set in an array
-		$aFields = !is_array($mFields) ? array( $mFields ) : $mFields;
-		$this -> useArrayKeyAsValue( sizeof( $aFields) == 2 );
+        // make sure that the fields are set in an array
+        $aFields = !is_array($mFields) ? array($mFields) : $mFields;
+        $this->useArrayKeyAsValue(sizeof($aFields) == 2);
 
-		// generate the query to retrieve the records
-		$sQuery =
-		  'SELECT '. implode(', ', $aFields).
-		  ' FROM '. $oDb->quote( $sTable).' '.$sExtraSQL;
+        // generate the query to retrieve the records
+        $sQuery =
+            'SELECT ' . implode(', ', $aFields) .
+            ' FROM ' . $oDb->quote($sTable) . ' ' . $sExtraSQL;
 
-		// get the records and load the options
-		$this->_aOptions = is_array($aMergeArray) ? $aMergeArray : array(); // @phpstan-ignore-line (Else branch is unreachable because ternary operator condition is always true.)
+        // get the records and load the options
+        $this->_aOptions = is_array($aMergeArray) ? $aMergeArray : array(); // @phpstan-ignore-line (Else branch is unreachable because ternary operator condition is always true.)
 
-		// execute the query
-		$sql = $oDb->query( $sQuery );
+        // execute the query
+        $sql = $oDb->query($sQuery);
 
-		// query succeeded
-		if( $sql )
-		{
-    		while( $row = $oDb->getRecord( $sql ) )
-    		{
-    			if( sizeof( $row ) == 1 )
-    			{
-    				$this->_aOptions[] = array_shift( $row );
-    			}
-    			else
-    			{
-    		        $this->_aOptions[array_shift( $row )] = array_shift( $row );
-    		    }
-    		}
-		}
-		// query failed
-		else
-		{
-		    trigger_error(
-		      "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n".
-		      "Error message: ". $oDb->getError()."<br '. FH_XHTML_CLOSE .'>\n".
-		      "Query: ". $sQuery,
-		      E_USER_WARNING
-		    );
-		}
- 	}
+        // query succeeded
+        if ($sql)
+        {
+            while ($row = $oDb->getRecord($sql))
+            {
+                if (sizeof($row) == 1)
+                {
+                    $this->_aOptions[] = array_shift($row);
+                }
+                else
+                {
+                    $this->_aOptions[array_shift($row)] = array_shift($row);
+                }
+            }
+        }
+        // query failed
+        else
+        {
+            trigger_error(
+                "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Error message: " . $oDb->getError() . "<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Query: " . $sQuery,
+                E_USER_WARNING
+            );
+        }
+    }
 }
-
-?>

@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class dbTextSelectField
  *
@@ -12,7 +13,7 @@
 
 class dbTextSelectField extends TextSelectField
 {
-	private $_aOptions;		
+    private $_aOptions;
 
     /**
      * dbTextSelectField::dbTextSelectField()
@@ -30,40 +31,38 @@ class dbTextSelectField extends TextSelectField
      * @since 22-10-2008
      * @author Johan Wiegel
      */
-	public function __construct( &$oForm, $sName, &$oDb, $sTable, $sField, $sExtraSQL = null )
-	{
-		// generate the query to retrieve the records
-		$sQuery =
-		  'SELECT '.$sField.
-		  ' FROM '. $oDb->quote( $sTable).' '.$sExtraSQL;
+    public function __construct(&$oForm, $sName, &$oDb, $sTable, $sField, $sExtraSQL = null)
+    {
+        // generate the query to retrieve the records
+        $sQuery =
+            'SELECT ' . $sField .
+            ' FROM ' . $oDb->quote($sTable) . ' ' . $sExtraSQL;
 
-		$this->_aOptions = array();
+        $this->_aOptions = array();
 
-		
-		// execute the query
-		$sql = $oDb->query( $sQuery );
 
-		// query succeeded
-		if( $sql )
-		{
-    		while( $row = $oDb->getRecord( $sql ) )
-    		{
-    			$this->_aOptions[] = $row[$sField];
-    		}
-		}
-		// query failed
-		else
-		{
-		    trigger_error(
-		      "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n".
-		      "Error message: ". $oDb->getError()."<br '. FH_XHTML_CLOSE .'>\n".
-		      "Query: ". $sQuery,
-		      E_USER_WARNING
-		    );
-		}
-			    // call the constructor of the selectfield
-		parent::__construct( $oForm, $sName, $this->_aOptions );
+        // execute the query
+        $sql = $oDb->query($sQuery);
 
- 	}
+        // query succeeded
+        if ($sql)
+        {
+            while ($row = $oDb->getRecord($sql))
+            {
+                $this->_aOptions[] = $row[$sField];
+            }
+        }
+        // query failed
+        else
+        {
+            trigger_error(
+                "Error, could not retrieve records.<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Error message: " . $oDb->getError() . "<br '. FH_XHTML_CLOSE .'>\n" .
+                    "Query: " . $sQuery,
+                E_USER_WARNING
+            );
+        }
+        // call the constructor of the selectfield
+        parent::__construct($oForm, $sName, $this->_aOptions);
+    }
 }
-?>
