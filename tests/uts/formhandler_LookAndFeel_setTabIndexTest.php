@@ -98,7 +98,7 @@ final class formhandler_LookAndFeel_setTabIndexTest extends FormhandlerTestCase
         );
   
         $this->expectError();
-        $this->expectExceptionMessage("Undefined variable $tabs");
+        $this->expectExceptionMessage("Undefined variable \$tabs");
         $form->setTabIndex($tabs);
     }
 };
