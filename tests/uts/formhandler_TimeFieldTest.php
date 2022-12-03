@@ -105,7 +105,7 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
             $hour--;
 
         $aExpected = [];
-        $aExpected[] = 'Timefield:<select name="timefield_hour" id="timefield_hour" size="1">	<option  value="00" >00</option>';
+        $aExpected[] = 'Timefield:<select name="timefield_hour" id="timefield_hour" size="1">';
 
         $aExpected[] = implode("\n\t", $this->getHours(true, $hour));
         $aExpected[] = '</select> : <select name="timefield_minute" id="timefield_minute" size="1">';
