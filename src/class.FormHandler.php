@@ -1914,7 +1914,7 @@ class FormHandler
 				// no field is given, remove it's index
 				else
 				{
-					unset($tabs);
+					unset($tabs[$key]);
 				}
 			}
 
