@@ -1,4 +1,4 @@
-name: php 8.0.x
+name: php SingleStan
 
 on: [push]
 
