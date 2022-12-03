@@ -22,9 +22,8 @@ class Button
      *
      * Constructor: create a new Button object
      *
-     * @param object $form: the form where the button is located on
-     * @param string $name: the name of the button
-     * @return Button
+     * @param object $oForm: the form where the button is located on
+     * @param string $sName: the name of the button
      * @access public
      * @author Teye Heimans
      */
@@ -56,7 +55,7 @@ class Button
      *
      * Set the caption of the button
      *
-     * @param string $caption: The caption of the button
+     * @param string $sCaption: The caption of the button
      * @return void
      * @access public
      * @author Teye Heimans
@@ -91,7 +90,7 @@ class Button
      *
      * Set extra tag information, like CSS or Javascript
      *
-     * @param string $extra: the CSS, JS or other extra tag info
+     * @param string $sExtra: the CSS, JS or other extra tag info
      * @return void
      * @access public
      * @author Teye Heimans

@@ -12,6 +12,7 @@ class BrowserField extends Field
 {
     private $_iSize;         // int: the size of the field
     private $_form;    		 // object: form
+    private $_path;
 
     /**
      * TextField::BrowserField()

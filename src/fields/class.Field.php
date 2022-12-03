@@ -12,6 +12,11 @@
 
 class Field
 {
+	/**
+	 * owning Form
+	 *
+	 * @var FormHandler
+	 */
 	protected $_oForm;         // object: the form where the field is located in
 	protected $_sName;         // string: name of the field
 	protected $_sValidator;    // string: callback function to validate the value of the field
@@ -29,7 +34,7 @@ class Field
      *
      * Public abstract constructor: Create a new field
      *
-     * @param object $oForm: The form where the field is located on
+     * @param FormHandler $oForm: The form where the field is located on
      * @param string $sName: The name of the field
      * @return Field
      * @access public
@@ -51,9 +56,6 @@ class Field
 		// get the value of the field
 		if( $oForm->isPosted() )
 		{
-			// make sure that the $_POST array is global
-			if(!_global) global $_POST;
-
 			// get the value if it exists in the $_POST array
 			if( isset( $_POST[$sName] ) )
 			{
@@ -252,7 +254,6 @@ class Field
 					"in object '".get_class($this->_sValidator[0])."'!",
 					E_USER_ERROR
 					);
-					$error = false;
 				}
 			}
 
@@ -331,7 +332,7 @@ class Field
      *
      * Set some extra HTML, JS or something like that (to use after the html tag)
      *
-     * @param string $sExtra: the extra html to insert into the tag
+     * @param string $sExtraAfter: the extra html to insert into the tag
      * @return void
      * @author Teye Heimans
      * @access public
@@ -499,7 +500,10 @@ class Field
 		// edit form and posted ? then first get the database value!
 		if( isset( $this -> _oForm -> edit ) && $this -> _oForm -> edit && $this -> _oForm -> isPosted() )
 		{
-			$this -> setValue( $this -> _oForm -> _dbData[ $this -> _sName ] );
+			if (isset($this -> _oForm -> _dbData))
+			{
+				$this -> setValue( $this -> _oForm -> _dbData[ $this -> _sName ] );
+			}
 		}
 
 		// get the value for the field

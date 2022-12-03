@@ -46,7 +46,7 @@ class ListField extends Field
     	// set the options
         $this->_aOptions = $aOptions;
 
-        parent::__construct( $oForm, $sName, $aOptions );
+        parent::__construct( $oForm, $sName );
 
         // make the fields of the listfield
         $this->_oHidden = new HiddenField($oForm, $sName);
@@ -83,7 +83,7 @@ class ListField extends Field
      *
      * Set the value of the field
      *
-     * @param array | string $aValue: The new value of the field
+     * @param array|string $aValue: The new value of the field
      * @return void
      * @access public
      * @author Teye Heimans
@@ -137,7 +137,7 @@ class ListField extends Field
      *
      * Set the title of the ON selection of the field
      *
-     * @param strint $sTitle: The title
+     * @param string $sTitle: The title
      * @return void
      * @access public
      * @author Teye Heimans

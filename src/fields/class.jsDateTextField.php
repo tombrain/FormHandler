@@ -25,7 +25,7 @@ class jsDateTextField extends DateTextField
      * @author Thomas Branius
      * @since 16-03-2010
      */
-	public function __construct( &$oForm, $sName, $sMask = null, $bParseOtherPresentations = false, $bIncludeJS = true )
+	public function __construct( &$oForm, $sName, $sMask = null, $bParseOtherPresentations = false, $bIncludeJS = true)
 	{
 		parent::__construct( $oForm, $sName, $sMask, $bParseOtherPresentations);
 		
@@ -53,7 +53,7 @@ class jsDateTextField extends DateTextField
 	/**
      * Set the display of the fields
      *
-     * @param string $sMast: how we have to display the datefield (day-month-year combination)
+     * @param string $sMask: how we have to display the datefield (day-month-year combination)
      * @return void
      * @access public
      * @author Thomas Branius

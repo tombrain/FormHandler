@@ -21,7 +21,7 @@ class AjaxValidator
 
 	public function CreateObservers( $oForm )
 	{
-		$bSetJS = false;
+		static $bSetJS = false;
 
 		// needed javascript included yet ?
 		if(!$bSetJS)
@@ -138,7 +138,6 @@ class AjaxValidator
 						jQuery('#".$aRequest['msgbox']."').prev('input').addClass( 'error' );
 						//]]>-->
 						</script>".stripslashes( $aRequest['msg'] );				
-						exit;  // stop if one validator fails
 					}
 					elseif( empty( $aRequest['value'] ) )
 					{
@@ -150,7 +149,6 @@ class AjaxValidator
 						jQuery('#".$aRequest['msgbox']."').addClass( 'fh_mandatory' );	
 						//]]>-->											
 						</script>";
-						exit;
 					}
 					else
 					{
@@ -164,7 +162,6 @@ class AjaxValidator
 						jQuery('#".$aRequest['msgbox']."').prev('input').removeClass( 'error' );
 						//]]>-->
 						</script>";
-						exit;
 					}
 				}
 			}

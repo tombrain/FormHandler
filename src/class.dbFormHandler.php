@@ -81,7 +81,7 @@ class dbFormHandler extends FormHandler
 	/**
 	 * Set the id which we are watching in the URL of the form is an edit form
 	 *
-	 * @param srting $sEditName
+	 * @param string $sEditName
 	 * 
 	 * @author Remco van Arkelen & Johan Wiegel
 	 * @since 01-03-2010
@@ -115,7 +115,7 @@ class dbFormHandler extends FormHandler
      * @param string $extraSQL: Extra SQL
      * @param string $validator: The validator which should be used to validate the value of the field
      * @param string $extra: CSS, Javascript or other which are inserted into the HTML tag
-     * @param string $mask: if more the 1 options are given, glue the fields together with this mask
+     * @param string $sMask: if more the 1 options are given, glue the fields together with this mask
      * @return void
      * @access public
      * @author Johan Wiegel
@@ -219,7 +219,7 @@ class dbFormHandler extends FormHandler
      * @param string $extraSQL: Extra SQL
      * @param string $validator: The validator which should be used to validate the value of the field
      * @param string $extra: CSS, Javascript or other which are inserted into the HTML tag
-     * @param string $mask: if more the 1 options are given, glue the fields together with this mask
+     * @param string $sMask: if more the 1 options are given, glue the fields together with this mask
      * @return void
      * @access public
      * @author Johan Wiegel
@@ -429,14 +429,12 @@ class dbFormHandler extends FormHandler
      * Get the value of the requested field
      *
      * @param string $field: The field which value we have to return
-     * @return string
+     * @return string|null
      * @access public
      * @author Teye Heimans
      */
 	public function value( $field )
 	{
-		if(!_global) global $_POST;
-
 		// is it a field?
 		if( isset( $this->_fields[$field] ) && is_object($this->_fields[$field][1]) && method_exists($this->_fields[$field][1], 'getvalue')  )
 		{
@@ -506,9 +504,9 @@ class dbFormHandler extends FormHandler
      *
      * Set the value of the specified field
      *
-     * @param string $field: The field which value we have to set
-     * @param string $value: The value we have to set
-     * @param boolean $overwriteCurrentValue: Do we have to overwrite the current value of the field (posted or db-loaded values)
+     * @param string $sField: The field which value we have to set
+     * @param string|array $sValue: The value we have to set
+     * @param boolean $bOverwriteCurrentValue: Do we have to overwrite the current value of the field (posted or db-loaded values)
      * @return void
      * @access public
      * @author Teye Heimans
@@ -651,7 +649,7 @@ class dbFormHandler extends FormHandler
 				E_USER_WARNING
 				);
 
-				return false;
+				return;
 			}
 		}
 		// the database info is not set yet!
@@ -680,9 +678,9 @@ class dbFormHandler extends FormHandler
      *
      * Use an already opened connection instead of opening a new one.
      *
-     * @param resource $conn:
-     * @param string $table: The table which should be used to save the data in
-     * @param string type: The type of database you are using
+     * @param resource|string $conn:
+     * @param resource|string|null $table: The table which should be used to save the data in
+     * @param string|null $type: The type of database you are using
      * @return void
      * @access public
      * @author Teye Heimans
@@ -729,7 +727,7 @@ class dbFormHandler extends FormHandler
      *
      * Set the function  which has to be called when the form data is saved in the database
      *
-     * @param string $callback: The name of the function
+     * @param string|array $callback: The name of the function
      * @return void
      * @access public
      * @author Teye Heimans
@@ -805,7 +803,7 @@ class dbFormHandler extends FormHandler
      *
      * prints or returns the form
      *
-     * @return string: the form or null when the form should be printed
+     * @return string|null: the form or null when the form should be printed
      * @access public
      * @author Teye Heimans
      */
@@ -894,7 +892,7 @@ class dbFormHandler extends FormHandler
 				else
 				{
 					// got id back ?
-					if(is_array($id) && sizeof($id) == 1)
+					if(is_array($id) && sizeof($id) == 1) // @phpstan-ignore-line (Call to function is_array() with int<min, -2>|int<0, max> will always evaluate to false.)
 					{
 						$id = $id[0];
 					}
@@ -953,7 +951,7 @@ class dbFormHandler extends FormHandler
 		}*/
 
 		// disable our error handler!
-		if( FH_DISPLAY_ERRORS )
+		if( FH_DISPLAY_ERRORS ) // @phpstan-ignore-line (If condition is always false.)
 		{
 			restore_error_handler();
 		}
@@ -1027,6 +1025,7 @@ class dbFormHandler extends FormHandler
 						elseif( $this->fieldExists( $field ) )
 						{
 							$fieldInForm = $field;
+							$value = null;
 
 							// is the field a datefield (in the form)?
 							if( in_array( $field, $this->_date ) )
@@ -1541,7 +1540,7 @@ class dbFormHandler extends FormHandler
      * @param array $sqlFields: array of field which value is an SQL function (so it should not be quoted)
      * @param boolean $edit: do we have to generate an edit or insert query
      * @param array $keys: the primary key values
-     * @return string: the query
+     * @return string|false the query
      * @access private
      * @author Teye Heimans
      */

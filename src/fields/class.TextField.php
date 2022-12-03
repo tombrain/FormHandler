@@ -66,7 +66,6 @@ class TextField extends Field
 		if( strlen( $this->getValue() ) > $iLength )
 		{
 			$this->_sError = $this->_oForm->_text( 14 );
-			return false;
 		}
 	}
 
@@ -87,7 +86,6 @@ class TextField extends Field
 		if( strlen( $this->getValue() ) < $iLength )
 		{
 			$this->_sError = $this->_oForm->_text( 14 );
-			return false;
 		}
 	}
 

@@ -30,7 +30,7 @@ class dbTextSelectField extends TextSelectField
      * @since 22-10-2008
      * @author Johan Wiegel
      */
-	public function __construct( &$oForm, $sName, &$oDb, $sTable, $sField, $sExtraSQL = null, $sMask = null )
+	public function __construct( &$oForm, $sName, &$oDb, $sTable, $sField, $sExtraSQL = null )
 	{
 		// generate the query to retrieve the records
 		$sQuery =

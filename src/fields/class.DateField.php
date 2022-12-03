@@ -193,7 +193,7 @@ class DateField extends Field
      * Set the display of the fields
      * (use d,m,y and t for positioning, like "d-m-y", "t, d d" or "y/m/d" )
      *
-     * @param string $sMast: how we have to display the datefield (day-month-year combination)
+     * @param string $sMask: how we have to display the datefield (day-month-year combination)
      * @return void
      * @access public
      * @author Teye Heimans
@@ -211,7 +211,7 @@ class DateField extends Field
      * Default the years are beginning at 90 yeas from the current. It is also possible to have years in the future.
      * This is done like this: "90:10" (10 years in the future).
      *
-     * @param string/int $sInterval: the interval we should use
+     * @param string|int $sInterval: the interval we should use
      * @return void
      * @access public
      * @author Teye Heimans
@@ -538,7 +538,6 @@ class DateField extends Field
     	    $m = date('m', $sValue );
     	    $y = date('Y', $sValue );
     	}
-    	if( !empty( $t ) ) $y = $t;
 
     	// save the dates for the fields
     	if( isset( $this -> _oYear ) && is_object( $this -> _oYear ) && isset( $y ) )

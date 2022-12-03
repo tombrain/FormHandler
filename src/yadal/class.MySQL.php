@@ -38,9 +38,9 @@ class MySQL extends Yadal
      * Make a connection with the database and
      * select the database.
      *
-     * @param string host: the host to connect to
-     * @param string username: the username which should be used to login
-     * @param string password: the password which should be used to login
+     * @param string $host: the host to connect to
+     * @param string $username: the username which should be used to login
+     * @param string $password: the password which should be used to login
      * @return resource: The connection resource
      * @access public
      * @author Teye Heimans
@@ -184,7 +184,7 @@ class MySQL extends Yadal
      * Fetch a record in assoc mode and return it
      *
      * @param resource $sql: The resource which should be used to retireve a record from
-     * @return assoc array or false when there are no records left
+     * @return array|null|false array or false when there are no records left
      * @access public
      * @author Teye Heimans
      */
@@ -199,7 +199,7 @@ class MySQL extends Yadal
      * Return the field names of the table
      *
      * @param string $table: The table where the field names should be collected from
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
@@ -266,7 +266,7 @@ class MySQL extends Yadal
      *
      * Return the tables from the database
      *
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
@@ -312,7 +312,7 @@ class MySQL extends Yadal
      * Retrieve the fields that can not contain NULL
      *
      * @param string $table: The table which fields we should retrieve
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
@@ -362,7 +362,7 @@ class MySQL extends Yadal
      * Retrieve the field types of the given table
      *
      * @param string $table: The table where we should fetch the fields and their types from
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */

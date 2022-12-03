@@ -16,9 +16,8 @@ class ResetButton extends Button
      *
      * constructor: Create a new reset button object
      *
-     * @param object $form: the form where the button is located on
-     * @param string $name: the name of the button
-     * @return ResetButton
+     * @param object $oForm: the form where the button is located on
+     * @param string $sName: the name of the button
      * @access public
      * @author Teye Heimans
      */

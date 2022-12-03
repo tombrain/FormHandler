@@ -272,7 +272,7 @@ class ImageConverter
 	{
 	   	if (!extension_loaded('gd'))
 	   	{
-	   		return false;
+	   		return 0;
 	   	}
 
 	   	static $gd_ver = 0;
@@ -296,7 +296,7 @@ class ImageConverter
 	   		$ver_info = gd_info();
 	       	preg_match('/\d/', $ver_info['GD Version'], $match);
 	       	$gd_ver = $match[0];
-	       	return $match[0];
+	       	return intval($match[0]);
 	   	}
 	   	// If phpinfo() is disabled use a specified / fail-safe choice...
 	   	if (preg_match('/phpinfo/', ini_get('disable_functions')))
@@ -321,7 +321,7 @@ class ImageConverter
 		$info = stristr($info, 'gd version');
 		preg_match('/\d/', $info, $match);
 		$gd_ver = $match[0];
-		return $match[0];
+		return intval($match[0]);
 	}
 
 
@@ -459,7 +459,7 @@ class ImageConverter
      * Create a new image resource based on the extension of the given file
      *
      * @param string $sFile: The file
-     * @return resource or false on failure
+     * @return GdImage|false or false on failure
      * @author Teye Heimans
      * @access private
      */
@@ -493,7 +493,7 @@ class ImageConverter
      *
      * Function to save the new image
      *
-     * @param resource $rImg: the image to save
+     * @param resource $rImage: the image to save
      * @param string $sDestination: how to save the new image
      * @param int $iQuality: the quality of the new image
      * @return bool: true of succes and false on failure

@@ -12,6 +12,8 @@
 
 class Editor extends TextArea
 {
+    private $_oEditor;
+
 	public function __construct( $oForm, $sName )
 	{
 		parent::__construct( $oForm, $sName );	
@@ -28,7 +30,7 @@ class Editor extends TextArea
 				);
 		}
 
-		$this->_oEditor = new stdClass( $sName );
+		$this->_oEditor = new stdClass();
 		$this->_oEditor->basePath = FH_FHTML_DIR . 'ckeditor/';
         $this->_oEditor->Value = isset( $this->_mValue ) ? $this->_mValue : '';
 
@@ -130,7 +132,7 @@ class Editor extends TextArea
      *
      * Set the server path used for browsing and uploading images
      *
-     * @param string $sPath: The path
+     * @param string|false $sPath: The path
      * @return void
      * @access public
      * @author Teye Heimans
@@ -170,7 +172,7 @@ class Editor extends TextArea
      *
      * Set the skin used for the FCKeditor
      *
-     * @param string $skin
+     * @param string $sSkin
      * @return void
      * @access public
      * @author Teye Heimans
@@ -187,7 +189,7 @@ class Editor extends TextArea
      *
      * @param string $sDir: The dir given by the user
      * @param string $sServerPath: The dir where the script is located on the server
-     * @return void
+     * @return string
      * @access private
      * @author Teye Heimans
      */

@@ -21,7 +21,7 @@ class TextArea extends Field {
      *
      * Constructor: create a new textarea
      *
-     * @param object &$oForm: The form where this field is located on
+     * @param object &$oform: The form where this field is located on
      * @param string $sName: The name of the field
      * @return TextArea
      * @author Teye Heimans

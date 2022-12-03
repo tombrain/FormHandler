@@ -436,8 +436,8 @@ class Validator
 	public static function FH_CAPTCHA( $value )
 	{
 		require(FH_FHTML_INCLUDE_DIR . 'securimage/securimage.php');
-		$img = new Securimage();
-		$valid = $img->check( $value );
+		$img = new Securimage(); // @phpstan-ignore-line (Instantiated class Securimage not found.)
+		$valid = $img->check( $value ); // @phpstan-ignore-line (Call to method check() on an unknown class Securimage.)
 		if( $valid == true )
 		{
 			return true;

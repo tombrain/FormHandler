@@ -13,7 +13,7 @@
  *
  * Saves all PHP errors occoured in the form
  *
- * @return array: the array of occured errors
+ * @return ?array: the array of occured errors
  * @access public
  * @author Teye Heimans
  */

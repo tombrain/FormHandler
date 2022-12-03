@@ -11,7 +11,7 @@
 
 class CheckBox extends Field
 {
-	private $_aOptions;              // array: contains all the options!
+	protected $_aOptions;              // array: contains all the options!
 	// $this->_mValue contains the values which are selected!
 	private $_bUseArrayKeyAsValue;   // boolean: if the keys of the array should be used as values
 	private $_sMask;                 // string: what kind of "glue" should be used to merge the checkboxes
@@ -24,7 +24,7 @@ class CheckBox extends Field
      *
      * @param object $oForm: The form where this field is located on
      * @param string $sName: The name of the field
-     * @param mixed: array|string $aOptions - The options for the field
+     * @param array|string $aOptions - The options for the field
      * @return CheckBox
      * @access public
      * @author Teye Heimans
@@ -48,7 +48,7 @@ class CheckBox extends Field
      *
      * Set the value of the field
      *
-     * @param string / array $mValue: the value to set
+     * @param string|array $aValue: the value to set
      * @return void
      * @access public
      * @author Teye Heimans

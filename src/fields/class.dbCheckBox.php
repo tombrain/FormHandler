@@ -27,7 +27,7 @@ class dbCheckBox extends CheckBox
      * @access public
      * @author Johan Wiegel
      */
-	public function __construct( &$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null, $sMask = null )
+	public function __construct( &$oForm, $sName, &$oDb, $sTable, $mFields, $sExtraSQL = null )
 	{
 	    // call the constructor of the selectfield
 		parent::__construct( $oForm, $sName, array() );

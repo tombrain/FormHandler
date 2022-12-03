@@ -20,7 +20,6 @@ class SubmitButton extends Button
      *
      * @param object $oForm: the form where this field is located on
      * @param string $sName: the name of the button
-     * @return SubmitButton
      * @access public
      * @author Teye Heimans
      */
@@ -40,7 +39,7 @@ class SubmitButton extends Button
      * Set if the submitbutton has to be disabled after pressing it
      * (avoid dubble post!)
      *
-     * @param boolean status
+     * @param boolean $bStatus
      * @return void
      * @access public
      * @author Teye Heimans

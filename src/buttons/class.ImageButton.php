@@ -18,10 +18,9 @@ class ImageButton extends Button
      *
      * Constructor: Create a new ImageButton object
      *
-     * @param object $form: the form where the image button is located on
-     * @param string $name: the name of the button
-     * @param string $image: the image we have to use as button
-     * @return ImageButton
+     * @param object $oForm: the form where the image button is located on
+     * @param string $sName: the name of the button
+     * @param string $sImage: the image we have to use as button
      * @access public
      * @author Teye Heimans
      */

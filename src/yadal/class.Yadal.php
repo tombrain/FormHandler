@@ -32,33 +32,28 @@ function newYadal( $database = null, $type = null )
 	  case 'mysqli':
 		include_once dirname(__FILE__).'/class.MySQLi.php';
 		return new YadalMySQLi( $database );
-		break;
 		
 	  // mysql
 	  case 'mysql':
 		include_once dirname(__FILE__).'/class.MySQL.php';
-		return new MySQL( $database );
-		break;
+		return new MySQL( $database ); // @phpstan-ignore-line (Instantiated class MySQL not found.)
 
 	  // postgresql
 	  case 'postgresql':
 	  case 'postgres':
 	  case 'pgsql':
 	    include_once dirname(__FILE__).'/class.PostgreSQL.php';
-	    return new PostgreSQL( $database );
-	    break;
+	    return new PostgreSQL( $database ); // @phpstan-ignore-line (Instantiated class PostgreSQL not found.)
 
 	  // Microsoft SQL server (MSSQL)
 	  case 'mssql':
 	    include_once dirname(__FILE__).'/class.MSSQL.php';
-	    return new MSSQL( $database );
-	    break;
+	    return new MSSQL( $database ); // @phpstan-ignore-line (Instantiated class MSSQL not found.)
 
 	  // Microsoft access database (Windows only)
 	  case 'access':
 	    include_once dirname(__FILE__).'/class.Access.php';
-	    return new Access( $database );
-	    break;
+	    return new Access( $database ); // @phpstan-ignore-line (Instantiated class Access not found.)
 
 	  // ODBC
 	  /* NOT SUPPORTED YET
@@ -74,7 +69,6 @@ function newYadal( $database = null, $type = null )
 	      'Error, database type "'.$type.'" not supported!',
 	      E_USER_ERROR
 	    );
-	    return null;
 	}
 }
 
@@ -305,7 +299,7 @@ class Yadal
      * @param resource $sql: The sql where you want to get a result from
      * @param int $row: The row where you want a result from
      * @param string $field: The field which result you want
-     * @return string
+     * @return string|false
      * @access public
      * @author Teye Heimans
      */

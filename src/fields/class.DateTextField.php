@@ -27,7 +27,6 @@ class DateTextField extends TextField
      * @param string $sName: the name of the datefield
      * @param string $sMask: the mask which is used to display the fields
      * @param bool $bParseOtherPresentations: try to parse other presentations of dateformat
-     * @return dateTextField
      * @access public
      * @author Thomas Branius
      * @since 16-03-2010
@@ -48,7 +47,7 @@ class DateTextField extends TextField
 	/**
      * Set the display of the fields
      *
-     * @param string $sMast: how we have to display the datefield (day-month-year combination)
+     * @param string $sMask: how we have to display the datefield (day-month-year combination)
      * @return void
      * @access public
      * @author Thomas Branius]
@@ -169,8 +168,11 @@ class DateTextField extends TextField
 	public function setValue( $mValue )
 	{
 		if ($this->_oForm->isPosted())
-		return parent::setValue($mValue);
-
+		{
+			parent::setValue($mValue);
+			return;
+		}
+		
 		// parse value from db
 		$regex = '/([0-9]{4})-([0-9]{2})-([0-9]{2})/';
 

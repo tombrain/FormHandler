@@ -44,7 +44,7 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
     {
         parent::setUp();
         /** 
-         * Your Database Connection (In This Example MySQL) 
+         * Your Database Connection (In This Example MySQLi) 
          */
        $factory = $this->getDriversFactory();
 

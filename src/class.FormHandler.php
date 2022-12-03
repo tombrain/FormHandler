@@ -62,21 +62,6 @@ define('FH_TITLE_ABOVE_FIELD_MASK',
 "  </tr>\n"
 );
 
-// make some variables global when the version < 4.1.0
-if(intval( str_replace('.', '', phpversion()) ) < 410)
-{
-	define('_global', false);
-	$_GET    = $HTTP_GET_VARS;
-	$_POST   = $HTTP_POST_VARS;
-	$_FILES  = $HTTP_POST_FILES;
-	$_SERVER = $HTTP_SERVER_VARS;
-}
-// set the var so that we dont have to make the $_GET arrays global
-else
-{
-	define('_global', true);
-}
-
 // include needed files
 define('FH_INCLUDE_DIR', str_replace('\\', '/', dirname(__FILE__)).'/');
 require_once( FH_INCLUDE_DIR . 'fields/class.Field.php' );
@@ -109,7 +94,7 @@ class FormHandler
 	protected $_add;              // array: contains the data which was added by the user
 	protected $_focus;            // string: the field which should get the focus
 	protected $_convert;          // array: fields which should be converted (eg. resizeimage or mergeimage)
-	protected $_buffer;           // array: buffer of set values (used when the field does not exists yet)
+	public $_buffer;              // array: buffer of set values (used when the field does not exists yet)
 	protected $_text;             // array: the language array we are using to display the messages etc
 	protected $_lang;             // string: the language used
 	protected $_setTable;         // boolean: set a html table arround the fields or has the user done that in the mask ?
@@ -118,6 +103,7 @@ class FormHandler
 	protected $_curPage;          // int: current page
 	protected $_mail;             // array: contains the mailing data
 	protected $_tabindexes;       // array: tab indexes of the fields...
+	protected $_customMsg;        // array: custom messages of the fields...
 	protected $_js;               // array: contains all the needed javascript for the form
 	protected $_help;             // array: contains the help text for the fields
 	protected $_helpIcon;         // string: the path to the help image
@@ -163,9 +149,6 @@ class FormHandler
 		$this->_setTable        = true;
 		$this->_focus           = null;
 		$this->_pageCounter     = 1;
-
-		// make vars global if needed
-		if(!_global) global $_SERVER, $_POST, $_GET;
 
 		// try to disable caching from the browser if possible
 		if(!headers_sent())
@@ -243,7 +226,7 @@ class FormHandler
 		$this->_curPage = isset($_POST[$this->_name.'_page']) ? $_POST[$this->_name.'_page'] : 1;
 
 		// set our own error handler
-		if(FH_DISPLAY_ERRORS)
+		if(FH_DISPLAY_ERRORS) // @phpstan-ignore-line (If condition is always false.)
 		{
 			error_reporting( E_ALL );
 			set_error_handler( 'catchErrors' );
@@ -818,8 +801,7 @@ class FormHandler
      * @param string $skin: The skin to use
      * @param int $width: The width of the field
      * @param int $height: The height of the field
-     * @param boolean $useArrayKeyAsValue: If the array key's are the values for the options in the field
-     * @param string $extra: CSS, Javascript or other which are inserted into the HTML tag
+     * @param array $config additional config
      * @return void
      * @access public
      * @author Teye Heimans
@@ -1200,7 +1182,6 @@ class FormHandler
      * @param string $image: The image URL which should be a button
      * @param string $name: The name of the button
      * @param string $extra: CSS, Javascript or other which are inserted into the HTML tag
-     * @param boolean $disableOnSubmit: Disable the button when it is pressed
      * @return void
      * @access public
      * @author Teye Heimans
@@ -1263,7 +1244,7 @@ class FormHandler
      * @param string $caption: The caption of the button
      * @param string $url: The URL to go to when the button is clicked
      * @param string $name: The name of the button
-     * @param string $extra: CSS, Javascript or other which are inserted into the HTML tag
+     * @param string|null $extra: CSS, Javascript or other which are inserted into the HTML tag
      * @return void
      * @access public
      * @author Teye Heimans
@@ -1293,11 +1274,7 @@ class FormHandler
 		// create new button
 		$btn = new Button( $this, $name );
 		$btn->setCaption( $caption );
-
-		if(!empty($extra))
-		{
-			$btn->setExtra( $extra );
-		}
+		$btn->setExtra( $extra );
 
 		// register the button
 		$this->_registerField( $name, $btn );
@@ -1343,11 +1320,7 @@ class FormHandler
 		// create new button
 		$btn = new Button( $this, $name );
 		$btn->setCaption( $caption );
-
-		if(!empty($extra))
-		{
-			$btn->setExtra( $extra );
-		}
+		$btn->setExtra( $extra );
 
 		// register the button
 		$this->_registerField( $name, $btn );
@@ -1407,7 +1380,7 @@ class FormHandler
      *
      * Set the style class on a by %error_style% specified element
      *
-     * @param string $html: html for the field
+     * @param string $mask
      * @return string
      * @access public
      * @author Ronald Hulshof
@@ -1572,7 +1545,7 @@ class FormHandler
      *
      * Add a new row to the form.
      *
-     * @param string $data: Possible data to set into the row (line)
+     * @param string $text: Possible text to set into the row (line)
      * @return void
      * @access public
      * @author Teye Heimans
@@ -1697,7 +1670,7 @@ class FormHandler
 	 * Get the file contents by including it, to enable parsing of php files
 	 *
 	 * @param string $sFilename : the file to get/parse
-	 * @return void
+	 * @return string|false
 	 * @access public
 	 * @author sid benachenhou
 	 * @since 14-02-2008 added by Johan Wiegel
@@ -1863,7 +1836,7 @@ class FormHandler
      *
      * Set the tab index for the fields
      *
-     * @param mixed $mTabs: array or comma seperated string with the field names.
+     * @param mixed $tabs: array or comma seperated string with the field names.
      * When an array is given the array index will set as tabindex
      * @return void
      * @access public
@@ -1929,15 +1902,13 @@ class FormHandler
      * Set the language we should use for error messages etc.
      * If no language is given, try to get the language defined by the visitors browser.
      *
-     * @param string $language: The language we should use
+     * @param string $sLanguage: The language we should use
      * @return void
      * @access public
      * @author Teye Heimans
      */
 	public function setLanguage( $sLanguage = null )
 	{
-		if(!_global) global $_SERVER;
-
 		// if nog language is given, try to get it from the visitors browser if wanted
 		if( is_null($sLanguage))
 		{
@@ -2007,7 +1978,7 @@ class FormHandler
 				include( FH_INCLUDE_DIR.'language/'.$sLanguage.'.php' );
 
 				// load the array from the text file
-				$this->_text = $fh_lang;
+				$this->_text = $fh_lang; // @phpstan-ignore-line (Undefined variable: $fh_lang)
 
 				// save the language
 				$this->_lang = $sLanguage;
@@ -2090,7 +2061,7 @@ class FormHandler
      *
      * Set the focus to a sepcific field
      *
-     * @param string $field: The field which should get the focus
+     * @param string|false $field: The field which should get the focus
      * @return boolean: true if the focus could be set, false if not
      * @access public
      * @author Teye Heimans
@@ -2112,7 +2083,7 @@ class FormHandler
 			E_USER_NOTICE
 			);
 
-			return;
+			return false;
 		}
 
 		// some fields have other names... change it.
@@ -2239,20 +2210,23 @@ class FormHandler
 			// get the mode
 			return $this -> _fields[$field][1] -> getViewMode();
 		}
+
 		// the field does not exists! error!
-		else
-		{
-			trigger_error(
-			'Error, could not find field "'. $field .'"! Please define the field first!',
-			E_USER_NOTICE
-			);
-		}
+		trigger_error(
+		'Error, could not find field "'. $field .'"! Please define the field first!',
+		E_USER_NOTICE
+		);
+		return false;
 	}
 
 	/**
 	 * FormHandler::setTableSettings()
 	 *
-	 * @param int width
+	 * @param int $width
+	 * @param int $cellspacing
+	 * @param int $cellpadding
+	 * @param int $border
+	 * @param string $extra
 	 * @return void
 	 * @author Teye Heimans
 	 */
@@ -2305,7 +2279,7 @@ class FormHandler
      * Return the value of a datefield as an array: array(y,m,d)
      *
      * @param string $datefield: return the value of the datefield as an array
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
@@ -2334,14 +2308,12 @@ class FormHandler
      * Get the value of the requested field
      *
      * @param string $field: The field which value we have to return
-     * @return string
+     * @return string|null
      * @access public
      * @author Teye Heimans
      */
 	public function value( $field )
 	{
-		if(!_global) global $_POST;
-
 		// is it a field?
 		if( isset( $this->_fields[$field] ) && is_object($this->_fields[$field][1]) && method_exists($this->_fields[$field][1], 'getvalue')  )
 		{
@@ -2389,9 +2361,9 @@ class FormHandler
      *
      * Set the value of the spicified field
      *
-     * @param string $field: The field which value we have to set
-     * @param string $value: The value we have to set
-     * @param boolean $overwriteCurrentValue: Do we have to overwrite the current value of the field (posted value)
+     * @param string $sField: The field which value we have to set
+     * @param string $sValue: The value we have to set
+     * @param boolean $bOverwriteCurrentValue: Do we have to overwrite the current value of the field (posted value)
      * @return void
      * @access public
      * @author Teye Heimans
@@ -2442,7 +2414,7 @@ class FormHandler
      *
      * Set the function which has to be called when the form is correct
      *
-     * @param string $callback: The name of the function
+     * @param string|array $callback: The name of the function
      * @return void
      * @access public
      * @author Teye Heimans
@@ -2666,8 +2638,7 @@ class FormHandler
      *
      * @param string $filename: the name of the file which will load the new values for the select field
      * @param string $fields: the name of the first dynamic select field.
-     * @param ...: More fields which are linked to eachother
-     * @return null
+     * @return void
      * @access public
      * @author Teye Heimans
      */
@@ -2731,7 +2702,7 @@ class FormHandler
 				'Error, the field "'.$fld1.'" could not be found in the form!',
 				E_USER_NOTICE
 				);
-				return false;
+				return;
 			}
 			// make sure that the fields exists
 			if( !$this->fieldExists( $fld2) )
@@ -2740,7 +2711,7 @@ class FormHandler
 				'Error, the field "'.$fld2.'" could not be found in the form!',
 				E_USER_NOTICE
 				);
-				return false;
+				return;
 			}
 
 			// values opslaan
@@ -2798,7 +2769,7 @@ class FormHandler
 			$jsAfter .= " new Array(  ";
 			foreach( $values as $value )
 			{
-				if( is_array( $value ) )
+				if( is_array( $value ) ) // @phpstan-ignore-line (Call to function is_array() with string will always evaluate to false.)
 				{
 					$jsAfter .= " new Array(  ";
 					foreach( $value as $item )
@@ -2829,7 +2800,7 @@ class FormHandler
      * used for dynamic select fields
      *
      * @param array $options: the new options for the select field
-     * @return null
+     * @return void
      * @access public
      * @author Teye Heimans
      */
@@ -2857,7 +2828,7 @@ class FormHandler
      * Return the title of the given field name
      *
      * @param string $sField: The fieldname where to retrieve the title from
-     * @return string
+     * @return string|null
      * @access public
      * @author Teye Heimans
      */
@@ -2981,8 +2952,6 @@ class FormHandler
 			$return[$s] = true;
 			return $result;
 		}
-
-		return '';
 	}
 
 	/**
@@ -3095,8 +3064,8 @@ class FormHandler
      *
      * @param string $field: The field where the image is uploaded
      * @param string $merge: The image which we should merge
-     * @param int $align: The align of the merge image (eg: left, center, right)
-     * @param int $valign: The vertical align of the merge image( eg: top, middle, bottom)
+     * @param string $align: The align of the merge image (eg: left, center, right)
+     * @param string $valign: The vertical align of the merge image( eg: top, middle, bottom)
      * @return void
      * @access public
      * @author Teye Heimans
@@ -3186,8 +3155,6 @@ class FormHandler
      */
 	public function isCorrect()
 	{
-		if( !_global) global $_POST;
-
 		$result = true;
 
 		foreach( $this->_fields as $id => $data )
@@ -3219,7 +3186,7 @@ class FormHandler
      *
      * Prints or returns the form
      *
-     * @return string: the form or null when the form should be printed
+     * @return string|null: the form or null when the form should be printed
      * @access public
      * @author Teye Heimans
      */
@@ -3338,7 +3305,7 @@ class FormHandler
 		*/
 
 		// disable our error handler!
-		if( FH_DISPLAY_ERRORS )
+		if( FH_DISPLAY_ERRORS ) // @phpstan-ignore-line (If condition is always false.)
 		{
 			restore_error_handler();
 		}
@@ -3398,7 +3365,7 @@ class FormHandler
      *
      * Return the given text in the correct language
      *
-     * @param int $index: the index of the text in the textfile
+     * @param int $iIndex: the index of the text in the textfile
      * @return string: the text in the correct language
      * @access private
      * @author Teye Heimans
@@ -3410,7 +3377,6 @@ class FormHandler
 		if( !isset( $this->_text ) || !is_array($this->_text))
 		{
 			trigger_error('No language file set!', E_USER_ERROR);
-			return false;
 		}
 
 		// does the index exists in the language file ?
@@ -3431,7 +3397,7 @@ class FormHandler
      *
      * @param string $name: The name of the field (or button)
      * @param object $field: The object of the field or button
-     * @return string $title: The titlt of the field. Leave blank for a button
+     * @return Field
      * @access private
      * @author Teye Heimans
      */

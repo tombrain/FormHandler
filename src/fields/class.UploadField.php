@@ -21,7 +21,7 @@ class UploadField extends Field
      *
      * Constructor: Create a new UploadField object
      *
-     * @param object &$oForm: The form where this field is located on
+     * @param FormHandler &$oForm: The form where this field is located on
      * @param string $sName: The name of the field
      * @param array $aConfig: The config array
      * @return UploadField
@@ -101,9 +101,6 @@ class UploadField extends Field
 		// get the value of the field
 		if( $oForm->isPosted() )
 		{
-			// make sure that the $_FILES and $_POST array are global
-			if(!_global) global $_FILES, $_POST;
-
 			// get the value if it exists in the $_FILES array
 			if( isset( $_FILES[$sName] ) )
 			{
@@ -278,8 +275,6 @@ class UploadField extends Field
      */
 	public function isUploaded()
 	{
-		if(!_global) global $_FILES;
-
 		return (
 		$this->_oForm->isPosted() && # form is posted
 		isset( $_FILES[$this->_sName] ) && # file known in the $_FILES array
@@ -389,9 +384,6 @@ class UploadField extends Field
      */
 	public function isValid()
 	{
-		// make the files array global if they are not
-		if(!_global) global $_FILES;
-
 		/**
          * Removed this part in order to get the required parameter working. 
          * @since 02-04-2008
@@ -603,7 +595,6 @@ class UploadField extends Field
 					),
 					E_USER_ERROR
 					);
-					return false;
 				}
 				@chmod( $sUpload, FH_DEFAULT_CHMOD );
 
@@ -647,7 +638,7 @@ class UploadField extends Field
      * Create the given dir
      *
      * @param string $sPath: the path to create
-     * @param int $mode: the chmode which should be used to create the dir
+     * @param int $iMode: the chmode which should be used to create the dir
      * @return boolean
      * @access private
      * @author Teye Heimans
@@ -656,22 +647,22 @@ class UploadField extends Field
 	{
 		if ( strlen( $sPath) == 0)
 		{
-			return 0;
+			return false;
 		}
 		if ( strlen( $sPath) < 3)
 		{
-			return 1; // avoid 'xyz:\' problem.
+			return true; // avoid 'xyz:\' problem.
 		}
 		elseif ( is_dir( $sPath ))
 		{
-			return 1; // avoid 'xyz:\' problem.
+			return true; // avoid 'xyz:\' problem.
 		}
 		elseif   ( dirname( $sPath) == $sPath )
 		{
-			return 1; // avoid 'xyz:\' problem.
+			return true; // avoid 'xyz:\' problem.
 		}
 
-		return ( $this->_forceDir( dirname($sPath), $sPath) and mkdir( $sPath, $iMode));
+		return ( $this->_forceDir( dirname($sPath), $sPath) && mkdir( $sPath, $iMode));
 	}
 
 	/**
@@ -680,7 +671,7 @@ class UploadField extends Field
      * Get the filename like we are going to save it
      *
      * @param boolean $bIgnoreRename: Ignore the rename option ?
-     * @return string: the filename
+     * @return string|null: the filename
      * @access private
      * @author Teye Heimans
      */
@@ -776,7 +767,7 @@ class UploadField extends Field
      * Get the given size in bytes
      *
      * @param string $sIniSize: The size we have to make to bytes
-     * @return integer: the size in bytes
+     * @return integer|false: the size in bytes
      * @access private
      * @author Teye Heimans
      */
