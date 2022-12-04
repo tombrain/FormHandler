@@ -8,8 +8,10 @@ function delete_directory($dirname)
         $dir_handle = opendir($dirname);
     if (!$dir_handle)
         return false;
-    while ($file = readdir($dir_handle)) {
-        if ($file != "." && $file != "..") {
+    while ($file = readdir($dir_handle))
+    {
+        if ($file != "." && $file != "..")
+        {
             if (!is_dir($dirname . "/" . $file))
                 unlink($dirname . "/" . $file);
             else
@@ -52,9 +54,9 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
         $config = array(
             "type" => "jpg jpeg jpe",
             "mime" => "image/jpeg image/jpg"
-          ); 
-          
-          $form = new FormHandler();
+        );
+
+        $form = new FormHandler();
 
         $this->assertFalse($form->isPosted());
 
@@ -82,7 +84,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "mime" => "image/jpeg image/jpg",
             "name" => "uploaded",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -121,7 +123,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "name" => "uploaded",
             "path" => $this->_tempPath,
             "size" => 100
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -138,8 +140,10 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $this->setPrivateProperty($form, "_unittestmode", true);
 
-        $this->assertFormFlushContains($form, ['Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'jpg jpeg jpe\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
-                                                '<span id="error_uploadfield" class="error">Maximum file size of 0.1 kb exceeded</span>']);
+        $this->assertFormFlushContains($form, [
+            'Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'jpg jpeg jpe\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
+            '<span id="error_uploadfield" class="error">Maximum file size of 0.1 kb exceeded</span>'
+        ]);
     }
 
     public function test_posted_failure_mime(): void
@@ -159,7 +163,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "mime" => "text/plain",
             "name" => "uploaded",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -176,8 +180,10 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $this->setPrivateProperty($form, "_unittestmode", true);
 
-        $this->assertFormFlushContains($form, ['Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'php\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
-                                                '<span id="error_uploadfield" class="error">The uploaded file is of an invalid file type!</span>']);
+        $this->assertFormFlushContains($form, [
+            'Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'php\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
+            '<span id="error_uploadfield" class="error">The uploaded file is of an invalid file type!</span>'
+        ]);
     }
 
     public function test_posted_failure_extension(): void
@@ -197,7 +203,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "mime" => "text/x-php",
             "name" => "uploaded",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -214,8 +220,10 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $this->setPrivateProperty($form, "_unittestmode", true);
 
-        $this->assertFormFlushContains($form, ['Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'txt\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
-                                                '<span id="error_uploadfield" class="error">Only the following extensions are allowed: txt.</span>']);
+        $this->assertFormFlushContains($form, [
+            'Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'txt\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
+            '<span id="error_uploadfield" class="error">Only the following extensions are allowed: txt.</span>'
+        ]);
     }
 
     public function test_posted_failure_width(): void
@@ -237,7 +245,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "path" => $this->_tempPath,
             "width" => 100,
             "height" => 100
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -254,8 +262,10 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $this->setPrivateProperty($form, "_unittestmode", true);
 
-        $this->assertFormFlushContains($form, ['Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'jpg jpeg jpe\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
-                                                '<span id="error_uploadfield" class="error">The dimension of the image can be 100 x 100 or less. The uploaded file has a dimension of 291 x 139!</span>']);
+        $this->assertFormFlushContains($form, [
+            'Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'jpg jpeg jpe\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
+            '<span id="error_uploadfield" class="error">The dimension of the image can be 100 x 100 or less. The uploaded file has a dimension of 291 x 139!</span>'
+        ]);
     }
 
     public function test_posted_failure_override(): void
@@ -278,7 +288,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "mime" => "image/jpeg image/jpg",
             "name" => "uploaded",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -318,7 +328,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "name" => "uploaded",
             "path" => $this->_tempPath,
             "exists" => "rename"
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -361,7 +371,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "name" => "uploaded",
             "path" => $this->_tempPath,
             "exists" => "overwrite"
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -388,7 +398,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "type" => "jpg jpeg jpe",
             "mime" => "image/jpeg image/jpg",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $_POST['FormHandler_submit'] = "1";
         $_FILES = [
@@ -416,8 +426,10 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $form->setError("textforfailure", "isfails");
 
-        $this->assertFormFlushContains($form, ['Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'jpg jpeg jpe\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
-                                                "<span id=\"error_uploadfield\" class=\"error\">Because the form isn't valid the file <b>test.jpg</b> has to be selected again if you want to send it with this form!<br />"]);
+        $this->assertFormFlushContains($form, [
+            'Uploadfield:<input type="file" name="uploadfield" id="uploadfield" onchange="fh_checkUpload(this, \'jpg jpeg jpe\', \'Only the following extensions are allowed: %s.\')"  class="error" />error_uploadfield',
+            "<span id=\"error_uploadfield\" class=\"error\">Because the form isn't valid the file <b>test.jpg</b> has to be selected again if you want to send it with this form!<br />"
+        ]);
     }
 
     public function test_required(): void
@@ -426,7 +438,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "type" => "jpg jpeg jpe",
             "mime" => "image/jpeg image/jpg",
             "required" => true
-          ); 
+        );
 
         $_POST['FormHandler_submit'] = "1";
         $_FILES = [
@@ -449,8 +461,10 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_uploadfield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['uploadfield']);
+        $this->assertEquals(
+            '<span id="error_uploadfield" class="error">You did not enter a correct value for this field!</span>',
+            $t['uploadfield']
+        );
     }
 
     public function test_new_extra(): void
@@ -483,7 +497,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "mime" => "image/jpeg image/jpg",
             "name" => "uploaded",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $form = new FormHandler();
 
@@ -509,7 +523,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
         $this->assertTrue(unlink("{$this->_tempPath}/uploaded.jpg"));
         $this->assertTrue(unlink("{$this->_tempPath}/resizeuploaded.jpg"));
     }
-    
+
     public function test_mergeImage(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -527,7 +541,7 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
             "mime" => "image/jpeg image/jpg",
             "name" => "uploadedandmerged",
             "path" => $this->_tempPath
-          ); 
+        );
 
         $form = new FormHandler();
 

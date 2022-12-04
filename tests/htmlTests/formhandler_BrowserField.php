@@ -1,33 +1,37 @@
-<?php  declare(strict_types=1); ?>
-<!DOCTYPE html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
 <?php
 
-define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/' );
-ini_set("display_errors", "1");
-@error_reporting(E_USER_WARNING | E_ALL);
+declare(strict_types=1); ?>
+<!DOCTYPE html>
 
-// uploads in tempdir
-$uploaddir = sys_get_temp_dir() . "/formhandler_upload_tests";
-if (!is_dir($uploaddir))
-  mkdir($uploaddir);
+<head>
+    <meta charset="utf-8">
+</head>
 
-require_once '../../vendor/autoload.php';
+<body>
+    <?php
 
-$form = new FormHandler();
-$form->onCorrect("mOnCorrect");
+    define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/');
+    ini_set("display_errors", "1");
+    @error_reporting(E_USER_WARNING | E_ALL);
 
-$form->browserField("Browserfield", "browserfield", $uploaddir);
+    // uploads in tempdir
+    $uploaddir = sys_get_temp_dir() . "/formhandler_upload_tests";
+    if (!is_dir($uploaddir))
+        mkdir($uploaddir);
 
-$form->submitButton();
+    require_once '../../vendor/autoload.php';
 
-$form->flush();
+    $form = new FormHandler();
+    $form->onCorrect("mOnCorrect");
 
-function mOnCorrect(array $fields, FormHandler $fh)
-{
-    var_dump($fields);
-    var_dump($fh);
-}
+    $form->browserField("Browserfield", "browserfield", $uploaddir);
+
+    $form->submitButton();
+
+    $form->flush();
+
+    function mOnCorrect(array $fields, FormHandler $fh)
+    {
+        var_dump($fields);
+        var_dump($fh);
+    }

@@ -30,7 +30,7 @@ final class formhandler_HiddenFieldTest extends FormhandlerTestCase
 
         $this->assertEquals("hiddenvalue", $form->getValue("hiddenfield"));
     }
-    
+
     public function test_posted_fillvalue_byinvalid(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -46,10 +46,12 @@ final class formhandler_HiddenFieldTest extends FormhandlerTestCase
 
         $form->setError("hiddenfield", "forcedError");
 
-        $this->assertFormFlushContains($form, ['<input type="hidden" name="hiddenfield" id="hiddenfield" value="hiddenvalue" />',
-                                                '<span id="error_hiddenfield" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            '<input type="hidden" name="hiddenfield" id="hiddenfield" value="hiddenvalue" />',
+            '<span id="error_hiddenfield" class="error">forcedError</span>'
+        ]);
     }
-    
+
     public function test_validator(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -64,8 +66,10 @@ final class formhandler_HiddenFieldTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_hiddenfield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['hiddenfield']);
+        $this->assertEquals(
+            '<span id="error_hiddenfield" class="error">You did not enter a correct value for this field!</span>',
+            $t['hiddenfield']
+        );
     }
 
     public function test_new_extra(): void
@@ -80,5 +84,4 @@ final class formhandler_HiddenFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['<input type="hidden" name="hiddenfield" id="hiddenfield" value="" data-old="123" />']);
     }
-
 };

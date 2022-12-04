@@ -30,7 +30,7 @@ final class formhandler_PassFieldTest extends FormhandlerTestCase
 
         $this->assertEquals("passvalue", $form->getValue("passfield"));
     }
-    
+
     public function test_posted_fillvalue_byinvalid(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -46,10 +46,12 @@ final class formhandler_PassFieldTest extends FormhandlerTestCase
 
         $form->setError("passfield", "forcedError");
 
-        $this->assertFormFlushContains($form, ['Passfield:<input type="password" name="passfield" id="passfield" size="20" class="error" />error_passfield',
-                                                '<span id="error_passfield" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            'Passfield:<input type="password" name="passfield" id="passfield" size="20" class="error" />error_passfield',
+            '<span id="error_passfield" class="error">forcedError</span>'
+        ]);
     }
-    
+
     public function test_validator(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -64,8 +66,10 @@ final class formhandler_PassFieldTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_passfield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['passfield']);
+        $this->assertEquals(
+            '<span id="error_passfield" class="error">You did not enter a correct value for this field!</span>',
+            $t['passfield']
+        );
     }
 
     public function test_new_size(): void
@@ -106,5 +110,4 @@ final class formhandler_PassFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Passfield:<input type="password" name="passfield" id="passfield" size="20" data-old="123" />error_passfield']);
     }
-
 };

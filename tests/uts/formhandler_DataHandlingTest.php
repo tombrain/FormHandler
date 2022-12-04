@@ -1,12 +1,14 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 final class formhandler_DataHandlingTest extends FormhandlerTestCase
 {
-    final protected function getFormhandlerType() : string
+    final protected function getFormhandlerType(): string
     {
         return "Formhandler";
-    } 
-    public function testGetAsArray() : void
+    }
+    public function testGetAsArray(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['date_year'] = "2020";
@@ -15,18 +17,18 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $form->dateField( 'Date', 'date' );
+        $form->dateField('Date', 'date');
 
         $this->assertTrue($form->isPosted());
 
-        list( $year, $month, $day ) = $form->getAsArray( 'date' );
+        list($year, $month, $day) = $form->getAsArray('date');
 
         $this->assertEquals("2020", $year);
         $this->assertEquals("3", $month);
         $this->assertEquals("21", $day);
     }
 
-    public function testGetValue() : void
+    public function testGetValue(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['name'] = 'Text';
@@ -41,25 +43,25 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
         $this->assertEquals("Text", $form->value("name"));
     }
 
-    public function testSetValue() : void
+    public function testSetValue(): void
     {
         $form = new FormHandler();
 
         $form->textField("Name", "name", FH_STRING);
         $form->setValue("name", "defaultValue");
-        
+
         $this->assertFalse($form->isPosted());
 
         $expected  = 'value="defaultValue"';
 
         $this->assertStringContainsString($expected, $form->flush(true));
-      }
+    }
 
-    public function testAddValue() : void
+    public function testAddValue(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['name'] = 'Text';
-        
+
         $form = new FormHandler();
 
         $form->textField("Name", "name", FH_STRING);
@@ -74,9 +76,9 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
 
         $expected  = "Code";
         $this->assertStringContainsString($expected, $form->flush(true));
-      }
+    }
 
-    public function testOnCorrect() : void
+    public function testOnCorrect(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['name'] = 'Text';
@@ -91,7 +93,7 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
         $this->assertEquals($expected, $form->flush(true));
     }
 
-    public function testOnCorrect_Class() : void
+    public function testOnCorrect_Class(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['name'] = 'Text';
@@ -104,15 +106,15 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
 
         // set the method which we should call when the form is saved
         $form->onCorrect(
-                            // note: the & caracter is needed!
-                            array(&$example, "doRun")
-                        );
+            // note: the & caracter is needed!
+            array(&$example, "doRun")
+        );
 
         $expected  = $_POST['name'];
         $this->assertEquals($expected, $form->flush(true));
     }
 
-    public function testOnCorrect_Validation_false() : void
+    public function testOnCorrect_Validation_false(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['name'] = 'Te';
@@ -128,7 +130,7 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
         $this->assertStringContainsString($expected, $form->flush(true));
     }
 
-    public function testOnCorrect_Validation_true() : void
+    public function testOnCorrect_Validation_true(): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['name'] = 'Test';
@@ -143,11 +145,11 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
         $this->assertEquals($expected, $form->flush(true));
     }
 
-    public function testSetError() : void
+    public function testSetError(): void
     {
         $form = new FormHandler();
 
-        $form->textField("Name", "name", FH_STRING );
+        $form->textField("Name", "name", FH_STRING);
 
         $form->setError("name", "This is an error");
 
@@ -156,32 +158,32 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
     }
 }
 
-function doRun_ReturnDataName( $data, &$form ) : string
+function doRun_ReturnDataName($data, &$form): string
 {
     return $data["name"];
-} 
+}
 
 /**** Simple example class!! *******/
-class Example 
+class Example
 {
     // this is the method we are going to call
     // when the form is correct!
-    function doRun( $data, &$form ) : string
+    function doRun($data, &$form): string
     {
         return $data["name"];
     }
 }
 
 // the oncorrect function
-function doRun_testOnCorrect_Validation( array $data, FormHandler &$form )
+function doRun_testOnCorrect_Validation(array $data, FormHandler &$form)
 {
     // is the name shorter then 3 characters ?
-    if( strlen( $data['name'] ) < 3 )
+    if (strlen($data['name']) < 3)
     {
         // set an error message for the name field
         $form->setError(
-          'name', 
-          'Your name has to be at least 3 characters!'
+            'name',
+            'Your name has to be at least 3 characters!'
         );
 
         // display the form again
@@ -191,4 +193,4 @@ function doRun_testOnCorrect_Validation( array $data, FormHandler &$form )
     {
         return $data["name"];
     }
-} 
+}

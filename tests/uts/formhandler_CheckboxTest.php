@@ -9,7 +9,7 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
         "c2" => "Check2",
         "c3" => "Check3"
     ];
-    
+
     public function test_new_single(): void
     {
         $form = new FormHandler();
@@ -22,7 +22,7 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox" id="checkbox_1" value="on" />error_checkbox']);
     }
-    
+
     public function test_new_empty_optionArray(): void
     {
         $form = new FormHandler();
@@ -33,7 +33,7 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Checkbox:error_checkbox']);
     }
-    
+
     public function test_new_single_viewmode(): void
     {
         $form = new FormHandler();
@@ -45,7 +45,7 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Checkbox:error_checkbox']);
     }
-    
+
     public function test_setValue(): void
     {
         $form = new FormHandler();
@@ -57,9 +57,11 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
         $form->setValue("checkbox", "c1,c3,");
         $this->assertEquals(array("c1", "c3"), $form->getValue("checkbox"));
 
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" checked="checked" /><label for="checkbox_1" class="noStyle">Check1</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" checked="checked" /><label for="checkbox_3" class="noStyle">Check3</label>error_checkbox']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" checked="checked" /><label for="checkbox_1" class="noStyle">Check1</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" checked="checked" /><label for="checkbox_3" class="noStyle">Check3</label>error_checkbox'
+        ]);
     }
 
     public function test_setMask(): void
@@ -71,12 +73,14 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
         $form->checkBox("Checkbox", "checkbox", $this->aChecks, null, null, null, "nofield");
         $form->checkBox("Checkbox2", "checkbox2", $this->aChecks, null, null, null, "with a %field%");
 
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>nofield',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>nofield',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>nofielderror_checkbox',
-                                                'Checkbox2:with a <input type="checkbox" name="checkbox2[]" id="checkbox2_4" value="c1" /><label for="checkbox2_4" class="noStyle">Check1</label>with a ',
-                                                '<input type="checkbox" name="checkbox2[]" id="checkbox2_5" value="c2" /><label for="checkbox2_5" class="noStyle">Check2</label>with a ',
-                                                '<input type="checkbox" name="checkbox2[]" id="checkbox2_6" value="c3" /><label for="checkbox2_6" class="noStyle">Check3</label>error_checkbox2']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>nofield',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>nofield',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>nofielderror_checkbox',
+            'Checkbox2:with a <input type="checkbox" name="checkbox2[]" id="checkbox2_4" value="c1" /><label for="checkbox2_4" class="noStyle">Check1</label>with a ',
+            '<input type="checkbox" name="checkbox2[]" id="checkbox2_5" value="c2" /><label for="checkbox2_5" class="noStyle">Check2</label>with a ',
+            '<input type="checkbox" name="checkbox2[]" id="checkbox2_6" value="c3" /><label for="checkbox2_6" class="noStyle">Check3</label>error_checkbox2'
+        ]);
     }
 
     public function test_new_array(): void
@@ -89,10 +93,12 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertEmpty($form->getValue("checkbox"));
 
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>',
-                                                'error_checkbox']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>',
+            'error_checkbox'
+        ]);
     }
 
     public function test_new_array_useArrayKeyAsValueFalse(): void
@@ -105,10 +111,12 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertEmpty($form->getValue("checkbox"));
 
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="Check1" /><label for="checkbox_1" class="noStyle">Check1</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="Check2" /><label for="checkbox_2" class="noStyle">Check2</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="Check3" /><label for="checkbox_3" class="noStyle">Check3</label>',
-                                                'error_checkbox']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="Check1" /><label for="checkbox_1" class="noStyle">Check1</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="Check2" /><label for="checkbox_2" class="noStyle">Check2</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="Check3" /><label for="checkbox_3" class="noStyle">Check3</label>',
+            'error_checkbox'
+        ]);
     }
 
     public function test_new_array_extra(): void
@@ -121,10 +129,12 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertEmpty($form->getValue("checkbox"));
 
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" data-extra="true" /><label for="checkbox_1" class="noStyle">Check1</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" data-extra="true" /><label for="checkbox_2" class="noStyle">Check2</label>',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" data-extra="true" /><label for="checkbox_3" class="noStyle">Check3</label>',
-                                                'error_checkbox']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" data-extra="true" /><label for="checkbox_1" class="noStyle">Check1</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" data-extra="true" /><label for="checkbox_2" class="noStyle">Check2</label>',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" data-extra="true" /><label for="checkbox_3" class="noStyle">Check3</label>',
+            'error_checkbox'
+        ]);
     }
 
     public function test_new_array_mask(): void
@@ -137,10 +147,12 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertEmpty($form->getValue("checkbox"));
 
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>ABC',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>ABC',
-                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>ABC',
-                                                'error_checkbox']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>ABC',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>ABC',
+            '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>ABC',
+            'error_checkbox'
+        ]);
     }
 
     public function test_posted_single(): void
@@ -185,8 +197,10 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
         $this->assertEquals("on", $form->getValue("checkbox"));
 
         $form->setError("checkbox", "forcedError");
-        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox" id="checkbox_1" value="on" checked="checked" class="error" />error_checkbox',
-                                                '<span id="error_checkbox" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            'Checkbox:<input type="checkbox" name="checkbox" id="checkbox_1" value="on" checked="checked" class="error" />error_checkbox',
+            '<span id="error_checkbox" class="error">forcedError</span>'
+        ]);
     }
 
     public function test_posted_array_fillvalue_byinvalid(): void
@@ -218,9 +232,10 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $form->setError("textfield", "forcedError");
 
-        $this->assertFormFlushContains($form, ['Textfield:<input type="text" name="textfield" id="textfield" value="textvalue" size="20" class="error" />error_textfield',
-                                                '<span id="error_textfield" class="error">forcedError</span>']);
-
+        $this->assertFormFlushContains($form, [
+            'Textfield:<input type="text" name="textfield" id="textfield" value="textvalue" size="20" class="error" />error_textfield',
+            '<span id="error_textfield" class="error">forcedError</span>'
+        ]);
     }
 
     public function test_validator(): void
@@ -237,8 +252,10 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_textfield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['textfield']);
+        $this->assertEquals(
+            '<span id="error_textfield" class="error">You did not enter a correct value for this field!</span>',
+            $t['textfield']
+        );
     }
 
     public function test_new_size(): void
@@ -279,5 +296,4 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Textfield:<input type="text" name="textfield" id="textfield" value="" size="20"  data-old="123"']);
     }
-
 };

@@ -22,8 +22,10 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertEmpty($form->getValue("textNullable"));
         $this->assertEmpty($form->getValue("textNotNullable"));
 
-        $this->assertFormFlushContains($form, ['input type="text" name="textNullable" id="textNullable" value=""',
-                                                 'input type="text" name="textNotNullable" id="textNotNullable" value=""']);
+        $this->assertFormFlushContains($form, [
+            'input type="text" name="textNullable" id="textNullable" value=""',
+            'input type="text" name="textNotNullable" id="textNotNullable" value=""'
+        ]);
     }
 
     public function test_edit_noDataset(): void
@@ -39,10 +41,9 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
-                ->willReturnResultSet([
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
+            ->willReturnResultSet([]);
 
         $this->expectError();
         $this->expectErrorMessage("Try to edit a none existing record!");
@@ -63,11 +64,11 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '100'"))
-                ->willReturnResultSet([
-                    ['id' => '100', 'textNullable' => 'text1', 'textNotNullable' => 'text2'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '100'"))
+            ->willReturnResultSet([
+                ['id' => '100', 'textNullable' => 'text1', 'textNotNullable' => 'text2'],
+            ]);
 
         $this->setConnectedTable($form, "test");
 
@@ -77,8 +78,10 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertEquals("text1", $form->getValue("textNullable"));
         $this->assertEquals("text2", $form->getValue("textNotNullable"));
 
-        $this->assertFormFlushContains($form, ['input type="text" name="textNullable" id="textNullable" value="text1"',
-                                                'input type="text" name="textNotNullable" id="textNotNullable" value="text2"']);
+        $this->assertFormFlushContains($form, [
+            'input type="text" name="textNullable" id="textNullable" value="text1"',
+            'input type="text" name="textNotNullable" id="textNotNullable" value="text2"'
+        ]);
     }
 
     public function test_insert_noValues(): void
@@ -99,13 +102,13 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $form->textField("TextNotNullable", "textNotNullable");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("INSERT INTO test (textNullable, textNotNullable) VALUES (NULL, '');")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4712);
+            ->expects($this->once())
+            ->query("INSERT INTO test (textNullable, textNotNullable) VALUES (NULL, '');")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4712);
 
         $this->setCallbackOnSaved($form);
-        
+
         $r = $form->flush(true);
 
         $this->assertEmpty($r);
@@ -113,7 +116,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertSavedValueEmtpy('textNullable');
         $this->assertSavedValueEmtpy('textNotNullable');
     }
- 
+
     public function test_insert(): void
     {
         $this->createMocksForTable();
@@ -134,13 +137,13 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $form->textField("TextNotNullable", "textNotNullable");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("INSERT INTO test (textNullable, textNotNullable) VALUES ('thetext', 'anothertext');")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4713);
+            ->expects($this->once())
+            ->query("INSERT INTO test (textNullable, textNotNullable) VALUES ('thetext', 'anothertext');")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4713);
 
         $this->setCallbackOnSaved($form);
-        
+
         $r = $form->flush(true);
 
         $this->assertEmpty($r);
@@ -148,7 +151,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertSavedValue('thetext', 'textNullable');
         $this->assertSavedValue('anothertext', 'textNotNullable');
     }
-    
+
     public function test_update_noValues(): void
     {
         $this->createMocksForTable();
@@ -163,11 +166,11 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '4714'"))
-                ->willReturnResultSet([
-                    ['id' => '4714', 'textNullable' => 'text1', 'textNotNullable' => 'text2'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '4714'"))
+            ->willReturnResultSet([
+                ['id' => '4714', 'textNullable' => 'text1', 'textNotNullable' => 'text2'],
+            ]);
 
         $this->setConnectedTable($form, "test");
 
@@ -175,11 +178,11 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $form->textField("TextNotNullable", "textNotNullable");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("UPDATE test SET textNullable = NULL, textNotNullable = '' WHERE id = '4714'");
+            ->expects($this->once())
+            ->query("UPDATE test SET textNullable = NULL, textNotNullable = '' WHERE id = '4714'");
 
         $this->setCallbackOnSaved($form);
-        
+
         $r = $form->flush(true);
 
         $this->assertEmpty($r);
@@ -187,7 +190,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertSavedValueEmtpy('textNullable');
         $this->assertSavedValueEmtpy('textNotNullable');
     }
- 
+
     public function test_update(): void
     {
         $this->createMocksForTable();
@@ -204,22 +207,22 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
         $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '4715'"))
-                ->willReturnResultSet([
-                    ['id' => '4715', 'textNullable' => 'text1', 'textNotNullable' => 'text2'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '4715'"))
+            ->willReturnResultSet([
+                ['id' => '4715', 'textNullable' => 'text1', 'textNotNullable' => 'text2'],
+            ]);
         $this->setConnectedTable($form, "test");
 
         $form->textField("TextNullable", "textNullable");
         $form->textField("TextNotNullable", "textNotNullable");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("UPDATE test SET textNullable = 'thetext', textNotNullable = 'anothertext' WHERE id = '4715'");
+            ->expects($this->once())
+            ->query("UPDATE test SET textNullable = 'thetext', textNotNullable = 'anothertext' WHERE id = '4715'");
 
         $this->setCallbackOnSaved($form);
-        
+
         $r = $form->flush(true);
 
         $this->assertEmpty($r);

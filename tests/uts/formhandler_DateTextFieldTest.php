@@ -67,8 +67,10 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
 
         $form->setError("datetextfield", "forcedError");
 
-        $this->assertFormFlushContains($form, ['DateTextField:<input type="text" name="datetextfield" id="datetextfield" value="14-04-2020" size="20" class="error" />error_datetextfield',
-                                                '<span id="error_datetextfield" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            'DateTextField:<input type="text" name="datetextfield" id="datetextfield" value="14-04-2020" size="20" class="error" />error_datetextfield',
+            '<span id="error_datetextfield" class="error">forcedError</span>'
+        ]);
     }
 
     public function test_validator(): void
@@ -85,8 +87,10 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_datetextfield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['datetextfield']);
+        $this->assertEquals(
+            '<span id="error_datetextfield" class="error">You did not enter a correct value for this field!</span>',
+            $t['datetextfield']
+        );
     }
 
     public function test_new_extra(): void
@@ -102,7 +106,7 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
         $this->assertFormFlushContains($form, ['DateTextField:<input type="text" name="datetextfield" id="datetextfield" value="" size="20"  data-old="123"']);
     }
 
-    public function dataTestGetAsArray() : array
+    public function dataTestGetAsArray(): array
     {
         // The default display of the date fields useage:
         // d = day (2 digits with leading zeros)
@@ -112,29 +116,29 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
         // y = year (two digits)
         // Y = year (four digits)
         return [
-            [ ["mask" => 'd-m-Y', "value" => "",           "result" => ['day' => "",   'month' => "",   'year' => ""]] ],
-            [ ["mask" => 'd-m-Y', "value" => "31-03-2020", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'D-M-Y', "value" => "1-3-2020",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'Y-m-d', "value" => "2020-03-31", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'Y-M-D', "value" => "2020-3-1",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'd.m.Y', "value" => "31.03.2020", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'D.M.Y', "value" => "1.3.2020",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'Y/m/d', "value" => "2020/03/31", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'Y/M/D', "value" => "2020/3/1",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'd/m/Y', "value" => "31/03/2020", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'D/M/Y', "value" => "1/3/2020",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'd-m-y', "value" => "31-03-20",   "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'D-M-y', "value" => "1-3-20",     "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'd.m.y', "value" => "31.03.20",   "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'D.M.y', "value" => "1.3.20",     "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
-            [ ["mask" => 'd/m/y', "value" => "31/03/20",   "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]] ],
-            [ ["mask" => 'D/M/y', "value" => "1/3/20",     "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]] ],
+            [["mask" => 'd-m-Y', "value" => "",           "result" => ['day' => "",   'month' => "",   'year' => ""]]],
+            [["mask" => 'd-m-Y', "value" => "31-03-2020", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'D-M-Y', "value" => "1-3-2020",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'Y-m-d', "value" => "2020-03-31", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'Y-M-D', "value" => "2020-3-1",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'd.m.Y', "value" => "31.03.2020", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'D.M.Y', "value" => "1.3.2020",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'Y/m/d', "value" => "2020/03/31", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'Y/M/D', "value" => "2020/3/1",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'd/m/Y', "value" => "31/03/2020", "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'D/M/Y', "value" => "1/3/2020",   "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'd-m-y', "value" => "31-03-20",   "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'D-M-y', "value" => "1-3-20",     "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'd.m.y', "value" => "31.03.20",   "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'D.M.y', "value" => "1.3.20",     "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
+            [["mask" => 'd/m/y', "value" => "31/03/20",   "result" => ['day' => "31", 'month' => "03", 'year' => "2020"]]],
+            [["mask" => 'D/M/y', "value" => "1/3/20",     "result" => ['day' => "1",  'month' => "3",  'year' => "2020"]]],
         ];
     }
     /**
      * @dataProvider dataTestGetAsArray
      */
-    public function testGetAsArray($dataTestGetAsArray) : void
+    public function testGetAsArray($dataTestGetAsArray): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['datetextfield'] = $dataTestGetAsArray['value'];
@@ -145,7 +149,7 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
 
         $this->assertTrue($form->isPosted());
 
-        list( $year, $month, $day ) = $form->getAsArray( 'datetextfield' );
+        list($year, $month, $day) = $form->getAsArray('datetextfield');
 
         $this->assertEquals($dataTestGetAsArray['result']['year'], $year);
         $this->assertEquals($dataTestGetAsArray['result']['month'], $month);
@@ -155,7 +159,7 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
     /**
      * @dataProvider dataTestGetAsArray
      */
-    public function testParseOtherRepresentaions($dataTestGetAsArray) : void
+    public function testParseOtherRepresentaions($dataTestGetAsArray): void
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['datetextfield'] = $dataTestGetAsArray['value'];
@@ -173,13 +177,13 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
             $this->expectError();
             $this->expectErrorMessage("Value is not a valid date [" . $dataTestGetAsArray['value'] . "]");
         }
-        list( $year, $month, $day ) = $form->getAsArray( 'datetextfield' );
+        list($year, $month, $day) = $form->getAsArray('datetextfield');
 
         $this->assertEquals($dataTestGetAsArray['result']['year'], $year);
         $this->assertEquals($dataTestGetAsArray['result']['month'], $month);
         $this->assertEquals($dataTestGetAsArray['result']['day'], $day);
 
-        list( $year2, $month2, $day2 ) = $form->getAsArray( 'datetextfield2' );
+        list($year2, $month2, $day2) = $form->getAsArray('datetextfield2');
 
         $this->assertEquals($dataTestGetAsArray['result']['year'], $year2);
         $this->assertEquals($dataTestGetAsArray['result']['month'], $month2);

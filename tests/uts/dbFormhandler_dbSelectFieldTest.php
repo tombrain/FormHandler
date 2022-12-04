@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
 {
@@ -9,13 +11,13 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->setConnectedTable($form, "test");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->matches('SELECT keyField, valueField FROM loadFromTable ORDER BY valueField'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->matches('SELECT keyField, valueField FROM loadFromTable ORDER BY valueField'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInField',
@@ -40,7 +42,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->createMocksForTable();
 
         $_GET['id'] = "123";
-        
+
         $form = new dbFormHandler();
 
         $this->assertFalse($form->insert);
@@ -48,22 +50,22 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
-                ->willReturnResultSet([
-                    ['id' => '123', 'saveInField' => '2'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
+            ->willReturnResultSet([
+                ['id' => '123', 'saveInField' => '2'],
+            ]);
 
         $this->setConnectedTable($form, "test");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->matches('SELECT keyField, valueField FROM loadFromTable ORDER BY valueField'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->matches('SELECT keyField, valueField FROM loadFromTable ORDER BY valueField'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInField',
@@ -89,7 +91,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['saveInField'] = "2";
-        
+
         $form = new dbFormHandler();
 
         $this->setConnectedTable($form, "test");
@@ -98,13 +100,13 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInField',
@@ -115,10 +117,10 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         );
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("INSERT INTO test (saveInField) VALUES ('2');")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4711);
+            ->expects($this->once())
+            ->query("INSERT INTO test (saveInField) VALUES ('2');")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4711);
 
 
         $this->setCallbackOnSaved($form);
@@ -128,14 +130,13 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->assertEquals("", $r);
         $this->assertSavedId(4711);
         $this->assertSavedValue('2', 'saveInField');
-
     }
 
     // public function test_insert_wrongValue(): void
     // {
     //     $_POST['FormHandler_submit'] = "1";
     //     $_POST['saveInField'] = "3";
-        
+
     //     $form = new dbFormHandler();
 
     //     $this->setConnectedTable($form, "test");
@@ -148,7 +149,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
     //                 ['keyField' => 1, 'valueField' => 'foo'],
     //                 ['keyField' => 2, 'valueField' => 'bar'],
     //             ]);
-    
+
     //     $form->dbSelectField(
     //         'Options from a table',
     //         'saveInField',
@@ -181,11 +182,11 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
     public function test_update(): void
     {
         $this->createMocksForTable();
- 
+
         $_POST['FormHandler_submit'] = "1";
         $_GET['id'] = "123";
         $_POST['saveInField'] = "2";
-        
+
         $form = new dbFormHandler();
 
         $this->assertFalse($form->insert);
@@ -193,22 +194,22 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
-                ->willReturnResultSet([
-                    ['id' => '123', 'saveInField' => '1'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
+            ->willReturnResultSet([
+                ['id' => '123', 'saveInField' => '1'],
+            ]);
 
         $this->setConnectedTable($form, "test");
- 
+
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInField',
@@ -219,10 +220,10 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         );
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("UPDATE test SET saveInField = '2' WHERE id = '123'")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4711);
+            ->expects($this->once())
+            ->query("UPDATE test SET saveInField = '2' WHERE id = '123'")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4711);
 
 
         $this->setCallbackOnSaved($form);
@@ -242,21 +243,21 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->matches('SELECT keyField, valueField FROM loadFromTable ORDER BY valueField'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->matches('SELECT keyField, valueField FROM loadFromTable ORDER BY valueField'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInFieldString',
             'loadFromTable',
             array('keyField', 'valueField'),
             'ORDER BY valueField',
-            FH_NOT_EMPTY
-            ,true
+            FH_NOT_EMPTY,
+            true
         );
 
         $aExpected = [
@@ -274,7 +275,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
     //     $this->createMocksForTable();
 
     //     $_GET['id'] = "123";
-        
+
     //     $form = new dbFormHandler();
 
     //     $this->assertFalse($form->insert);
@@ -296,7 +297,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
     //                 ['keyField' => 1, 'valueField' => 'foo'],
     //                 ['keyField' => 2, 'valueField' => 'bar'],
     //             ]);
-    
+
     //     $form->dbSelectField(
     //         'Options from a table',
     //         'saveInFieldString',
@@ -325,7 +326,7 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
     {
         $_POST['FormHandler_submit'] = "1";
         $_POST['saveInFieldString'] = ['0' => "2", '1' => "1"];
-        
+
         $form = new dbFormHandler();
 
         $this->assertTrue($form->isPosted());
@@ -334,13 +335,13 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $this->createMocksForTable();
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInFieldString',
@@ -351,10 +352,10 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         );
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("INSERT INTO test (saveInFieldString) VALUES ( '2, 1' );")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4711);
+            ->expects($this->once())
+            ->query("INSERT INTO test (saveInFieldString) VALUES ( '2, 1' );")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4711);
 
 
         $this->setCallbackOnSaved($form);
@@ -372,28 +373,28 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         $_POST['FormHandler_submit'] = "1";
         $_POST['saveInFieldString'] = ['0' => "2"];
         $_GET['id'] = "123";
-        
+
         $form = new dbFormHandler();
 
         $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
-                ->willReturnResultSet([
-                    ['id' => '123', 'saveInFieldString' => '2, 1'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
+            ->willReturnResultSet([
+                ['id' => '123', 'saveInFieldString' => '2, 1'],
+            ]);
 
         $this->setConnectedTable($form, "test");
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
-                ->willReturnResultSet([
-                    ['keyField' => 1, 'valueField' => 'foo'],
-                    ['keyField' => 2, 'valueField' => 'bar'],
-                ]);
-    
+            ->expects($this->once())
+            ->query($this->stringStartsWith('SELECT keyField, valueField FROM loadFromTable'))
+            ->willReturnResultSet([
+                ['keyField' => 1, 'valueField' => 'foo'],
+                ['keyField' => 2, 'valueField' => 'bar'],
+            ]);
+
         $form->dbSelectField(
             'Options from a table',
             'saveInFieldString',
@@ -404,10 +405,10 @@ final class dbFormhandler_dbSelectFieldTest extends dbFormhandlerTestCase
         );
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("UPDATE test SET saveInFieldString = '2' WHERE id = '123'")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4711);
+            ->expects($this->once())
+            ->query("UPDATE test SET saveInFieldString = '2' WHERE id = '123'")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4711);
 
 
         $this->setCallbackOnSaved($form);

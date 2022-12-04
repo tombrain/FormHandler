@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 final class formhandler_DateFieldTest extends FormhandlerTestCase
 {
-    private function getDays($days, $daySelected = null) : array
+    private function getDays($days, $daySelected = null): array
     {
         $r = [];
         for ($i = 1; $i <= 31; $i++)
@@ -17,7 +17,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         return $r;
     }
-    private function getMonths($monthSelected = null) : array
+    private function getMonths($monthSelected = null): array
     {
         $aMonthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
         $r = [];
@@ -31,7 +31,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         return $r;
     }
-    private function getYears($startYear, $endYear, $yearSelected = null) : array
+    private function getYears($startYear, $endYear, $yearSelected = null): array
     {
         $r = [];
         for ($i = $startYear; $i >= $endYear; $i--)
@@ -87,7 +87,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear, date('Y')));
         $aExpected[] = '</select> error_datefield';
 
-        $t =$this->assertFormFlushContains($form, $aExpected);
+        $t = $this->assertFormFlushContains($form, $aExpected);
         $this->assertFalse(strpos($t, '<option  value="" ></option>'));
     }
 
@@ -226,8 +226,10 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
         $form->dateField("Datefield2", "datefield2", null, null, "Y.M-D");
 
-        $this->assertFormFlushContains($form, ['Datefield: <input type="text" name="datefield_day" id="datefield_day" value="" size="2" maxlength="2" /> - <input type="text" name="datefield_month" id="datefield_month" value="" size="2" maxlength="2" /> - <input type="text" name="datefield_year" id="datefield_year" value="" size="4" maxlength="4" /> error_datefield',
-                                                'Datefield2: <input type="text" name="datefield2_year" id="datefield2_year" value="" size="4" maxlength="4" /> . <input type="text" name="datefield2_month" id="datefield2_month" value="" size="2" maxlength="2" /> - <input type="text" name="datefield2_day" id="datefield2_day" value="" size="2" maxlength="2" /> error_datefield2']);
+        $this->assertFormFlushContains($form, [
+            'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="" size="2" maxlength="2" /> - <input type="text" name="datefield_month" id="datefield_month" value="" size="2" maxlength="2" /> - <input type="text" name="datefield_year" id="datefield_year" value="" size="4" maxlength="4" /> error_datefield',
+            'Datefield2: <input type="text" name="datefield2_year" id="datefield2_year" value="" size="4" maxlength="4" /> . <input type="text" name="datefield2_month" id="datefield2_month" value="" size="2" maxlength="2" /> - <input type="text" name="datefield2_day" id="datefield2_day" value="" size="2" maxlength="2" /> error_datefield2'
+        ]);
     }
 
     public function test_posted_editfields_fillvalue_byinvalid(): void
@@ -248,8 +250,8 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $form->setError("datefield", "forcedError");
 
         $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="03" size="2" maxlength="2" class="error" />' .
-                                                ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
-                                                ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" /> error_datefield<span id="error_datefield" class="error">forcedError');
+            ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" /> error_datefield<span id="error_datefield" class="error">forcedError');
     }
 
     public function test_new_extra(): void
@@ -273,5 +275,4 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, $aExpected);
     }
-
 };

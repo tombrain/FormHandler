@@ -1,43 +1,47 @@
-<?php  declare(strict_types=1); ?>
-<!DOCTYPE html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
 <?php
 
-define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/' );
-ini_set("display_errors", "1");
-@error_reporting(E_USER_WARNING | E_ALL);
+declare(strict_types=1); ?>
+<!DOCTYPE html>
 
-require_once '../../vendor/autoload.php';
+<head>
+    <meta charset="utf-8">
+</head>
 
-// make a new formhandler object
-$form = new FormHandler();
-// passfield
-$form -> passField("Password", "password", FH_STRING);
+<body>
+    <?php
 
-// get the value of the field
-$value = $form->value("password");
+    define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/');
+    ini_set("display_errors", "1");
+    @error_reporting(E_USER_WARNING | E_ALL);
 
-// save the password MD5 encrypted
-// so OVERWRITE the current value!!
-$form->addValue(
-  "password", 
-  "MD5('". ctype_lower( $value ) ."')", 
-);
+    require_once '../../vendor/autoload.php';
 
-// submitbutton
-$form -> submitButton("Save");
+    // make a new formhandler object
+    $form = new FormHandler();
+    // passfield
+    $form->passField("Password", "password", FH_STRING);
 
-// set the onCorrect function
-$form -> onCorrect("doRun");
+    // get the value of the field
+    $value = $form->value("password");
 
-// flush
-$form -> flush();
+    // save the password MD5 encrypted
+    // so OVERWRITE the current value!!
+    $form->addValue(
+        "password",
+        "MD5('" . ctype_lower($value) . "')",
+    );
 
-// commit after form function
-function doRun($data) 
-{
-    echo "MD5 encrypted password: ".$data['password'];
-} 
+    // submitbutton
+    $form->submitButton("Save");
+
+    // set the onCorrect function
+    $form->onCorrect("doRun");
+
+    // flush
+    $form->flush();
+
+    // commit after form function
+    function doRun($data)
+    {
+        echo "MD5 encrypted password: " . $data['password'];
+    }

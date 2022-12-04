@@ -2,8 +2,8 @@
 
 declare(strict_types=1);
 
-define( 'FH_TEXTSELECT_MASK', '%s-%s-%d-%s-%s-%s');
-define( 'FH_TEXTSELECT_OPTION_MASK', '%s-%s');
+define('FH_TEXTSELECT_MASK', '%s-%s-%d-%s-%s-%s');
+define('FH_TEXTSELECT_OPTION_MASK', '%s-%s');
 
 final class formhandler_TextSelectFieldTest extends FormhandlerTestCase
 {
@@ -12,7 +12,7 @@ final class formhandler_TextSelectFieldTest extends FormhandlerTestCase
         "o2" => "Option2",
         "o3" => "Option3"
     ];
-    
+
     public function test_new(): void
     {
         $form = new FormHandler();
@@ -23,20 +23,22 @@ final class formhandler_TextSelectFieldTest extends FormhandlerTestCase
 
         $this->assertEmpty($form->getValue("textselectfield"));
 
-        $this->assertFormFlushContains($form, ["<script type=\"text/javascript\">\n" .
-                                                "function FH_CLOSE_TEXTSELECT( id )\n" .
-                                                "{\n" .
-                                                "  setTimeout( 'document.getElementById(\"'+id+'\").style.display=\"none\"', 110 );\n" .
-                                                "}\n" .
-                                                "\n" .
-                                                "function FH_SET_TEXTSELECT( id, waarde )\n" . 
-                                                "{\n" .
-                                                "  document.getElementById(id).value=waarde;\n" .
-                                                "  FH_CLOSE_TEXTSELECT( 'FHSpan_'+id );return false;\n" .
-                                                "}\n" .
-                                                "\n" .
-                                                "</script>\n",
-                                                'Textselectfield:textselectfield--20---textselectfield-Option1textselectfield-Option2textselectfield-Option3error_textselectfield']);
+        $this->assertFormFlushContains($form, [
+            "<script type=\"text/javascript\">\n" .
+                "function FH_CLOSE_TEXTSELECT( id )\n" .
+                "{\n" .
+                "  setTimeout( 'document.getElementById(\"'+id+'\").style.display=\"none\"', 110 );\n" .
+                "}\n" .
+                "\n" .
+                "function FH_SET_TEXTSELECT( id, waarde )\n" .
+                "{\n" .
+                "  document.getElementById(id).value=waarde;\n" .
+                "  FH_CLOSE_TEXTSELECT( 'FHSpan_'+id );return false;\n" .
+                "}\n" .
+                "\n" .
+                "</script>\n",
+            'Textselectfield:textselectfield--20---textselectfield-Option1textselectfield-Option2textselectfield-Option3error_textselectfield'
+        ]);
     }
 
     public function test_posted(): void
@@ -110,6 +112,5 @@ final class formhandler_TextSelectFieldTest extends FormhandlerTestCase
         $this->assertEmpty($form->getValue("textselectfield"));
 
         $this->assertFormFlushContains($form, ['Textselectfield:textselectfield--20- data-old="123" --textselectfield-Option1textselectfield-Option2textselectfield-Option3error_textselectfield']);
-     }
-
+    }
 };

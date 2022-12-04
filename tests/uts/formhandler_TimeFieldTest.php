@@ -4,27 +4,27 @@ declare(strict_types=1);
 
 final class formhandler_TimeFieldTest extends FormhandlerTestCase
 {
-    private function getNearestMinute( int &$minute, int $intervall ) : int
+    private function getNearestMinute(int &$minute, int $intervall): int
     {
         // get the nearest value at the minutes...
-    	for($i = 0; $i < $minute; $i += $intervall);
+        for ($i = 0; $i < $minute; $i += $intervall);
 
-    	$i = abs( $minute - $i ) < abs( $minute - ($i - $intervall)) ? 	$i : ($i - $intervall);
+        $i = abs($minute - $i) < abs($minute - ($i - $intervall)) ?     $i : ($i - $intervall);
 
-    	$minute = $i;
+        $minute = $i;
 
-    	if($minute == 60)
-    	{
-    	    $minute = 0;
-    	    return 1;
-    	}
-    	else
-    	{
-    	    return 0;
-    	}
+        if ($minute == 60)
+        {
+            $minute = 0;
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 
-    private function getMinutes($intervall = 1, $minuteSelected = -1) : array
+    private function getMinutes($intervall = 1, $minuteSelected = -1): array
     {
         $r = [];
 
@@ -34,12 +34,11 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
                 $r[] = sprintf("<option  value=\"%02d\"  selected=\"selected\">%02d</option>", $i, $i);
             else
                 $r[] = sprintf("<option  value=\"%02d\" >%02d</option>", $i, $i);
-
         }
 
         return $r;
     }
-    private function getHours(bool $format24h, $hourSelected = -1) : array
+    private function getHours(bool $format24h, $hourSelected = -1): array
     {
         $r = [];
         for ($i = 0; $i < ($format24h ? 24 : 12); $i++)
@@ -53,12 +52,12 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
         return $r;
     }
 
-    public function timeintervall() : array
+    public function timeintervall(): array
     {
         return [[1], [5], [10], [15], [20], [30]];
     }
 
-     /**
+    /**
      * @dataProvider timeintervall
      */
     public function test_new($timeintervall): void
@@ -83,7 +82,7 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, $aExpected);
     }
-    
+
     /**
      * @dataProvider timeintervall
      */
@@ -192,8 +191,10 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_timefield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['timefield']);
+        $this->assertEquals(
+            '<span id="error_timefield" class="error">You did not enter a correct value for this field!</span>',
+            $t['timefield']
+        );
     }
 
     public function test_new_format(): void
@@ -261,5 +262,4 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, $aExpected);
     }
-
 };

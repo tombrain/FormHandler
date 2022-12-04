@@ -11,14 +11,16 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
         $form->textField("Textfield", "textfield");
         $form->textField("Textfield2", "textfield2");
 
-        $this->assertFormFlushContains($form,
-                    "// set the focus on a specific field \n" .
-                    "var elem = document.getElementById ? document.getElementById('textfield'): document.all? document.all['textfield']: false; \n" .
-                    "if( (elem) && (elem.type != 'hidden')) {\n" .
-                    "    try {\n" .
-                    "      elem.focus();\n" .
-                    "    } catch(e) {}\n" .
-                    "}\n");
+        $this->assertFormFlushContains(
+            $form,
+            "// set the focus on a specific field \n" .
+                "var elem = document.getElementById ? document.getElementById('textfield'): document.all? document.all['textfield']: false; \n" .
+                "if( (elem) && (elem.type != 'hidden')) {\n" .
+                "    try {\n" .
+                "      elem.focus();\n" .
+                "    } catch(e) {}\n" .
+                "}\n"
+        );
     }
 
     public function test_set(): void
@@ -29,14 +31,16 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
         $form->textField("Textfield2", "textfield2");
 
         $this->assertTrue($form->setFocus("textfield2"));
-        $this->assertFormFlushContains($form,
-                    "// set the focus on a specific field \n" .
-                    "var elem = document.getElementById ? document.getElementById('textfield2'): document.all? document.all['textfield2']: false; \n" .
-                    "if( (elem) && (elem.type != 'hidden')) {\n" .
-                    "    try {\n" .
-                    "      elem.focus();\n" .
-                    "    } catch(e) {}\n" .
-                    "}\n");
+        $this->assertFormFlushContains(
+            $form,
+            "// set the focus on a specific field \n" .
+                "var elem = document.getElementById ? document.getElementById('textfield2'): document.all? document.all['textfield2']: false; \n" .
+                "if( (elem) && (elem.type != 'hidden')) {\n" .
+                "    try {\n" .
+                "      elem.focus();\n" .
+                "    } catch(e) {}\n" .
+                "}\n"
+        );
     }
 
     public function test_nofocus(): void
@@ -60,7 +64,6 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
         $this->expectErrorMessage('Could net set focus to unknown field "textfield"');
 
         $form->setFocus("textfield");
-
     }
 
     public function test_set_specialfield_datefield(): void
@@ -71,14 +74,16 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
 
         $this->assertTrue($form->setFocus("field"));
 
-        $this->assertFormFlushContains($form,
-                    "// set the focus on a specific field \n" .
-                    "var elem = document.getElementById ? document.getElementById('field_day'): document.all? document.all['field_day']: false; \n" .
-                    "if( (elem) && (elem.type != 'hidden')) {\n" .
-                    "    try {\n" .
-                    "      elem.focus();\n" .
-                    "    } catch(e) {}\n" .
-                    "}\n");
+        $this->assertFormFlushContains(
+            $form,
+            "// set the focus on a specific field \n" .
+                "var elem = document.getElementById ? document.getElementById('field_day'): document.all? document.all['field_day']: false; \n" .
+                "if( (elem) && (elem.type != 'hidden')) {\n" .
+                "    try {\n" .
+                "      elem.focus();\n" .
+                "    } catch(e) {}\n" .
+                "}\n"
+        );
     }
 
     public function test_set_specialfield_jsdatefield(): void
@@ -89,14 +94,16 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
 
         $this->assertTrue($form->setFocus("field"));
 
-        $this->assertFormFlushContains($form,
-                    "// set the focus on a specific field \n" .
-                    "var elem = document.getElementById ? document.getElementById('field_day'): document.all? document.all['field_day']: false; \n" .
-                    "if( (elem) && (elem.type != 'hidden')) {\n" .
-                    "    try {\n" .
-                    "      elem.focus();\n" .
-                    "    } catch(e) {}\n" .
-                    "}\n");
+        $this->assertFormFlushContains(
+            $form,
+            "// set the focus on a specific field \n" .
+                "var elem = document.getElementById ? document.getElementById('field_day'): document.all? document.all['field_day']: false; \n" .
+                "if( (elem) && (elem.type != 'hidden')) {\n" .
+                "    try {\n" .
+                "      elem.focus();\n" .
+                "    } catch(e) {}\n" .
+                "}\n"
+        );
     }
 
     public function test_set_specialfield_listfield(): void
@@ -107,14 +114,16 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
 
         $this->assertTrue($form->setFocus("field"));
 
-        $this->assertFormFlushContains($form,
-                    "// set the focus on a specific field \n" .
-                    "var elem = document.getElementById ? document.getElementById('field_ListOn'): document.all? document.all['field_ListOn']: false; \n" .
-                    "if( (elem) && (elem.type != 'hidden')) {\n" .
-                    "    try {\n" .
-                    "      elem.focus();\n" .
-                    "    } catch(e) {}\n" .
-                    "}\n");
+        $this->assertFormFlushContains(
+            $form,
+            "// set the focus on a specific field \n" .
+                "var elem = document.getElementById ? document.getElementById('field_ListOn'): document.all? document.all['field_ListOn']: false; \n" .
+                "if( (elem) && (elem.type != 'hidden')) {\n" .
+                "    try {\n" .
+                "      elem.focus();\n" .
+                "    } catch(e) {}\n" .
+                "}\n"
+        );
     }
 
     public function test_set_spezialfield_timefield(): void
@@ -125,14 +134,16 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
 
         $this->assertTrue($form->setFocus("field"));
 
-        $this->assertFormFlushContains($form,
-                    "// set the focus on a specific field \n" .
-                    "var elem = document.getElementById ? document.getElementById('field_hour'): document.all? document.all['field_hour']: false; \n" .
-                    "if( (elem) && (elem.type != 'hidden')) {\n" .
-                    "    try {\n" .
-                    "      elem.focus();\n" .
-                    "    } catch(e) {}\n" .
-                    "}\n");
+        $this->assertFormFlushContains(
+            $form,
+            "// set the focus on a specific field \n" .
+                "var elem = document.getElementById ? document.getElementById('field_hour'): document.all? document.all['field_hour']: false; \n" .
+                "if( (elem) && (elem.type != 'hidden')) {\n" .
+                "    try {\n" .
+                "      elem.focus();\n" .
+                "    } catch(e) {}\n" .
+                "}\n"
+        );
     }
 
     public function test_np_focus_possible(): void

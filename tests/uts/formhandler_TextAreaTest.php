@@ -30,7 +30,7 @@ final class formhandler_TextAreaTest extends FormhandlerTestCase
 
         $this->assertEquals("text\nvalue", $form->getValue("textarea"));
     }
-    
+
     public function test_posted_fillvalue_byinvalid(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -46,10 +46,12 @@ final class formhandler_TextAreaTest extends FormhandlerTestCase
 
         $form->setError("textarea", "forcedError");
 
-        $this->assertFormFlushContains($form, ['Textarea:<textarea class="error" name="textarea" id="textarea" cols="40" rows="7">textvalue</textarea>error_textarea',
-                                                '<span id="error_textarea" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            'Textarea:<textarea class="error" name="textarea" id="textarea" cols="40" rows="7">textvalue</textarea>error_textarea',
+            '<span id="error_textarea" class="error">forcedError</span>'
+        ]);
     }
-    
+
     public function test_validator(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -64,8 +66,10 @@ final class formhandler_TextAreaTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_textarea" class="error">You did not enter a correct value for this field!</span>',
-                                $t['textarea']);
+        $this->assertEquals(
+            '<span id="error_textarea" class="error">You did not enter a correct value for this field!</span>',
+            $t['textarea']
+        );
     }
 
     public function test_new_cols(): void
@@ -106,5 +110,4 @@ final class formhandler_TextAreaTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Textarea:<textarea name="textarea" id="textarea" cols="40" rows="7" data-old="123"></textarea>error_textarea']);
     }
-
 };

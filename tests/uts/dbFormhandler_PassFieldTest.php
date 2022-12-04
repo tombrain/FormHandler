@@ -22,8 +22,10 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
         $this->assertEmpty($form->getValue("textNullable"));
         $this->assertEmpty($form->getValue("textNotNullable"));
 
-        $this->assertFormFlushContains($form, ['Your password:<input type="password" name="pass" id="pass" size="20" />error_pass',
-                                                 'TextNullable:<input type="text" name="textNullable" id="textNullable" value="" size="20" />error_textNullable']);
+        $this->assertFormFlushContains($form, [
+            'Your password:<input type="password" name="pass" id="pass" size="20" />error_pass',
+            'TextNullable:<input type="text" name="textNullable" id="textNullable" value="" size="20" />error_textNullable'
+        ]);
     }
 
     public function test_edit(): void
@@ -39,11 +41,11 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
         $this->assertFalse($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '100'"))
-                ->willReturnResultSet([
-                    ['id' => '100', 'textNullable' => 'text1', 'pass' => 'secret'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '100'"))
+            ->willReturnResultSet([
+                ['id' => '100', 'textNullable' => 'text1', 'pass' => 'secret'],
+            ]);
 
         $this->setConnectedTable($form, "test");
 
@@ -53,8 +55,10 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
         $this->assertEquals("text1", $form->getValue("textNullable"));
         $this->assertEquals("secret", $form->getValue("pass"));
 
-        $this->assertFormFlushContains($form, ['Your password:<input type="password" name="pass" id="pass" size="20" />error_pass',
-                                                 'TextNullable:<input type="text" name="textNullable" id="textNullable" value="text1" size="20" />error_textNullable']);
+        $this->assertFormFlushContains($form, [
+            'Your password:<input type="password" name="pass" id="pass" size="20" />error_pass',
+            'TextNullable:<input type="text" name="textNullable" id="textNullable" value="text1" size="20" />error_textNullable'
+        ]);
     }
 
     public function test_insert_noValues(): void
@@ -71,12 +75,12 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
 
         $form->passField("Your password", "pass", FH_PASSWORD);
 
-         $e = $form->catchErrors();
+        $e = $form->catchErrors();
 
-         $expected  = "You did not enter a correct value for this field!";
-         $this->assertStringContainsString($expected, $e['pass']);
+        $expected  = "You did not enter a correct value for this field!";
+        $this->assertStringContainsString($expected, $e['pass']);
     }
- 
+
     public function test_insert(): void
     {
         $this->createMocksForTable();
@@ -98,13 +102,13 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
 
         // only textfield, not passfield
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("INSERT INTO test (pass, textNullable) VALUES ( 'secret', 'thetext' );")
-                ->willSetAffectedRows(1)
-                ->willSetLastInsertId(4711);
+            ->expects($this->once())
+            ->query("INSERT INTO test (pass, textNullable) VALUES ( 'secret', 'thetext' );")
+            ->willSetAffectedRows(1)
+            ->willSetLastInsertId(4711);
 
         $this->setCallbackOnSaved($form);
-        
+
         $r = $form->flush(true);
 
         $this->assertEmpty($r);
@@ -112,7 +116,7 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
         $this->assertSavedValue('secret', 'pass');
         $this->assertSavedValue('thetext', 'textNullable');
     }
-    
+
     // public function test_update_noValues(): void
     // {
     //     $this->createMocksForTable();
@@ -142,7 +146,7 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
     //             ->query("UPDATE test SET textNullable = NULL WHERE id = '4714'");
 
     //     $this->setCallbackOnSaved($form);
-        
+
     //     $r = $form->flush(true);
 
     //     $this->fail("forced failure: empty pass fails");
@@ -151,7 +155,7 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
     //     $this->assertSavedId(4714);
     //     $this->assertSavedValueEmtpy('textNullable');
     // }
- 
+
     public function test_update(): void
     {
         $this->createMocksForTable();
@@ -167,23 +171,23 @@ final class dbFormhandler_PassFieldTest extends dbFormhandlerTestCase
         $this->assertTrue($form->isPosted());
 
         $this->getDatabaseMock()
-                ->expects($this->exactly(1))
-                ->query($this->matches("SELECT * FROM test WHERE id = '4715'"))
-                ->willReturnResultSet([
-                    ['id' => '4715', 'pass' => 'secret'],
-                ]);
+            ->expects($this->exactly(1))
+            ->query($this->matches("SELECT * FROM test WHERE id = '4715'"))
+            ->willReturnResultSet([
+                ['id' => '4715', 'pass' => 'secret'],
+            ]);
 
         $this->setConnectedTable($form, "test");
 
         $form->passField("Your password", "pass", FH_PASSWORD);
 
         $this->getDatabaseMock()
-                ->expects($this->once())
-                ->query("UPDATE test SET pass = 'newpass' WHERE id = '4715'")
-                ->willSetLastInsertId(4715);
+            ->expects($this->once())
+            ->query("UPDATE test SET pass = 'newpass' WHERE id = '4715'")
+            ->willSetLastInsertId(4715);
 
         $this->setCallbackOnSaved($form);
-        
+
         $r = $form->flush(true);
 
         $this->assertEmpty($r);

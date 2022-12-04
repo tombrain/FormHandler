@@ -1,47 +1,51 @@
-<?php  declare(strict_types=1); ?>
-<!DOCTYPE html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
 <?php
 
-define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/' );
-ini_set("display_errors", "1");
-@error_reporting(E_USER_WARNING | E_ALL);
+declare(strict_types=1); ?>
+<!DOCTYPE html>
 
-require_once '../../vendor/autoload.php';
+<head>
+    <meta charset="utf-8">
+</head>
 
-// new form object
-$form = new FormHandler();
+<body>
+    <?php
 
-// datefield
-$form -> dateField( 'Date', 'date' );
+    define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/');
+    ini_set("display_errors", "1");
+    @error_reporting(E_USER_WARNING | E_ALL);
 
-// only when the form is posted..
-if( $form -> isPosted() )
-{
-    // get the value from the field 
-    list( $year, $month, $day ) = $form -> getAsArray( 'date' );
+    require_once '../../vendor/autoload.php';
 
-    echo 
-    "Day: ". $day ."\n".
-    "Month: ". $month ."\n".
-    "Year: ". $year ."\n";
-}
+    // new form object
+    $form = new FormHandler();
 
-// submitbutton
-$form -> submitButton();
+    // datefield
+    $form->dateField('Date', 'date');
 
-// which function to run when the form is correct
-$form -> onCorrect( 'doRun' );
+    // only when the form is posted..
+    if ($form->isPosted())
+    {
+        // get the value from the field 
+        list($year, $month, $day) = $form->getAsArray('date');
 
-// display the form
-$form -> flush();
+        echo
+        "Day: " . $day . "\n" .
+            "Month: " . $month . "\n" .
+            "Year: " . $year . "\n";
+    }
 
-// the function which is called when the form is correct
-function doRun( $data )
-{
-    // do something here..
-    echo "Selected date: ". $data['date'] ."\n";
-} 
+    // submitbutton
+    $form->submitButton();
+
+    // which function to run when the form is correct
+    $form->onCorrect('doRun');
+
+    // display the form
+    $form->flush();
+
+    // the function which is called when the form is correct
+    function doRun($data)
+    {
+        // do something here..
+        echo "Selected date: " . $data['date'] . "\n";
+    }

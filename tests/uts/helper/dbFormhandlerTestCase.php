@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 use Cz\PHPUnit\MockDibi\Drivers\DriversFactory;
 use Cz\PHPUnit\MockDibi\Mock;
@@ -11,19 +13,19 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
 {
     use Cz\PHPUnit\MockDibi\MockTrait;
 
-	private ?Dibi\Connection $_localDBConnection = null;
+    private ?Dibi\Connection $_localDBConnection = null;
     private ?Mock $_mock = null;
-    
+
     private $_expectedResult;
 
-    protected function assertSavedId(int $expected) : void
+    protected function assertSavedId(int $expected): void
     {
         $this->assertTrue(is_array($this->_expectedResult), "function 'dbFormhandlerTestCase::setCallbackOnSaved' not called");
         $this->assertTrue(sizeof($this->_expectedResult) > 0, "formhandler don't call callback function");
 
         $this->assertEquals($expected, $this->_expectedResult['id']);
     }
-    protected function assertSavedValue($expected, string $field) : void
+    protected function assertSavedValue($expected, string $field): void
     {
         $this->assertTrue(is_array($this->_expectedResult), "function 'dbFormhandlerTestCase::setCallbackOnSaved' not called");
         $this->assertTrue(sizeof($this->_expectedResult) > 0, "formhandler don't call callback function");
@@ -31,7 +33,7 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
         $this->assertTrue(array_key_exists($field, $this->_expectedResult['values']), "field not saved");
         $this->assertEquals($expected, $this->_expectedResult['values'][$field]);
     }
-    protected function assertSavedValueEmtpy(string $field) : void
+    protected function assertSavedValueEmtpy(string $field): void
     {
         $this->assertTrue(is_array($this->_expectedResult), "function 'dbFormhandlerTestCase::setCallbackOnSaved' not called");
         $this->assertTrue(sizeof($this->_expectedResult) > 0, "formhandler don't call callback function");
@@ -46,25 +48,25 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
         /** 
          * Your Database Connection (In This Example MySQLi) 
          */
-       $factory = $this->getDriversFactory();
+        $factory = $this->getDriversFactory();
 
-       $this->_localDBConnection = new Dibi\Connection ([
-           'driver' => $factory->createMySqliDriver()  // or whatever other driver you may be needing.
-       ]);
-       $this->_expectedResult = null;
+        $this->_localDBConnection = new Dibi\Connection([
+            'driver' => $factory->createMySqliDriver()  // or whatever other driver you may be needing.
+        ]);
+        $this->_expectedResult = null;
     }
 
     final protected function getFormhandlerType(): string
     {
         return "dbFormhandler";
-	}
-	
-	protected function getLocalConnection() : Dibi\Connection
-	{
-		return $this->_localDBConnection;
-	}
+    }
 
-    protected function setConnectedTable(dbFormHandler $form, string $table) : void
+    protected function getLocalConnection(): Dibi\Connection
+    {
+        return $this->_localDBConnection;
+    }
+
+    protected function setConnectedTable(dbFormHandler $form, string $table): void
     {
         $db = new YadalDibi();
         $db->setConnectionResource($this->_localDBConnection);
@@ -75,77 +77,83 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
             $this->executePrivateMethod($form, "_loadDbData", array());
     }
 
-	protected function getDatabaseMock() : Mock
-	{
-		if ($this->_mock == null)
-			$this->_mock = $this->createDatabaseMock($this->_localDBConnection);
+    protected function getDatabaseMock(): Mock
+    {
+        if ($this->_mock == null)
+            $this->_mock = $this->createDatabaseMock($this->_localDBConnection);
 
-		return $this->_mock;
-	}
+        return $this->_mock;
+    }
 
     /**
      * @return  DriversFactory
      */
-    private function getDriversFactory() : DriversFactory
+    private function getDriversFactory(): DriversFactory
     {
         return new DriversFactory;
     }
-    
-    protected function createMocksForTable() : void
+
+    protected function createMocksForTable(): void
     {
         $this->getDatabaseMock()
-                ->expects($this->any())
-                ->query($this->stringStartsWith('SHOW KEYS FROM test'))
-                ->willReturnResultSet([
-                    ['Table' => 'test', 'Non_unique' => '0', 'Key_name' => 'PRIMARY', 'Column_name' => 'id'],
-                ]);
+            ->expects($this->any())
+            ->query($this->stringStartsWith('SHOW KEYS FROM test'))
+            ->willReturnResultSet([
+                ['Table' => 'test', 'Non_unique' => '0', 'Key_name' => 'PRIMARY', 'Column_name' => 'id'],
+            ]);
         $this->getDatabaseMock()
-                ->expects($this->any())
-                ->query($this->stringStartsWith('DESCRIBE test'))
-                ->willReturnResultSet([
-                    ['Field' => 'id',
-                        'Type' => 'int(11)',
-                        'Null' => 'NO',
-                        'Key' => 'PRI',
-                        'Default' => null,
-                        'Extra' => 'auto_increment'
-                    ],
-                    ['Field' => 'saveInField',
-                        'Type' => 'int(11)',
-                        'Null' => 'YES',
-                        'Key' => '',
-                        'Default' => null,
-                        'Extra' => ''
-                    ],
-                    ['Field' => 'saveInFieldString',
-                        'Type' => 'varchar(10)',
-                        'Null' => 'YES',
-                        'Key' => '',
-                        'Default' => null,
-                        'Extra' => ''
-                    ],
-                    ['Field' => 'textNullable',
-                        'Type' => 'varchar(255)',
-                        'Null' => 'YES',
-                        'Key' => '',
-                        'Default' => null,
-                        'Extra' => ''
-                    ],
-                    ['Field' => 'textNotNullable',
-                        'Type' => 'varchar(255)',
-                        'Null' => 'NO',
-                        'Key' => '',
-                        'Default' => null,
-                        'Extra' => ''
-                    ],
-                    ['Field' => 'pass',
-                        'Type' => 'varchar(255)',
-                        'Null' => 'NO',
-                        'Key' => '',
-                        'Default' => null,
-                        'Extra' => ''
-                    ],
-                ]);
+            ->expects($this->any())
+            ->query($this->stringStartsWith('DESCRIBE test'))
+            ->willReturnResultSet([
+                [
+                    'Field' => 'id',
+                    'Type' => 'int(11)',
+                    'Null' => 'NO',
+                    'Key' => 'PRI',
+                    'Default' => null,
+                    'Extra' => 'auto_increment'
+                ],
+                [
+                    'Field' => 'saveInField',
+                    'Type' => 'int(11)',
+                    'Null' => 'YES',
+                    'Key' => '',
+                    'Default' => null,
+                    'Extra' => ''
+                ],
+                [
+                    'Field' => 'saveInFieldString',
+                    'Type' => 'varchar(10)',
+                    'Null' => 'YES',
+                    'Key' => '',
+                    'Default' => null,
+                    'Extra' => ''
+                ],
+                [
+                    'Field' => 'textNullable',
+                    'Type' => 'varchar(255)',
+                    'Null' => 'YES',
+                    'Key' => '',
+                    'Default' => null,
+                    'Extra' => ''
+                ],
+                [
+                    'Field' => 'textNotNullable',
+                    'Type' => 'varchar(255)',
+                    'Null' => 'NO',
+                    'Key' => '',
+                    'Default' => null,
+                    'Extra' => ''
+                ],
+                [
+                    'Field' => 'pass',
+                    'Type' => 'varchar(255)',
+                    'Null' => 'NO',
+                    'Key' => '',
+                    'Default' => null,
+                    'Extra' => ''
+                ],
+            ]);
     }
 
 
@@ -155,12 +163,12 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
      * @param dbFormHandler $form
      * @return void
      */
-    protected function setCallbackOnSaved(dbFormHandler $form) : void
+    protected function setCallbackOnSaved(dbFormHandler $form): void
     {
         $this->_expectedResult = array();
-        $form->onSaved(array($this, "callback_onSaved"));        
+        $form->onSaved(array($this, "callback_onSaved"));
     }
-    
+
     /**
      * Function for callback after save
      *
@@ -169,7 +177,7 @@ abstract class dbFormhandlerTestCase extends FormhandlerTestCase
      * @param dbFormHandler $form
      * @return void
      */
-    final public function callback_onSaved(int $id, array $values, dbFormHandler $form) : void
+    final public function callback_onSaved(int $id, array $values, dbFormHandler $form): void
     {
         $this->_expectedResult['id'] = $id;
         $this->_expectedResult['values'] = $values;

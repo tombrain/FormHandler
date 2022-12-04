@@ -14,9 +14,11 @@ final class formhandler_AutocompleteTest extends FormhandlerTestCase
 
         $form->setAutoComplete("textfield", $aOptions);
 
-        $this->assertFormFlushContains($form, ['FHTML/js/autocomplete.js',
-                                                'textfield_values = ["first", "second", "third"];',
-                                                'Textfield:<input type="text" name="textfield" id="textfield" value="" size="20"   onkeypress=\'return FH_autocomplete(this, event, textfield_values);\'  />error_textfield']);
+        $this->assertFormFlushContains($form, [
+            'FHTML/js/autocomplete.js',
+            'textfield_values = ["first", "second", "third"];',
+            'Textfield:<input type="text" name="textfield" id="textfield" value="" size="20"   onkeypress=\'return FH_autocomplete(this, event, textfield_values);\'  />error_textfield'
+        ]);
     }
 
     public function test_no_textfield(): void
@@ -53,9 +55,11 @@ final class formhandler_AutocompleteTest extends FormhandlerTestCase
 
         $form->setAutoCompleteAfter("textfield", "@", $aOptions);
 
-        $this->assertFormFlushContains($form, ['FHTML/js/autocomplete.js',
-                                                'textfield_values = ["first", "second", "third"];',
-                                                'Textfield:<input type="text" name="textfield" id="textfield" value="" size="20"   onkeypress=\'return autocompleteafter(this, event,"@", textfield_values);\'  />error_textfield']);
+        $this->assertFormFlushContains($form, [
+            'FHTML/js/autocomplete.js',
+            'textfield_values = ["first", "second", "third"];',
+            'Textfield:<input type="text" name="textfield" id="textfield" value="" size="20"   onkeypress=\'return autocompleteafter(this, event,"@", textfield_values);\'  />error_textfield'
+        ]);
     }
 
     public function test_after_no_textfield(): void

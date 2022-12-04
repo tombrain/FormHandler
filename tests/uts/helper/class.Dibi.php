@@ -1,4 +1,6 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 
 use Dibi\Connection;
@@ -19,26 +21,26 @@ use Dibi\Connection;
  */
 class YadalDibi extends Yadal
 {
-	use Cz\PHPUnit\MockDibi\MockTrait;
-	
-	private function _Conn() : Connection
-	{
-		return $this->_conn;
-	}
-	/**
+    use Cz\PHPUnit\MockDibi\MockTrait;
+
+    private function _Conn(): Connection
+    {
+        return $this->_conn;
+    }
+    /**
      * YadalDibi::YadalDibi()
      *
      * Constructor: set the database we should be using
      *
      */
-	public function __construct()
-	{
-		parent::__construct();
-		$this->_quoteNumbers = true;
-		$this->_nameQuote = '';
-	}
+    public function __construct()
+    {
+        parent::__construct();
+        $this->_quoteNumbers = true;
+        $this->_nameQuote = '';
+    }
 
-	/**
+    /**
      * YadalDibi::connect()
      *
      * Make a connection with the database and
@@ -50,13 +52,13 @@ class YadalDibi extends Yadal
      * @return resource: The connection resource
      * @access public
      */
-	public function connect( $host = 'localhost', $username = '', $password = '' )
-	{
+    public function connect($host = 'localhost', $username = '', $password = '')
+    {
         return $this->_conn;
-	}
+    }
 
 
-	/**
+    /**
      * YadalDibi::close()
      *
      * Close the connection
@@ -64,15 +66,15 @@ class YadalDibi extends Yadal
      * @return bool
      * @access public
      */
-	public function close()
-	{
-		if( $this->_isConnected )
-			$this->_isConnected = false;
+    public function close()
+    {
+        if ($this->_isConnected)
+            $this->_isConnected = false;
 
-		return true;
-	}
+        return true;
+    }
 
-	/**
+    /**
      * YadalDibi::query()
      *
      * Execute the query
@@ -81,17 +83,17 @@ class YadalDibi extends Yadal
      * @return resource
      * @access public
      */
-	public function query( $query )
-	{
+    public function query($query)
+    {
 
-		$query = SqlFormatter::compress($query);
-		
-		$this->_lastQuery = $query;
+        $query = SqlFormatter::compress($query);
 
-		return $this->_Conn()->query($query);
-	}
+        $this->_lastQuery = $query;
 
-	/**
+        return $this->_Conn()->query($query);
+    }
+
+    /**
      * YadalDibi::getInsertId()
      *
      * Get the id of the last inserted record
@@ -99,12 +101,12 @@ class YadalDibi extends Yadal
      * @return int
      * @access public
      */
-	public function getInsertId()
-	{
-		return $this->_Conn()->getInsertId();
-	}
+    public function getInsertId()
+    {
+        return $this->_Conn()->getInsertId();
+    }
 
-	/**
+    /**
      * YadalDibi::result()
      *
      * Return a specific result of a sql resource
@@ -115,12 +117,12 @@ class YadalDibi extends Yadal
      * @return string
      * @access public
      */
-	public function result( $sql, $row = 0, $field = 0 )
-	{
-		throw new Exception("not implemented");
-	}
+    public function result($sql, $row = 0, $field = 0)
+    {
+        throw new Exception("not implemented");
+    }
 
-	/**
+    /**
      * YadalDibi::getError()
      *
      * Return the last error
@@ -128,12 +130,12 @@ class YadalDibi extends Yadal
      * @return string
      * @access public
      */
-	public function getError()
-	{
-		throw new Exception("not implemented");
-	}
+    public function getError()
+    {
+        throw new Exception("not implemented");
+    }
 
-	/**
+    /**
      * YadalDibi::getErrorNo()
      *
      * Return the error number
@@ -141,12 +143,12 @@ class YadalDibi extends Yadal
      * @return int
      * @access public
      */
-	public function getErrorNo()
-	{
-		throw new Exception("not implemented");
-	}
+    public function getErrorNo()
+    {
+        throw new Exception("not implemented");
+    }
 
-	/**
+    /**
      * YadalDibi::recordCount()
      *
      * Return the number of records found by the query
@@ -155,12 +157,12 @@ class YadalDibi extends Yadal
      * @return int
      * @access public
      */
-	public function recordCount( $sql )
-	{
-		return $sql->getRowCount();
-	}
+    public function recordCount($sql)
+    {
+        return $sql->getRowCount();
+    }
 
-	/**
+    /**
      * YadalDibi::getRecord()
      *
      * Fetch a record in assoc mode and return it
@@ -169,17 +171,17 @@ class YadalDibi extends Yadal
      * @return assoc array or false when there are no records left
      * @access public
      */
-	public function getRecord( $sql )
-	{
-		$t = $sql->fetch();
+    public function getRecord($sql)
+    {
+        $t = $sql->fetch();
 
-		if ($t)
-			return (array)$t;
-		
-		return false;
-	}
+        if ($t)
+            return (array)$t;
 
-	/**
+        return false;
+    }
+
+    /**
      * YadalDibi::getFieldNames()
      *
      * Return the field names of the table
@@ -188,35 +190,35 @@ class YadalDibi extends Yadal
      * @return array
      * @access public
      */
-	public function getFieldNames($table )
-	{
-		$t = strtolower($table);
+    public function getFieldNames($table)
+    {
+        $t = strtolower($table);
 
-		// return the data from the cache if it exists
-		if( isset( $this->_cache['fields'][$t] ) )
-		{
-			return $this->_cache['fields'][$t];
-		}
+        // return the data from the cache if it exists
+        if (isset($this->_cache['fields'][$t]))
+        {
+            return $this->_cache['fields'][$t];
+        }
 
-		$result = array();
+        $result = array();
 
-		// try to get a record and fetch the field names..
-		$sql = $this->query( 'DESCRIBE ' . $this->quote( $table ) );
+        // try to get a record and fetch the field names..
+        $sql = $this->query('DESCRIBE ' . $this->quote($table));
 
-		if (!$sql)
-			throw new Exception("query not successful");
+        if (!$sql)
+            throw new Exception("query not successful");
 
-		$result = array();
-		while($r = $this->getRecord($sql))
-			$result[] = $r['Field'];
-	
-		// save the result in the cache
-		$this->_cache['fields'][$t] = $result;
+        $result = array();
+        while ($r = $this->getRecord($sql))
+            $result[] = $r['Field'];
 
-		return $result;
-	}
+        // save the result in the cache
+        $this->_cache['fields'][$t] = $result;
 
-	/**
+        return $result;
+    }
+
+    /**
      * YadalDibi::getTables()
      *
      * Return the tables from the database
@@ -224,27 +226,27 @@ class YadalDibi extends Yadal
      * @return array
      * @access public
      */
-	public function getTables()
-	{		
-		// return the data from the cache if it exists
-		if( isset( $this->_cache['tables'] ) )
-		{
-			return $this->_cache['tables'];
-		}
-		$sql = $this->query('SHOW TABLES');
-	
-		$result = $this->_Conn()->fetch();
-		
-		if (!is_array($result))
-			throw new Exception("result must be an array");
+    public function getTables()
+    {
+        // return the data from the cache if it exists
+        if (isset($this->_cache['tables']))
+        {
+            return $this->_cache['tables'];
+        }
+        $sql = $this->query('SHOW TABLES');
 
-		// save the result in the cache
-		$this->_cache['tables'] = $result;
+        $result = $this->_Conn()->fetch();
 
-		return $result;
-	}
+        if (!is_array($result))
+            throw new Exception("result must be an array");
 
-	/**
+        // save the result in the cache
+        $this->_cache['tables'] = $result;
+
+        return $result;
+    }
+
+    /**
      * YadalDibi::getNotNullFields()
      *
      * Retrieve the fields that can not contain NULL
@@ -253,41 +255,41 @@ class YadalDibi extends Yadal
      * @return array
      * @access public
      */
-	public function getNotNullFields ( $table )
-	{
-		$t = strtolower($table);
+    public function getNotNullFields($table)
+    {
+        $t = strtolower($table);
 
-		// return the data from the cache if it exists
-		if( isset( $this->_cache['notnull'][$t] ) )
-		{
-			return $this->_cache['notnull'][$t];
-		}
+        // return the data from the cache if it exists
+        if (isset($this->_cache['notnull'][$t]))
+        {
+            return $this->_cache['notnull'][$t];
+        }
 
-		$sql = $this->query('DESCRIBE '.$this->quote( $table ) );
+        $sql = $this->query('DESCRIBE ' . $this->quote($table));
 
-		if (!$sql)
-			throw new Exception("query not successful");
+        if (!$sql)
+            throw new Exception("query not successful");
 
-		$result = array();
-		while($r = $this->getRecord($sql))
-		{
-			if( $r['Null'] == 'NO' || empty($r['Null']) )
-			{
-				$result[] = $r['Field'];
-			}
-		}
-			
-		
-		if (!is_array($result))
-			throw new Exception("result must be an array");
+        $result = array();
+        while ($r = $this->getRecord($sql))
+        {
+            if ($r['Null'] == 'NO' || empty($r['Null']))
+            {
+                $result[] = $r['Field'];
+            }
+        }
 
-		// save the result in the cache
-		$this->_cache['notnull'][$t] = $result;
 
-		return $result;
-	}
+        if (!is_array($result))
+            throw new Exception("result must be an array");
 
-	/**
+        // save the result in the cache
+        $this->_cache['notnull'][$t] = $result;
+
+        return $result;
+    }
+
+    /**
      * YadalDibi::getFieldTypes()
      *
      * Retrieve the field types of the given table
@@ -297,51 +299,51 @@ class YadalDibi extends Yadal
      * @access public
      * @author Teye Heimans
      */
-	public function getFieldTypes( $table )
-	{
-		$t = strtolower($table);
+    public function getFieldTypes($table)
+    {
+        $t = strtolower($table);
 
-		// return the data from the cache if it exists
-		if( isset( $this->_cache['fieldtypes'][$t] ) )
-		{
-			return $this->_cache['fieldtypes'][$t];
-		}
+        // return the data from the cache if it exists
+        if (isset($this->_cache['fieldtypes'][$t]))
+        {
+            return $this->_cache['fieldtypes'][$t];
+        }
 
-		// Get the default values for the fields
-		$sql = $this->query("DESCRIBE " . $this->quote($table));
+        // Get the default values for the fields
+        $sql = $this->query("DESCRIBE " . $this->quote($table));
 
-		if (!$sql)
-			throw new Exception("query not successfull");
-			
-		$result = array();
-		while( $row = $this->getRecord($sql))
-		{
-			// split the size from the type
-			if( preg_match('/^(.*)\((\d+)\)$/', $row['Type'], $match) )
-			{
-				$type = $match[1];
-				$length = $match[2];
-			}
-			else
-			{
-				$type   = $row['Type'];
-				$length = null;
-			}
+        if (!$sql)
+            throw new Exception("query not successfull");
 
-			$result[ $row['Field'] ] = array(
-			$type,
-			$length,
-			$row['Default']
-			);
-		}
+        $result = array();
+        while ($row = $this->getRecord($sql))
+        {
+            // split the size from the type
+            if (preg_match('/^(.*)\((\d+)\)$/', $row['Type'], $match))
+            {
+                $type = $match[1];
+                $length = $match[2];
+            }
+            else
+            {
+                $type   = $row['Type'];
+                $length = null;
+            }
 
-		// save the result in the cache
-		$this->_cache['fieldtypes'][$t] = $result;
+            $result[$row['Field']] = array(
+                $type,
+                $length,
+                $row['Default']
+            );
+        }
 
-		return $result;
-	}
+        // save the result in the cache
+        $this->_cache['fieldtypes'][$t] = $result;
 
-	/**
+        return $result;
+    }
+
+    /**
      * YadalDibi::escapeString()
      *
      * Escape the string we are going to save from dangerous characters
@@ -350,12 +352,12 @@ class YadalDibi extends Yadal
      * @return string
      * @access public
      */
-	public function escapeString( $string )
-	{
-		return $string;
-	}
+    public function escapeString($string)
+    {
+        return $string;
+    }
 
-	/**
+    /**
      * YadalDibi::getPrKeys()
      *
      * Fetch the keys from the table
@@ -364,34 +366,36 @@ class YadalDibi extends Yadal
      * @return array of the keys which are found
      * @access public
      */
-	function getPrKeys( $table )
-	{
-		$t = strtolower($table);
+    function getPrKeys($table)
+    {
+        $t = strtolower($table);
 
-		// return the data from the cache if it exists
-		if( isset( $this->_cache['keys'][$t] ) ) {
-			return $this->_cache['keys'][$t];
-		}
+        // return the data from the cache if it exists
+        if (isset($this->_cache['keys'][$t]))
+        {
+            return $this->_cache['keys'][$t];
+        }
 
-		$sql = $this->query("SHOW KEYS FROM {$table}");
+        $sql = $this->query("SHOW KEYS FROM {$table}");
 
-		if (!$sql)
-			throw new Exception("query not successfull");
+        if (!$sql)
+            throw new Exception("query not successfull");
 
-		$keys = array();
-		while( $r = $this->getRecord($sql) )
-		{
-			if ( $r['Key_name'] == 'PRIMARY' ) {
-				$keys[] = $r['Column_name'];
-			}
-		}
-			// save the result in the cache
-		$this->_cache['keys'][$t] = $keys;
+        $keys = array();
+        while ($r = $this->getRecord($sql))
+        {
+            if ($r['Key_name'] == 'PRIMARY')
+            {
+                $keys[] = $r['Column_name'];
+            }
+        }
+        // save the result in the cache
+        $this->_cache['keys'][$t] = $keys;
 
-		return $keys;
-	}
+        return $keys;
+    }
 
-	/**
+    /**
      * YadalDibi::getUniqueFields()
      *
      * Fetch the unique fields from the table
@@ -401,34 +405,33 @@ class YadalDibi extends Yadal
      * @access public
      * @author Teye Heimans
      */
-	public function getUniqueFields( $table )
-	{
-		$t = strtolower( $table );
+    public function getUniqueFields($table)
+    {
+        $t = strtolower($table);
 
-		// return the data from the cache if it exists
-		if( isset( $this->_cache['unique'][$t] ) )
-		{
-			return $this->_cache['unique'][$t];
-		}
+        // return the data from the cache if it exists
+        if (isset($this->_cache['unique'][$t]))
+        {
+            return $this->_cache['unique'][$t];
+        }
 
-		// get the keys
-		$sql = $this->query("SHOW KEYS FROM " . $this->quote($table) );
+        // get the keys
+        $sql = $this->query("SHOW KEYS FROM " . $this->quote($table));
 
-		$unique = array();
+        $unique = array();
 
-		// save all keys which have to be unique
-		while( $r = $this->getRecord($sql) )
-		{
-			if ( $r['Non_unique'] == 0 )
-			{
-				$unique[$r['Key_name']][] = $r['Column_name'];
-			}
-		}
+        // save all keys which have to be unique
+        while ($r = $this->getRecord($sql))
+        {
+            if ($r['Non_unique'] == 0)
+            {
+                $unique[$r['Key_name']][] = $r['Column_name'];
+            }
+        }
 
-		// save the result in the cache
-		$this->_cache['unique'][$t] = $unique;
+        // save the result in the cache
+        $this->_cache['unique'][$t] = $unique;
 
-		return $unique;
-	}
+        return $unique;
+    }
 }
-?>

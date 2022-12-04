@@ -8,11 +8,11 @@ final class formhandler_LookAndFeelTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $form->addHTML( 
-            "  <tr>". 
-            "    <td colspan='3'><hr size='1' /></td>". 
-            "  </tr>" 
-          );  
+        $form->addHTML(
+            "  <tr>" .
+                "    <td colspan='3'><hr size='1' /></td>" .
+                "  </tr>"
+        );
 
         $this->assertFormFlushContains($form, "<td colspan='3'><hr size='1' /></td>");
     }
@@ -24,8 +24,10 @@ final class formhandler_LookAndFeelTest extends FormhandlerTestCase
         $form->addLine();
         $form->addLine("theline");
 
-        $this->assertFormFlushContains($form, ["<tr><td>&nbsp;</td><td>&nbsp;</td><td></td></tr>",
-                                                "<tr><td>&nbsp;</td><td>&nbsp;</td><td>theline</td></tr>"]);
+        $this->assertFormFlushContains($form, [
+            "<tr><td>&nbsp;</td><td>&nbsp;</td><td></td></tr>",
+            "<tr><td>&nbsp;</td><td>&nbsp;</td><td>theline</td></tr>"
+        ]);
     }
 
     public function test_useTable(): void
@@ -55,11 +57,12 @@ final class formhandler_LookAndFeelTest extends FormhandlerTestCase
         $form->textField("Textfield4", "textfield4");
         $form->setValue("textfield4", "value4");
 
-        $this->assertFormFlushContains($form, ['Textfield||:||<input type="text" name="textfield" id="textfield" value="value" size="20" />||textfield||||error_textfield||',
-                                                'Textfield2:<input type="text" name="textfield2" id="textfield2" value="value2" size="20" />error_textfield2',
-                                                'Textfield3--:--<input type="text" name="textfield3" id="textfield3" value="value3" size="20" />--%name----error_textfield3--',
-                                                'Textfield4--:--<input type="text" name="textfield4" id="textfield4" value="value4" size="20" />--%name----error_textfield4'
-                                                ]);
+        $this->assertFormFlushContains($form, [
+            'Textfield||:||<input type="text" name="textfield" id="textfield" value="value" size="20" />||textfield||||error_textfield||',
+            'Textfield2:<input type="text" name="textfield2" id="textfield2" value="value2" size="20" />error_textfield2',
+            'Textfield3--:--<input type="text" name="textfield3" id="textfield3" value="value3" size="20" />--%name----error_textfield3--',
+            'Textfield4--:--<input type="text" name="textfield4" id="textfield4" value="value4" size="20" />--%name----error_textfield4'
+        ]);
     }
 
     public function test_setErrorMessage(): void
@@ -73,9 +76,10 @@ final class formhandler_LookAndFeelTest extends FormhandlerTestCase
         $form->setErrorMessage("textfield2", "this is another individual errormessage", false);
         $form->setError("textfield2", "error2");
 
-        $this->assertFormFlushContains($form, ['Textfield:<input type="text" name="textfield" id="textfield" value="" size="20" />error_textfield<span id="error_textfield" class="error">this is an individual errormessage</span>',
-                                                'Textfield2:<input type="text" name="textfield2" id="textfield2" value="" size="20" />error_textfield2this is another individual errormessage'
-                                                ]);
+        $this->assertFormFlushContains($form, [
+            'Textfield:<input type="text" name="textfield" id="textfield" value="" size="20" />error_textfield<span id="error_textfield" class="error">this is an individual errormessage</span>',
+            'Textfield2:<input type="text" name="textfield2" id="textfield2" value="" size="20" />error_textfield2this is another individual errormessage'
+        ]);
     }
 
     public function test_setLanguage(): void
@@ -132,12 +136,12 @@ final class formhandler_LookAndFeelTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Textfield:<input type="text" name="textfield" id="textfield" value="textvalue" size="20" class="error" />error_textfieldtextfield-You did not enter a correct value for this field!']);
     }
-    
+
     public function test_setTableSettings(): void
     {
         $form = new FormHandler();
 
-        $form -> setTableSettings(400, 2, 2, 0, " style='border: 1px solid green'" );
+        $form->setTableSettings(400, 2, 2, 0, " style='border: 1px solid green'");
 
         $form->textField("Textfield", "textfield", FH_DIGIT);
 

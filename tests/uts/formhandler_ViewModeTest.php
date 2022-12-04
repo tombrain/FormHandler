@@ -48,10 +48,12 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form->setError("textfield", "forcedError");
 
-        $this->assertFormFlushContains($form, ['Textfield:textvalueerror_textfield<span id="error_textfield" class="error">forcedError</span>',
-                                                'Textfield2:<input type="text" name="textfield2" id="textfield2" value="textvalue2" size="20" />error_textfield2']);
+        $this->assertFormFlushContains($form, [
+            'Textfield:textvalueerror_textfield<span id="error_textfield" class="error">forcedError</span>',
+            'Textfield2:<input type="text" name="textfield2" id="textfield2" value="textvalue2" size="20" />error_textfield2'
+        ]);
     }
-    
+
     public function test_fieldViewMode_error_fieldNotExist(): void
     {
         $_POST['FormHandler_submit'] = "1";
@@ -68,7 +70,7 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form->setFieldViewMode("textfield2");
     }
-    
+
     public function test_fieldViewMode_error_NotAField(): void
     {
         $_POST['FormHandler_submit'] = "1";

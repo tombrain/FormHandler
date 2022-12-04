@@ -46,8 +46,10 @@ final class formhandler_TextFieldTest extends FormhandlerTestCase
 
         $form->setError("textfield", "forcedError");
 
-        $this->assertFormFlushContains($form, ['Textfield:<input type="text" name="textfield" id="textfield" value="textvalue" size="20" class="error" />error_textfield',
-                                                '<span id="error_textfield" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            'Textfield:<input type="text" name="textfield" id="textfield" value="textvalue" size="20" class="error" />error_textfield',
+            '<span id="error_textfield" class="error">forcedError</span>'
+        ]);
     }
 
     public function test_validator(): void
@@ -64,8 +66,10 @@ final class formhandler_TextFieldTest extends FormhandlerTestCase
 
         $t = $form->catchErrors(false);
 
-        $this->assertEquals('<span id="error_textfield" class="error">You did not enter a correct value for this field!</span>',
-                                $t['textfield']);
+        $this->assertEquals(
+            '<span id="error_textfield" class="error">You did not enter a correct value for this field!</span>',
+            $t['textfield']
+        );
     }
 
     public function test_new_size(): void
@@ -106,5 +110,4 @@ final class formhandler_TextFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, ['Textfield:<input type="text" name="textfield" id="textfield" value="" size="20"  data-old="123"']);
     }
-
 };

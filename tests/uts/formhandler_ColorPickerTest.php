@@ -14,8 +14,10 @@ final class formhandler_ColorPickerTest extends FormhandlerTestCase
 
         $this->assertEmpty($form->getValue("colorpicker"));
 
-        $this->assertFormFlushContains($form, ['FHTML/js/jscolor/jscolor.js',
-                                                'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="" size="20"  class="color" />error_colorpicker']);
+        $this->assertFormFlushContains($form, [
+            'FHTML/js/jscolor/jscolor.js',
+            'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="" size="20"  class="color" />error_colorpicker'
+        ]);
     }
 
     public function test_viewMode(): void
@@ -28,8 +30,10 @@ final class formhandler_ColorPickerTest extends FormhandlerTestCase
 
         $form->setFieldViewMode("colorpicker");
 
-        $this->assertFormFlushContains($form, ['FHTML/js/jscolor/jscolor.js',
-                                                'Colorpicker:error_colorpicker']);
+        $this->assertFormFlushContains($form, [
+            'FHTML/js/jscolor/jscolor.js',
+            'Colorpicker:error_colorpicker'
+        ]);
     }
 
     public function test_extraClass(): void
@@ -40,8 +44,10 @@ final class formhandler_ColorPickerTest extends FormhandlerTestCase
 
         $form->colorPicker("Colorpicker", "colorpicker", null, null, null, "class=\"dummy\"");
 
-        $this->assertFormFlushContains($form, ['FHTML/js/jscolor/jscolor.js',
-                                                'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="" size="20"  class="color dummy" />error_colorpicker']);
+        $this->assertFormFlushContains($form, [
+            'FHTML/js/jscolor/jscolor.js',
+            'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="" size="20"  class="color dummy" />error_colorpicker'
+        ]);
     }
 
     public function test_posted(): void
@@ -73,7 +79,9 @@ final class formhandler_ColorPickerTest extends FormhandlerTestCase
 
         $form->setError("colorpicker", "forcedError");
 
-        $this->assertFormFlushContains($form, ['Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="FFCC00" size="20"  class="error color" />error_colorpicker',
-                                                '<span id="error_colorpicker" class="error">forcedError</span>']);
+        $this->assertFormFlushContains($form, [
+            'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="FFCC00" size="20"  class="error color" />error_colorpicker',
+            '<span id="error_colorpicker" class="error">forcedError</span>'
+        ]);
     }
 };
