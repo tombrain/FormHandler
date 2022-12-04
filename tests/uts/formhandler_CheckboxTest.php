@@ -10,7 +10,7 @@ final class formhandler_CheckboxTest extends FormhandlerTestCase
         "c3" => "Check3"
     ];
     
-public function test_new_single(): void
+    public function test_new_single(): void
     {
         $form = new FormHandler();
 
@@ -21,6 +21,62 @@ public function test_new_single(): void
         $this->assertEmpty($form->getValue("checkbox"));
 
         $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox" id="checkbox_1" value="on" />error_checkbox']);
+    }
+    
+    public function test_new_empty_optionArray(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->checkBox("Checkbox", "checkbox", array());
+
+        $this->assertFormFlushContains($form, ['Checkbox:error_checkbox']);
+    }
+    
+    public function test_new_single_viewmode(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->checkBox("Checkbox", "checkbox");
+        $form->setFieldViewMode("checkbox");
+
+        $this->assertFormFlushContains($form, ['Checkbox:error_checkbox']);
+    }
+    
+    public function test_setValue(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->checkBox("Checkbox", "checkbox", $this->aChecks);
+
+        $form->setValue("checkbox", "c1,c3,");
+        $this->assertEquals(array("c1", "c3"), $form->getValue("checkbox"));
+
+        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" checked="checked" /><label for="checkbox_1" class="noStyle">Check1</label>',
+                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>',
+                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" checked="checked" /><label for="checkbox_3" class="noStyle">Check3</label>error_checkbox']);
+    }
+
+    public function test_setMask(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->checkBox("Checkbox", "checkbox", $this->aChecks, null, null, null, "nofield");
+        $form->checkBox("Checkbox2", "checkbox2", $this->aChecks, null, null, null, "with a %field%");
+
+        $this->assertFormFlushContains($form, ['Checkbox:<input type="checkbox" name="checkbox[]" id="checkbox_1" value="c1" /><label for="checkbox_1" class="noStyle">Check1</label>nofield',
+                                                '<input type="checkbox" name="checkbox[]" id="checkbox_2" value="c2" /><label for="checkbox_2" class="noStyle">Check2</label>nofield',
+                                                '<input type="checkbox" name="checkbox[]" id="checkbox_3" value="c3" /><label for="checkbox_3" class="noStyle">Check3</label>nofielderror_checkbox',
+                                                'Checkbox2:with a <input type="checkbox" name="checkbox2[]" id="checkbox2_4" value="c1" /><label for="checkbox2_4" class="noStyle">Check1</label>with a ',
+                                                '<input type="checkbox" name="checkbox2[]" id="checkbox2_5" value="c2" /><label for="checkbox2_5" class="noStyle">Check2</label>with a ',
+                                                '<input type="checkbox" name="checkbox2[]" id="checkbox2_6" value="c3" /><label for="checkbox2_6" class="noStyle">Check3</label>error_checkbox2']);
     }
 
     public function test_new_array(): void

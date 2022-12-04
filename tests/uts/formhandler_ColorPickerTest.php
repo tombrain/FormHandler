@@ -18,6 +18,32 @@ final class formhandler_ColorPickerTest extends FormhandlerTestCase
                                                 'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="" size="20"  class="color" />error_colorpicker']);
     }
 
+    public function test_viewMode(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->colorPicker("Colorpicker", "colorpicker");
+
+        $form->setFieldViewMode("colorpicker");
+
+        $this->assertFormFlushContains($form, ['FHTML/js/jscolor/jscolor.js',
+                                                'Colorpicker:error_colorpicker']);
+    }
+
+    public function test_extraClass(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->colorPicker("Colorpicker", "colorpicker", null, null, null, "class=\"dummy\"");
+
+        $this->assertFormFlushContains($form, ['FHTML/js/jscolor/jscolor.js',
+                                                'Colorpicker:<input type="text" name="colorpicker" id="colorpicker" value="" size="20"  class="color dummy" />error_colorpicker']);
+    }
+
     public function test_posted(): void
     {
         $_POST['FormHandler_submit'] = "1";

@@ -17,6 +17,21 @@ final class formhandler_ButtonsTest extends FormhandlerTestCase
                                                 '<input type="button" name="button2" id="button2" value="Button3" data-old="123" />error_button2']);
     }
 
+    public function test_button_setIndex(): void
+    {
+        $form = new FormHandler();
+
+        $form->button("Button", "but1");
+        $form->button("Button2", "but2");
+        $form->button("Button3", "but3");
+
+        $form->setTabIndex(array("but2", "but1", "but3"));
+
+        $this->assertFormFlushContains($form, ['<input type="button" name="but1" id="but1" value="Button" tabindex="2" />error_but1',
+                                                '<input type="button" name="but2" id="but2" value="Button2" tabindex="1" />error_but2',
+                                                '<input type="button" name="but3" id="but3" value="Button3" tabindex="3" />error_but3']);
+    }
+
     public function test_submitButtom(): void
     {
         $form = new FormHandler();
@@ -32,6 +47,15 @@ final class formhandler_ButtonsTest extends FormhandlerTestCase
                                                 '<input type="submit" value="Submit" name="submitbutton" id="submitbutton"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}"  />error_submitbutton',
                                                 '<input type="submit" value="Submit" name="button3" id="button3"  onclick=" if (this.form.querySelector(\':invalid\') == null) { this.form.submit();this.disabled=true;}" data-old="123" />error_button3',
                                                 '<input type="submit" value="Submit" name="button4" id="button4"  />error_button4']);
+    }
+
+    public function test_submitButtom_onClick(): void
+    {
+        $form = new FormHandler();
+
+        $form->submitButton("Caption", "submitbutton", "onClick='doIt()'");
+
+        $this->assertFormFlushContains($form, ['<input type="submit" value="Caption" name="submitbutton" id="submitbutton"  onclick=\'this.form.submit();this.disabled=true;doIt()\' />error_submitbutton']);
     }
 
     public function test_imageButton(): void
