@@ -15,6 +15,7 @@ jobs:
         uses: php-actions/phpunit@master
         env:
           TEST_NAME: Scarlett
+          XDEBUG_MODE: coverage
         with:
           php_version: 8.0.26
           php_extensions: gd
