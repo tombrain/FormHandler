@@ -1,9 +1,9 @@
 {
-    "name": "formhandler/formhandler",
+    "name": "tomdabrain/formhandler",
     "type": "library",
     "description": "Interactive forms within 10 lines",
     "homepage": "http://www.formhandler.net/",
-    "license": "LGPL-2.1",
+    "license": "LGPL-2.1-only",
     "support": {
         "forum": "http://www.formhandler.net/forum_index.html",
         "docs": "http://www.formhandler.net/manual/manual.html",
@@ -17,18 +17,10 @@
         }
     ],
     "repositories": [
-        {
-            "type":"package",
-            "package":{
-                "name":"tombrain/phpunit-mock-dibi",
-                "version":"master",
-                "source":{
-                    "url":"https://github.com/tombrain/phpunit-mock-dibi",
-                    "type":"git",
-                    "reference":"master"
-                }
-            }
-        }
+        	{
+      		"type": "vcs",
+      		"url": "https://github.com/tombrain/phpunit-mock-dibi.git"
+    	}	    
 	],
     "require": {
         "phpunit/phpunit": "^9.0.1",
@@ -36,21 +28,29 @@
         "jdorn/sql-formatter": "^1.2.17",
         "phan/phan": "^5.1",
 		"phpstan/phpstan": "^1.9.2",
-		"tombrain/phpunit-mock-dibi" : "@dev",
-        "dibi/dibi": "4.2.x-dev"
+		"tombrain/phpunit-mock-dibi" : "dev-master",
+        "dibi/dibi": "^4.2"
     },
     "autoload": {
         "files": [
             "src/class.FormHandler.php",
             "src/class.dbFormHandler.php",
-            "src/yadal/class.Yadal.php"
+            "src/yadal/class.Yadal.php",
+            "src/includes/class.ImageConverter.php"
         ],
         "psr-4": {
             "Cz\\PHPUnit\\MockDibi\\": "vendor\\tombrain\\phpunit-mock-dibi\\classes"
         }
-
+    },
+    "autoload-dev": {
+        "classmap": [
+            "tests/uts/helper"
+        ]
     },
     "extra": {
         "dev-master": "v3.3.x-dev"
+    },
+    "config": {
+        "platform-check": false
     }
 }

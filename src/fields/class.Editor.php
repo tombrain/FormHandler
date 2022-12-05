@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class Editor
  *
@@ -12,42 +13,43 @@
 
 class Editor extends TextArea
 {
-	public function __construct( $oForm, $sName )
-	{
-		parent::__construct( $oForm, $sName );	
-		
-		static $bSetJS = false;
+    private $_oEditor;
 
-		// needed javascript included yet ?
-		if(!$bSetJS)
-		{
+    public function __construct($oForm, $sName)
+    {
+        parent::__construct($oForm, $sName);
 
-			$bSetJS = true;
-				$oForm->_setJS(
-					FH_FHTML_DIR."ckeditor/ckeditor.js", true
-				);
-		}
+        static $bSetJS = false;
 
-		$this->_oEditor = new stdClass( $sName );
-		$this->_oEditor->basePath = FH_FHTML_DIR . 'ckeditor/';
-        $this->_oEditor->Value = isset( $this->_mValue ) ? $this->_mValue : '';
+        // needed javascript included yet ?
+        if (!$bSetJS)
+        {
 
-        $this->setToolbar( 'Default' ); // Default or Basic
-        $this->setServerPath( '' );
-		
+            $bSetJS = true;
+            $oForm->_setJS(
+                FH_FHTML_DIR . "ckeditor/ckeditor.js",
+                true
+            );
+        }
+
+        $this->_oEditor = new stdClass();
+        $this->_oEditor->basePath = FH_FHTML_DIR . 'ckeditor/';
+        $this->_oEditor->Value = isset($this->_mValue) ? $this->_mValue : '';
+
+        $this->setToolbar('Default'); // Default or Basic
+        $this->setServerPath('');
+
         // set the language
-        $this->_oEditor->config['language']  = str_replace('-utf8', '', $oForm->GetLang());        
+        $this->_oEditor->config['language']  = str_replace('-utf8', '', $oForm->GetLang());
 
-		// default height & width
-        $this->setWidth ( 720 );
-        $this->setHeight( 400 );
+        // default height & width
+        $this->setWidth(720);
+        $this->setHeight(400);
 
         // moono
-        $this->setSkin( 'moono' );
+        $this->setSkin('moono');
+    }
 
-		
-	}
-	
     /**
      * Editor::setHeight()
      *
@@ -58,11 +60,11 @@ class Editor extends TextArea
      * @access public
      * @author Teye Heimans
      */
-    public function setHeight( $iHeight )
+    public function setHeight($iHeight)
     {
         $this->_oEditor->config['height'] = $iHeight;
-    }	
-	
+    }
+
     /**
      * Editor::setValue()
      *
@@ -73,9 +75,9 @@ class Editor extends TextArea
      * @access public
      * @author Teye Heimans
      */
-    public function setValue( $sValue )
+    public function setValue($sValue)
     {
-    	$this->_mValue = $sValue;
+        $this->_mValue = $sValue;
     }
 
 
@@ -89,7 +91,7 @@ class Editor extends TextArea
      * @access public
      * @author Teye Heimans
      */
-    public function setWidth( $iWidth)
+    public function setWidth($iWidth)
     {
         $this->_oEditor->config['width'] = $iWidth;
     }
@@ -104,7 +106,7 @@ class Editor extends TextArea
      * @access public
      * @author Teye Heimans
      */
-    public function setToolbar( $sToolbar )
+    public function setToolbar($sToolbar)
     {
         $this->_oEditor->config['toolbar'] = $sToolbar;
     }
@@ -120,9 +122,9 @@ class Editor extends TextArea
      * @access public
      * @author Teye Heimans
      */
-    public function setConfig( $config )
+    public function setConfig($config)
     {
-        $this->_oEditor->config = array_merge( $this->_oEditor->config, $config );
+        $this->_oEditor->config = array_merge($this->_oEditor->config, $config);
     }
 
     /**
@@ -130,38 +132,37 @@ class Editor extends TextArea
      *
      * Set the server path used for browsing and uploading images
      *
-     * @param string $sPath: The path
+     * @param string|false $sPath: The path
      * @return void
      * @access public
      * @author Teye Heimans
      */
-    public function setServerPath( $sPath )
+    public function setServerPath($sPath)
     {
-        if( $sPath === false )
+        if ($sPath === false)
         {
             $this->_oEditor->Config['filebrowserBrowseUrl']  = false;
             $this->_oEditor->Config['filebrowserUploadUrl'] = false;
             return;
         }
 
-    	// get the dir where the script is located in
-    	$sSelfPath = $_SERVER['PHP_SELF'] ;
-	    $sSelfPath = substr( $sSelfPath, 0, strrpos( $sSelfPath, '/' ) ) ;
+        // get the dir where the script is located in
+        $sSelfPath = $_SERVER['PHP_SELF'];
+        $sSelfPath = substr($sSelfPath, 0, strrpos($sSelfPath, '/'));
 
-	    // get the dir where the user want's to upload the dir in
-	    $sPath = $this->_getServerPath( $sPath, $sSelfPath );
+        // get the dir where the user want's to upload the dir in
+        $sPath = $this->_getServerPath($sPath, $sSelfPath);
         // path (URL) to the FCKeditor...
         $char = substr(FH_FHTML_DIR, 0, 1);
-        $pre  = ($char != '/' && $char != '\\' && strtolower(substr(FH_FHTML_DIR, 0, 4)) != 'http') ? str_replace('//', '/', dirname( $_SERVER['PHP_SELF'] ).'/') : '';
+        $pre  = ($char != '/' && $char != '\\' && strtolower(substr(FH_FHTML_DIR, 0, 4)) != 'http') ? str_replace('//', '/', dirname($_SERVER['PHP_SELF']) . '/') : '';
 
         $sURL =
-          $pre . FH_FHTML_DIR .
-          'filemanager/browser/default/browser.html?'.
-          'Type=%s&Connector=../../connectors/php/connector.php?ServerPath='.$sPath
-        ;
+            $pre . FH_FHTML_DIR .
+            'filemanager/browser/default/browser.html?' .
+            'Type=%s&Connector=../../connectors/php/connector.php?ServerPath=' . $sPath;
 
-        $this->_oEditor->config['filebrowserBrowseUrl']  = ( sprintf( $sURL, 'File', $sPath ) );
-        $this->_oEditor->config['filebrowserUploadUrl']  = ( sprintf( $sURL, 'File', $sPath ) );
+        $this->_oEditor->config['filebrowserBrowseUrl']  = (sprintf($sURL, 'File', $sPath));
+        $this->_oEditor->config['filebrowserUploadUrl']  = (sprintf($sURL, 'File', $sPath));
     }
 
 
@@ -170,16 +171,16 @@ class Editor extends TextArea
      *
      * Set the skin used for the FCKeditor
      *
-     * @param string $skin
+     * @param string $sSkin
      * @return void
      * @access public
      * @author Teye Heimans
      */
-    public function setSkin( $sSkin )
+    public function setSkin($sSkin)
     {
-    	$this->_oEditor->config['skin'] = $sSkin;
-    }        
-	
+        $this->_oEditor->config['skin'] = $sSkin;
+    }
+
     /**
      * Editor::_getServerPath()
      *
@@ -187,61 +188,61 @@ class Editor extends TextArea
      *
      * @param string $sDir: The dir given by the user
      * @param string $sServerPath: The dir where the script is located on the server
-     * @return void
+     * @return string
      * @access private
      * @author Teye Heimans
      */
-    private function _getServerPath( $sDir, $sServerPath )
+    private function _getServerPath($sDir, $sServerPath)
     {
-    	// remove ending slash at the server path
-    	if( substr($sServerPath, -1) == '/' )
-    	{
-			$sServerPath = substr( $sServerPath, 0, -1);
-		}
-		// when no dir is given, just return the path where the script is located
-		if( $sDir == '' )
-		{
-			return $sServerPath;
-		}
+        // remove ending slash at the server path
+        if (substr($sServerPath, -1) == '/')
+        {
+            $sServerPath = substr($sServerPath, 0, -1);
+        }
+        // when no dir is given, just return the path where the script is located
+        if ($sDir == '')
+        {
+            return $sServerPath;
+        }
 
-		// dir starting with a /? Then start at the root...
-		if( $sDir[0] == '/' )
-		{
-			return $sDir;
-		}
-		// dir starting with ./? Then relative from the dir where the script is located
-		else if( substr( $sDir, 0, 2) == './' )
-		{
-			return $sServerPath.'/'.substr($sDir, 2);
-		}
-		// if we are at the root of the server, return the dir..
-		else if( $sServerPath == '/' || $sServerPath == '')
-		{
-			if( $sDir[0] != '.' && $sDir[0] != '/' )
-			{
-				 $sDir = '/'.$sDir;
-			}
-			return $sDir;
-		}
-		// go a dir lower...
-		else if( substr($sDir, 0, 3) == '../' )
-		{
-    		$sServerPath = substr($sServerPath, 0, -strlen( strrchr($sServerPath, "/") ));
+        // dir starting with a /? Then start at the root...
+        if ($sDir[0] == '/')
+        {
+            return $sDir;
+        }
+        // dir starting with ./? Then relative from the dir where the script is located
+        else if (substr($sDir, 0, 2) == './')
+        {
+            return $sServerPath . '/' . substr($sDir, 2);
+        }
+        // if we are at the root of the server, return the dir..
+        else if ($sServerPath == '/' || $sServerPath == '')
+        {
+            if ($sDir[0] != '.' && $sDir[0] != '/')
+            {
+                $sDir = '/' . $sDir;
+            }
+            return $sDir;
+        }
+        // go a dir lower...
+        else if (substr($sDir, 0, 3) == '../')
+        {
+            $sServerPath = substr($sServerPath, 0, -strlen(strrchr($sServerPath, "/")));
 
-    		return $this->_getServerPath( substr($sDir, 3), $sServerPath);
-    	}
-    	// none of the above, then return the dir!
-    	else
-    	{
-    		if( $sDir[0] == '/' )
-    		{
-    			$sDir = substr( $sDir, 1);
-    		}
-    		return $sServerPath.'/'.$sDir;
-    	}
-    }    
-    
-	/**
+            return $this->_getServerPath(substr($sDir, 3), $sServerPath);
+        }
+        // none of the above, then return the dir!
+        else
+        {
+            if ($sDir[0] == '/')
+            {
+                $sDir = substr($sDir, 1);
+            }
+            return $sServerPath . '/' . $sDir;
+        }
+    }
+
+    /**
      * Editor::getField()
      *
      * return the field
@@ -250,24 +251,26 @@ class Editor extends TextArea
      * @author Teye Heimans
      * @access public
      */
-	public function getField()
-	{
-		// view mode enabled ?
-		if( $this -> getViewMode() )
-		{
-			// get the view value..
-			return $this -> _getViewValue();
-		}
+    public function getField()
+    {
+        // view mode enabled ?
+        if ($this->getViewMode())
+        {
+            // get the view value..
+            return $this->_getViewValue();
+        }
 
-		$html = parent::getField();
-	
-		// add the javascript needed for the js calendar field
-		$this -> _oForm -> _setJS( 
-		"
-			CKEDITOR.replace( '".$this->_sName."', ".json_encode( $this->_oEditor->config )." );		
-		", 0, 0 );
-				
-		return $html;
-	}	
+        $html = parent::getField();
+
+        // add the javascript needed for the js calendar field
+        $this->_oForm->_setJS(
+            "
+            CKEDITOR.replace( '" . $this->_sName . "', " . json_encode($this->_oEditor->config) . " );		
+        ",
+            0,
+            0
+        );
+
+        return $html;
+    }
 }
-?>

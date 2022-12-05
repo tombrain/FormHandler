@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Class AjaxValidator
  * 
@@ -12,163 +13,159 @@
 
 class AjaxValidator
 {
-	static $bScript = true;
+    static $bScript = true;
 
-	public function __construct( $bScript = true  )
-	{
-		self::$bScript = $bScript;
-	}
+    public function __construct($bScript = true)
+    {
+        self::$bScript = $bScript;
+    }
 
-	public function CreateObservers( $oForm )
-	{
-		$bSetJS = false;
+    public function CreateObservers($oForm)
+    {
+        static $bSetJS = false;
 
-		// needed javascript included yet ?
-		if(!$bSetJS)
-		{
-			$bSetJS = true;
+        // needed javascript included yet ?
+        if (!$bSetJS)
+        {
+            $bSetJS = true;
 
-			// add the needed javascript
-			// only include library when bScript is treu
-			if( self::$bScript === true )
-			{
-				$oForm->_setJS( FH_FHTML_DIR."js/jquery-1.4.2.min.js", true );
-			}
+            // add the needed javascript
+            // only include library when bScript is treu
+            if (self::$bScript === true)
+            {
+                $oForm->_setJS(FH_FHTML_DIR . "js/jquery-1.4.2.min.js", true);
+            }
 
-			$oForm->_setJS( FH_FHTML_DIR."js/ajax_validator.js", true,false );
+            $oForm->_setJS(FH_FHTML_DIR . "js/ajax_validator.js", true, false);
 
-			// create observers for all fields with a validator
-			$sScript = "";
-			$sScript2 = "";
-			/*@var $oForm FormHandler*/
+            // create observers for all fields with a validator
+            $sScript = "";
+            $sScript2 = "";
+            /*@var $oForm FormHandler*/
 
-			foreach( $oForm->_fields AS $sField => $aField )
-			{
-				if( is_object( $aField[1]) && method_exists( $aField[1], 'getValidator' ) )
-				{
-					if( isset( $oForm->_customMsg[$sField][0] ) AND $oForm->_customMsg[$sField][0] != '' )
-					{
-						$sMsg = addslashes( $oForm->_customMsg[$sField][0] );
-					}
-					else
-					{
-						$sMsg = $oForm->_text(14);
-					}
+            foreach ($oForm->_fields as $sField => $aField)
+            {
+                if (is_object($aField[1]) && method_exists($aField[1], 'getValidator'))
+                {
+                    if (isset($oForm->_customMsg[$sField][0]) and $oForm->_customMsg[$sField][0] != '')
+                    {
+                        $sMsg = addslashes($oForm->_customMsg[$sField][0]);
+                    }
+                    else
+                    {
+                        $sMsg = $oForm->_text(14);
+                    }
 
-					// only when a validator is defined for this field
-					if( $aField[1]->getValidator() != '' )
-					{
-						if( is_a( $aField[1], 'selectField' ) )
-						{
-							$sEvent = 'change';
-						}
-						elseif( is_a( $aField[1], 'timeField' ))
-						{
-							$sField .= "_hour";
-							$sEvent = 'blur';
-						}
-						elseif( is_a( $aField[1], 'checkBox' ) )
-						{
-							// no on the fly checking yet
-							$sEvent = '';
-						}
-						elseif( is_a( $aField[1], 'radioButton' ) )
-						{
-							// no on the fly checking yet
-							$sEvent = '';
-						}
-						else
-						{
-							$sEvent = 'blur';
-						}
-						if( $sEvent != '' )
-						{
+                    // only when a validator is defined for this field
+                    if ($aField[1]->getValidator() != '')
+                    {
+                        if (is_a($aField[1], 'selectField'))
+                        {
+                            $sEvent = 'change';
+                        }
+                        elseif (is_a($aField[1], 'timeField'))
+                        {
+                            $sField .= "_hour";
+                            $sEvent = 'blur';
+                        }
+                        elseif (is_a($aField[1], 'checkBox'))
+                        {
+                            // no on the fly checking yet
+                            $sEvent = '';
+                        }
+                        elseif (is_a($aField[1], 'radioButton'))
+                        {
+                            // no on the fly checking yet
+                            $sEvent = '';
+                        }
+                        else
+                        {
+                            $sEvent = 'blur';
+                        }
+                        if ($sEvent != '')
+                        {
 
-							$sScript  .= "  jQuery('#".$sField."').live( '".$sEvent."', function(){FH_VALIDATE( '".$aField[1]->getValidator()."', '".$sField."', '".$sField."', '".FH_FHTML_DIR."', '".FH_INCLUDE_DIR."','".$sMsg."' )});\n";
-							if( $aField[1]->getValidator() <> 'FH_CHECK_DOMAIN' )
-							{
-								$sScript2 .= "FH_VALIDATE( '".$aField[1]->getValidator()."', '".$sField."', '".$sField."', '".FH_FHTML_DIR."', '".FH_INCLUDE_DIR."','".$sMsg."' );";
-							}
-						}
-					}
-				}
-			}
+                            $sScript  .= "  jQuery('#" . $sField . "').live( '" . $sEvent . "', function(){FH_VALIDATE( '" . $aField[1]->getValidator() . "', '" . $sField . "', '" . $sField . "', '" . FH_FHTML_DIR . "', '" . FH_INCLUDE_DIR . "','" . $sMsg . "' )});\n";
+                            if ($aField[1]->getValidator() <> 'FH_CHECK_DOMAIN')
+                            {
+                                $sScript2 .= "FH_VALIDATE( '" . $aField[1]->getValidator() . "', '" . $sField . "', '" . $sField . "', '" . FH_FHTML_DIR . "', '" . FH_INCLUDE_DIR . "','" . $sMsg . "' );";
+                            }
+                        }
+                    }
+                }
+            }
 
-			$oForm->_setJS( '$(function(){'.$sScript.'})', false, true );
-			//na een post ook de AJAX validators aanroepen om de classes te switchen
-			/**
-			 * very alpha, we vinden dat het anders moet, maar weten nog niet hoe, nog niet documenteren en/of publiceren
-			 * 
-			 * @author Johan Wiegel
-			 * @since 02-09-2009
-			 */
-			if( $oForm->isPosted() )
-			{
-				$oForm->_setJS( $sScript2,false,false );
-			}
-		}
-	}
+            $oForm->_setJS('$(function(){' . $sScript . '})', false, true);
+            //na een post ook de AJAX validators aanroepen om de classes te switchen
+            /**
+             * very alpha, we vinden dat het anders moet, maar weten nog niet hoe, nog niet documenteren en/of publiceren
+             * 
+             * @author Johan Wiegel
+             * @since 02-09-2009
+             */
+            if ($oForm->isPosted())
+            {
+                $oForm->_setJS($sScript2, false, false);
+            }
+        }
+    }
 
-	public function Validate( $aRequest, $oValidator )
-	{
-		// determin if there is more than one validator
-		if( $aRequest['validator'] != '' AND $aRequest['msg'] != '' AND isset( $aRequest['value'] ) )
-		{
-			if( strpos( $aRequest['validator'], '|' ) > 0 )
-			{
-				$aValidators = explode( '|', $aRequest['validator'] );
-			}
-			else
-			{
-				$aValidators = array( $aRequest['validator'] );
-			}
+    public function Validate($aRequest, $oValidator)
+    {
+        // determin if there is more than one validator
+        if ($aRequest['validator'] != '' and $aRequest['msg'] != '' and isset($aRequest['value']))
+        {
+            if (strpos($aRequest['validator'], '|') > 0)
+            {
+                $aValidators = explode('|', $aRequest['validator']);
+            }
+            else
+            {
+                $aValidators = array($aRequest['validator']);
+            }
 
-			// loop through validators
-			foreach( $aValidators AS $iKey => $sValidator )
-			{
-				if( is_object( $oValidator ) && method_exists( $oValidator, $sValidator ) AND $sValidator != 'FH_CAPTCHA' )  // CAPTCHA can not be validated by AJAX
-				{
-					if( $oValidator->$sValidator( $aRequest['value'] ) == false )
-					{
-						return "<script type=\"text/javascript\">
-						<!--//<![CDATA[	
-						jQuery('#".$aRequest['msgbox']."').addClass( 'fh_error' );
-						jQuery('#".$aRequest['msgbox']."').removeClass( 'fh_ok' );												
-						jQuery('#".$aRequest['msgbox']."').removeClass( 'fh_mandatory' );												
-						jQuery('#".$aRequest['msgbox']."').prev('input').addClass( 'error' );
-						//]]>-->
-						</script>".stripslashes( $aRequest['msg'] );				
-						exit;  // stop if one validator fails
-					}
-					elseif( empty( $aRequest['value'] ) )
-					{
-						return "<script type=\"text/javascript\">
-						<!--//<![CDATA[	
-						jQuery('#".$aRequest['msgbox']."').prev('input').removeClass( 'error' );
-						jQuery('#".$aRequest['msgbox']."').removeClass( 'fh_error' );
-						jQuery('#".$aRequest['msgbox']."').removeClass( 'fh_ok' );
-						jQuery('#".$aRequest['msgbox']."').addClass( 'fh_mandatory' );	
-						//]]>-->											
-						</script>";
-						exit;
-					}
-					else
-					{
-						return "
-						<script type=\"text/javascript\">	
-						<!--//<![CDATA[	
-						jQuery('#".$aRequest['msgbox']."').html('&nbsp;');
-						jQuery('#".$aRequest['msgbox']."').removeClass( 'fh_mandatory' );	
-						jQuery('#".$aRequest['msgbox']."').removeClass( 'fh_error' );
-						jQuery('#".$aRequest['msgbox']."').addClass( 'fh_ok' );		
-						jQuery('#".$aRequest['msgbox']."').prev('input').removeClass( 'error' );
-						//]]>-->
-						</script>";
-						exit;
-					}
-				}
-			}
-		}
-	}
+            // loop through validators
+            foreach ($aValidators as $iKey => $sValidator)
+            {
+                if (is_object($oValidator) && method_exists($oValidator, $sValidator) and $sValidator != 'FH_CAPTCHA')  // CAPTCHA can not be validated by AJAX
+                {
+                    if ($oValidator->$sValidator($aRequest['value']) == false)
+                    {
+                        return "<script type=\"text/javascript\">
+                        <!--//<![CDATA[	
+                        jQuery('#" . $aRequest['msgbox'] . "').addClass( 'fh_error' );
+                        jQuery('#" . $aRequest['msgbox'] . "').removeClass( 'fh_ok' );												
+                        jQuery('#" . $aRequest['msgbox'] . "').removeClass( 'fh_mandatory' );												
+                        jQuery('#" . $aRequest['msgbox'] . "').prev('input').addClass( 'error' );
+                        //]]>-->
+                        </script>" . stripslashes($aRequest['msg']);
+                    }
+                    elseif (empty($aRequest['value']))
+                    {
+                        return "<script type=\"text/javascript\">
+                        <!--//<![CDATA[	
+                        jQuery('#" . $aRequest['msgbox'] . "').prev('input').removeClass( 'error' );
+                        jQuery('#" . $aRequest['msgbox'] . "').removeClass( 'fh_error' );
+                        jQuery('#" . $aRequest['msgbox'] . "').removeClass( 'fh_ok' );
+                        jQuery('#" . $aRequest['msgbox'] . "').addClass( 'fh_mandatory' );	
+                        //]]>-->											
+                        </script>";
+                    }
+                    else
+                    {
+                        return "
+                        <script type=\"text/javascript\">	
+                        <!--//<![CDATA[	
+                        jQuery('#" . $aRequest['msgbox'] . "').html('&nbsp;');
+                        jQuery('#" . $aRequest['msgbox'] . "').removeClass( 'fh_mandatory' );	
+                        jQuery('#" . $aRequest['msgbox'] . "').removeClass( 'fh_error' );
+                        jQuery('#" . $aRequest['msgbox'] . "').addClass( 'fh_ok' );		
+                        jQuery('#" . $aRequest['msgbox'] . "').prev('input').removeClass( 'error' );
+                        //]]>-->
+                        </script>";
+                    }
+                }
+            }
+        }
+    }
 }
-?>

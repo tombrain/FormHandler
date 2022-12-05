@@ -1,55 +1,59 @@
-<?php  declare(strict_types=1); ?>
-<!DOCTYPE html>
-<head>
-	<meta charset="utf-8">
-</head>
-<body>
 <?php
 
-define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/' );
-ini_set("display_errors", "1");
-@error_reporting(E_USER_WARNING | E_ALL);
+declare(strict_types=1); ?>
+<!DOCTYPE html>
 
-require_once '../../vendor/autoload.php';
+<head>
+    <meta charset="utf-8">
+</head>
 
-$form = new FormHandler();
-$form->onCorrect("doRun");
+<body>
+    <?php
 
-// textfield
-$form -> textField("Name", "name", FH_STRING);
+    define('FH_FHTML_DIR', 'http://formhandler.test/src/FHTML/');
+    ini_set("display_errors", "1");
+    @error_reporting(E_USER_WARNING | E_ALL);
 
-// submitbutton
-$form -> submitButton("Save");
+    require_once '../../vendor/autoload.php';
 
-// get the errors of invalid fields
-$errors = $form->catchErrors();
+    $form = new FormHandler();
+    $form->onCorrect("doRun");
 
-// oncorrect function...
-$form -> onCorrect('doRun');
+    // textfield
+    $form->textField("Name", "name", FH_STRING);
 
-// flush
-$form -> flush();
+    // submitbutton
+    $form->submitButton("Save");
 
-/** handle your own errors! **/
+    // get the errors of invalid fields
+    $errors = $form->catchErrors();
 
-// any errors?
-if( sizeof($errors) > 0 ) 
-{
-    // create a JS message
-    $msg = "Some fields are incorrect!\\n";
+    // oncorrect function...
+    $form->onCorrect('doRun');
 
-    foreach($errors as $field => $error) 
+    // flush
+    $form->flush();
+
+    /** handle your own errors! **/
+
+    // any errors?
+    if (sizeof($errors) > 0)
     {
-        $msg .= "- ". $form -> getTitle( $field )."\\n";
-    }
-    echo
-    "<script language='javascript'>\n".
-    "alert('".$msg."');\n".
-    "</script>\n";
-} 
+        // create a JS message
+        $msg = "Some fields are incorrect!\\n";
 
-// function to show a message
-function doRun($data) 
-{
-    return print_r($data);
-} 
+        foreach ($errors as $field => $error)
+        {
+            $msg .= "- " . $form->getTitle($field) . "\\n";
+        }
+        echo
+        "<script language='javascript'>\n" .
+            "alert('" . $msg . "');\n" .
+            "</script>\n";
+    }
+
+    // function to show a message
+    function doRun($data)
+    {
+        return print_r($data);
+    }

@@ -11,7 +11,7 @@
  */
 class TimeField extends Field
 {
-    private $_iFormat;   // integer: hour format: {12, 24}
+    private $_iFormat;  // integer: hour format: {12, 24}
     public $_oHour;     // SelectField: object of the hour selectfield
     public $_oMinute;   // SelectField: object of the minute selectfield
     public $_bRequired; // boolean: if the field is required or if we have to give the option to leave this field empty
@@ -26,24 +26,24 @@ class TimeField extends Field
      * @return TimeField
      * @author Teye Heimans
      */
-    public function __construct( &$oForm, $sName )
+    public function __construct(&$oForm, $sName)
     {
         // set the default hour format
-        $this->setHourFormat( FH_TIMEFIELD_DEFAULT_HOUR_FORMAT );
+        $this->setHourFormat(FH_TIMEFIELD_DEFAULT_HOUR_FORMAT);
 
         // set if the field is required
-        $this->setRequired( FH_TIMEFIELD_DEFAULT_REQUIRED );
+        $this->setRequired(FH_TIMEFIELD_DEFAULT_REQUIRED);
 
         // make the hour and minute fields
-        $this->_oHour   = new SelectField($oForm, $sName.'_hour');
-        $this->_oMinute = new SelectField($oForm, $sName.'_minute');
+        $this->_oHour   = new SelectField($oForm, $sName . '_hour');
+        $this->_oMinute = new SelectField($oForm, $sName . '_minute');
 
-        parent::__construct( $oForm, $sName );
+        parent::__construct($oForm, $sName);
 
         // posted or edit form? Then load the value of the time
-        if( $oForm->isPosted() || (isset($oForm->edit) && $oForm->edit) )
+        if ($oForm->isPosted() || (isset($oForm->edit) && $oForm->edit))
         {
-            $this->_mValue = $this->_oHour->getValue().':'.$this->_oMinute->getValue();
+            $this->_mValue = $this->_oHour->getValue() . ':' . $this->_oMinute->getValue();
         }
     }
 
@@ -57,10 +57,10 @@ class TimeField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setExtra( $sExtra )
+    public function setExtra($sExtra)
     {
-    	$this->_oHour->setExtra  ( $sExtra );
-    	$this->_oMinute->setExtra( $sExtra );
+        $this->_oHour->setExtra($sExtra);
+        $this->_oMinute->setExtra($sExtra);
     }
 
     /**
@@ -73,18 +73,18 @@ class TimeField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setHourFormat( $iFormat )
+    public function setHourFormat($iFormat)
     {
-        if($iFormat == 12 || $iFormat == 24)
+        if ($iFormat == 12 || $iFormat == 24)
         {
             $this->_iFormat = $iFormat;
         }
         else
         {
-        	trigger_error(
-        	  'Invalid value as hour format! Only 12 or 24 are allowed!',
-        	  E_USER_WARNING
-        	);
+            trigger_error(
+                'Invalid value as hour format! Only 12 or 24 are allowed!',
+                E_USER_WARNING
+            );
         }
     }
 
@@ -99,7 +99,7 @@ class TimeField extends Field
      * @access public
      * @author Teye Heimans
      */
-    public function setRequired( $bStatus )
+    public function setRequired($bStatus)
     {
         $this->_bRequired = $bStatus;
     }
@@ -115,18 +115,18 @@ class TimeField extends Field
      * @access Public
      * @author Teye Heimans
      */
-    public function setValue( $sValue )
+    public function setValue($sValue)
     {
-    	if( strpos($sValue,':') !== false)
-    	{
+        if (strpos($sValue, ':') !== false)
+        {
             list($sHour, $sMinute) = explode(':', $sValue);
 
-            $this->_oHour->setValue   ( $sHour );
-            $this->_oMinute->setValue ( $sMinute );
+            $this->_oHour->setValue($sHour);
+            $this->_oMinute->setValue($sMinute);
             $this->_mValue = $sValue;
         }
         // possibility to set "no" value when the field is not required
-        elseif( (strtolower($sValue )== "null" || empty( $sValue ) ) && !$this->_bRequired )
+        elseif ((strtolower($sValue) == "null" || empty($sValue)) && !$this->_bRequired)
         {
             $this->_mValue = "";
         }
@@ -143,13 +143,13 @@ class TimeField extends Field
      */
     public function getValue()
     {
-        if($this->_oHour->getValue() == '' && $this->_oMinute->getValue() == '')
+        if ($this->_oHour->getValue() == '' && $this->_oMinute->getValue() == '')
         {
             return '';
         }
         else
         {
-        	$this->_mValue = $this->_oHour->getValue().':'.$this->_oMinute->getValue();
+            $this->_mValue = $this->_oHour->getValue() . ':' . $this->_oMinute->getValue();
             return $this->_mValue;
         }
     }
@@ -167,56 +167,58 @@ class TimeField extends Field
     public function getField()
     {
         // view mode enabled ?
-        if( $this -> getViewMode() )
+        if ($this->getViewMode())
         {
             // get the view value..
-            return $this -> _getViewValue();
+            return $this->_getViewValue();
         }
 
 
-    	// set the currect time if wanted
-        if( !$this->_oForm->isPosted() &&
+        // set the currect time if wanted
+        if (
+            !$this->_oForm->isPosted() &&
             (!isset($this->_oForm->edit) || !$this->_oForm->edit) &&
             $this->_bRequired &&
             $this->getValue() == '' &&
-            FH_TIMEFIELD_SET_CUR_TIME)
+            FH_TIMEFIELD_SET_CUR_TIME
+        )
         {
-        	$this->setValue( date('H').':'.date('i') );
+            $this->setValue(date('H') . ':' . date('i'));
         }
 
         // generate the hour options
         $aHours = array();
-        if(!$this->_bRequired)
+        if (!$this->_bRequired)
         {
             $aHours[''] = '';
         }
-        for($i = 0; $i <= ($this->_iFormat-1); $i++ )
+        for ($i = 0; $i <= ($this->_iFormat - 1); $i++)
         {
             $aHours[sprintf('%02d', $i)] = sprintf('%02d', $i);
         }
 
         // generate the minutes options
         $aMinutes = array();
-        if(!$this->_bRequired)
+        if (!$this->_bRequired)
         {
             $aMinutes[''] = '';
         }
         $i = 0;
-        while($i <= 59)
+        while ($i <= 59)
         {
             $aMinutes[sprintf("%02d", $i)] = sprintf("%02d", $i);
             $i += FH_TIMEFIELD_MINUTE_STEPS;
         }
 
         // set the options
-        $this->_oHour->setOptions  ( $aHours );
-        $this->_oMinute->setOptions( $aMinutes );
+        $this->_oHour->setOptions($aHours);
+        $this->_oMinute->setOptions($aMinutes);
 
         // make sure that the minutes option can be displayed
-        if( $this -> _bRequired ||  $this -> getValue() != "" )
+        if ($this->_bRequired ||  $this->getValue() != "")
         {
-            $this->_oHour->_mValue += $this->_getNearestMinute( $this->_oMinute->_mValue );
-            if($this->_oHour->_mValue == 24) $this->_oHour->_mValue = 0;
+            $this->_oHour->_mValue += $this->_getNearestMinute($this->_oMinute->_mValue);
+            if ($this->_oHour->_mValue == 24) $this->_oHour->_mValue = 0;
         }
 
         //debug
@@ -224,9 +226,9 @@ class TimeField extends Field
 
         // return the fields
         return
-          $this->_oHour->getField() . " : " .
-          $this->_oMinute->getField().
-          (isset($this->_sExtraAfter) ? $this->_sExtraAfter :'');
+            $this->_oHour->getField() . " : " .
+            $this->_oMinute->getField() .
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '');
     }
 
     /**
@@ -239,26 +241,24 @@ class TimeField extends Field
      * @access private
      * @author Teye Heimans
      */
-    private function _getNearestMinute( &$minute )
+    private function _getNearestMinute(&$minute)
     {
         // get the nearest value at the minutes...
-    	for($i = 0; $i < $minute; $i += FH_TIMEFIELD_MINUTE_STEPS);
+        for ($i = 0; $i < $minute; $i += FH_TIMEFIELD_MINUTE_STEPS);
 
-    	$i = abs( $minute - $i ) < abs( $minute - ($i - FH_TIMEFIELD_MINUTE_STEPS)) ?
-    	$i : ($i - FH_TIMEFIELD_MINUTE_STEPS);
+        $i = abs($minute - $i) < abs($minute - ($i - FH_TIMEFIELD_MINUTE_STEPS)) ?
+            $i : ($i - FH_TIMEFIELD_MINUTE_STEPS);
 
-    	$minute = $i;
+        $minute = $i;
 
-    	if($minute == 60)
-    	{
-    	    $minute = 0;
-    	    return 1;
-    	}
-    	else
-    	{
-    	    return 0;
-    	}
+        if ($minute == 60)
+        {
+            $minute = 0;
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
     }
 }
-
-?>

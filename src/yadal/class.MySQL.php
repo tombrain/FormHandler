@@ -1,4 +1,5 @@
 <?php
+
 /**
  * Yadal interface for the MySQL database type
  *
@@ -25,9 +26,9 @@ class MySQL extends Yadal
      * @param string $db: The database which should be used
      * @author Teye Heimans
      */
-	public function __construct( $db )
+    public function __construct($db)
     {
-        parent::__construct( $db );
+        parent::__construct($db);
         $this->_quoteNumbers = true;
         $this->_nameQuote = '`';
     }
@@ -38,32 +39,32 @@ class MySQL extends Yadal
      * Make a connection with the database and
      * select the database.
      *
-     * @param string host: the host to connect to
-     * @param string username: the username which should be used to login
-     * @param string password: the password which should be used to login
+     * @param string $host: the host to connect to
+     * @param string $username: the username which should be used to login
+     * @param string $password: the password which should be used to login
      * @return resource: The connection resource
      * @access public
      * @author Teye Heimans
      */
-    public function connect( $host = 'localhost', $username = '', $password = '' )
+    public function connect($host = 'localhost', $username = '', $password = '')
     {
-    	// connect with the mysql database
-    	$this->_conn = mysql_connect( $host, $username, $password );
+        // connect with the mysql database
+        $this->_conn = mysql_connect($host, $username, $password);
 
-    	// connection made?
-    	if( $this->_conn )
-    	{
-    		// select the database
-    	    if(mysql_select_db( $this->_db, $this->_conn ))
-    	    {
-    	    	$this->_isConnected = true;
+        // connection made?
+        if ($this->_conn)
+        {
+            // select the database
+            if (mysql_select_db($this->_db, $this->_conn))
+            {
+                $this->_isConnected = true;
 
-    	    	// return the connection resource
-    			return $this->_conn;
-    	    }
-    	}
+                // return the connection resource
+                return $this->_conn;
+            }
+        }
 
-    	return false;
+        return false;
     }
 
 
@@ -78,10 +79,10 @@ class MySQL extends Yadal
      */
     public function close()
     {
-        if( $this->_isConnected )
+        if ($this->_isConnected)
         {
             $this->_isConnected = false;
-            return mysql_close( $this->_conn );
+            return mysql_close($this->_conn);
         }
 
         return true;
@@ -97,11 +98,11 @@ class MySQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function query( $query )
+    public function query($query)
     {
-    	$this->_lastQuery = $query;
+        $this->_lastQuery = $query;
 
-        return mysql_query( $query, $this->_conn );
+        return mysql_query($query, $this->_conn);
     }
 
     /**
@@ -130,9 +131,9 @@ class MySQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function result( $sql, $row = 0, $field = null )
+    public function result($sql, $row = 0, $field = null)
     {
-    	return mysql_result( $sql, $row, $field );
+        return mysql_result($sql, $row, $field);
     }
 
     /**
@@ -173,9 +174,9 @@ class MySQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function recordCount( $sql )
+    public function recordCount($sql)
     {
-        return mysql_num_rows( $sql );
+        return mysql_num_rows($sql);
     }
 
     /**
@@ -184,13 +185,13 @@ class MySQL extends Yadal
      * Fetch a record in assoc mode and return it
      *
      * @param resource $sql: The resource which should be used to retireve a record from
-     * @return assoc array or false when there are no records left
+     * @return array|null|false array or false when there are no records left
      * @access public
      * @author Teye Heimans
      */
-    function getRecord( $sql )
+    function getRecord($sql)
     {
-        return mysql_fetch_assoc( $sql );
+        return mysql_fetch_assoc($sql);
     }
 
     /**
@@ -199,16 +200,16 @@ class MySQL extends Yadal
      * Return the field names of the table
      *
      * @param string $table: The table where the field names should be collected from
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
-    public function getFieldNames( $table )
+    public function getFieldNames($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['fields'][$t] ) )
+        if (isset($this->_cache['fields'][$t]))
         {
             return $this->_cache['fields'][$t];
         }
@@ -217,9 +218,9 @@ class MySQL extends Yadal
 
         // check if we have a connection handler..
         // if so, fetch the column names
-        if( $this->_conn && !empty($this->_db) )
+        if ($this->_conn && !empty($this->_db))
         {
-            $fields  = mysql_list_fields( $this->_db, $table, $this->_conn );
+            $fields  = mysql_list_fields($this->_db, $table, $this->_conn);
             $columns = mysql_num_fields($fields);
 
             for ($i = 0; $i < $columns; $i++)
@@ -231,28 +232,28 @@ class MySQL extends Yadal
         else
         {
             // try to get a record and fetch the field names..
-            $sql = $this->query( 'DESCRIBE ' . $this->quote( $table ) );
+            $sql = $this->query('DESCRIBE ' . $this->quote($table));
 
             // query succeeded?
-            if( $sql )
+            if ($sql)
             {
-            	while( $row = mysql_fetch_assoc( $sql ) )
-            	{
-            		$result[] = $row['Field'];
-            	}
+                while ($row = mysql_fetch_assoc($sql))
+                {
+                    $result[] = $row['Field'];
+                }
             }
             else
             {
-            	trigger_error(
-	    		  "Could not retrieve the field names for the table '".$table."'.\n".
-	    		  "Query: ".$this->getLastQuery()."\n".
-	    		  "Error: ".$this->getError(),
-	    		  E_USER_WARNING
-	    		);
-	    		return false;
+                trigger_error(
+                    "Could not retrieve the field names for the table '" . $table . "'.\n" .
+                        "Query: " . $this->getLastQuery() . "\n" .
+                        "Error: " . $this->getError(),
+                    E_USER_WARNING
+                );
+                return false;
             }
 
-            mysql_free_result( $sql );
+            mysql_free_result($sql);
         }
 
         // save the result in the cache
@@ -266,14 +267,14 @@ class MySQL extends Yadal
      *
      * Return the tables from the database
      *
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
     function getTables()
     {
         // return the data from the cache if it exists
-        if( isset( $this->_cache['tables'] ) )
+        if (isset($this->_cache['tables']))
         {
             return $this->_cache['tables'];
         }
@@ -281,27 +282,27 @@ class MySQL extends Yadal
         $sql = $this->query('SHOW TABLES;');
 
         // query failed ?
-        if( !$sql )
+        if (!$sql)
         {
             trigger_error(
-    		  "Could not retrieve the tables from the database!\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
+                "Could not retrieve the tables from the database!\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
         }
 
         // save the table names in an array and return them
         $result = array();
-        $num = $this->recordCount( $sql );
-        for( $i = 0; $i < $num; $i++ )
+        $num = $this->recordCount($sql);
+        for ($i = 0; $i < $num; $i++)
         {
-            $result[] = $this->result( $sql, $i);
+            $result[] = $this->result($sql, $i);
         }
 
         // save the result in the cache
-    	$this->_cache['tables'] = $result;
+        $this->_cache['tables'] = $result;
 
         return $result;
     }
@@ -312,46 +313,48 @@ class MySQL extends Yadal
      * Retrieve the fields that can not contain NULL
      *
      * @param string $table: The table which fields we should retrieve
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
-    public function getNotNullFields ( $table )
+    public function getNotNullFields($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['notnull'][$t] ) )
+        if (isset($this->_cache['notnull'][$t]))
         {
             return $this->_cache['notnull'][$t];
         }
 
-    	$sql = $this->query('DESCRIBE '.$this->quote( $table ) );
+        $sql = $this->query('DESCRIBE ' . $this->quote($table));
 
-    	if( $sql )
-    	{
-    	    // save the not null fields in an array
-	    	$result = array();
-	    	while( $r = mysql_fetch_assoc( $sql ) ) {
-	    		if( $r['Null'] == 'NO' || empty($r['Null']) ) {
-	    			$result[] = $r['Field'];
-	    		}
-	    	}
-    	}
-    	else
-    	{
-    	    // display the error message when the not null fields could not be retrieved
-    		trigger_error(
-    		  "Could not retrieve the not-null-field from the table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
-    	}
+        if ($sql)
+        {
+            // save the not null fields in an array
+            $result = array();
+            while ($r = mysql_fetch_assoc($sql))
+            {
+                if ($r['Null'] == 'NO' || empty($r['Null']))
+                {
+                    $result[] = $r['Field'];
+                }
+            }
+        }
+        else
+        {
+            // display the error message when the not null fields could not be retrieved
+            trigger_error(
+                "Could not retrieve the not-null-field from the table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
+        }
 
-    	// save the result in the cache
-    	$this->_cache['notnull'][$t] = $result;
+        // save the result in the cache
+        $this->_cache['notnull'][$t] = $result;
 
         return $result;
     }
@@ -362,40 +365,40 @@ class MySQL extends Yadal
      * Retrieve the field types of the given table
      *
      * @param string $table: The table where we should fetch the fields and their types from
-     * @return array
+     * @return array|false
      * @access public
      * @author Teye Heimans
      */
-    public function getFieldTypes( $table )
+    public function getFieldTypes($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['fieldtypes'][$t] ) )
+        if (isset($this->_cache['fieldtypes'][$t]))
         {
             return $this->_cache['fieldtypes'][$t];
         }
 
         // Get the default values for the fields
-        $sql = $this->query("DESCRIBE ".$this->quote($table));
+        $sql = $this->query("DESCRIBE " . $this->quote($table));
 
         // query failed ?
-        if( !$sql )
+        if (!$sql)
         {
             trigger_error(
-    		  "Could not fetch the meta data of the columns for table '".$table."'.\n".
-    		  "Query: ".$this->getLastQuery()."\n".
-    		  "Error: ".$this->getError(),
-    		  E_USER_WARNING
-    		);
-    		return false;
+                "Could not fetch the meta data of the columns for table '" . $table . "'.\n" .
+                    "Query: " . $this->getLastQuery() . "\n" .
+                    "Error: " . $this->getError(),
+                E_USER_WARNING
+            );
+            return false;
         }
 
         $result = array();
-        while( $row = $this->getRecord( $sql ) )
+        while ($row = $this->getRecord($sql))
         {
             // split the size from the type
-            if( preg_match('/^(.*)\((\d+)\)$/', $row['Type'], $match) )
+            if (preg_match('/^(.*)\((\d+)\)$/', $row['Type'], $match))
             {
                 $type = $match[1];
                 $length = $match[2];
@@ -406,17 +409,17 @@ class MySQL extends Yadal
                 $length = null;
             }
 
-            $result[ $row['Field'] ] = array(
-              $type,
-              $length,
-              $row['Default']
+            $result[$row['Field']] = array(
+                $type,
+                $length,
+                $row['Default']
             );
         }
 
         // save the result in the cache
-    	$this->_cache['fieldtypes'][$t] = $result;
+        $this->_cache['fieldtypes'][$t] = $result;
 
-		return $result;
+        return $result;
     }
 
     /**
@@ -429,9 +432,9 @@ class MySQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function escapeString( $string )
+    public function escapeString($string)
     {
-        return mysql_real_escape_string( $string );
+        return mysql_real_escape_string($string);
     }
 
     /**
@@ -444,20 +447,23 @@ class MySQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getPrKeys( $table )
+    public function getPrKeys($table)
     {
         $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['keys'][$t] ) ) {
+        if (isset($this->_cache['keys'][$t]))
+        {
             return $this->_cache['keys'][$t];
         }
 
-        $sql = $this->query("SHOW KEYS FROM `".$table."`");
+        $sql = $this->query("SHOW KEYS FROM `" . $table . "`");
 
         $keys = array();
-        while( $r = $this->getRecord($sql) ) {
-            if ( $r['Key_name'] == 'PRIMARY' ) {
+        while ($r = $this->getRecord($sql))
+        {
+            if ($r['Key_name'] == 'PRIMARY')
+            {
                 $keys[] = $r['Column_name'];
             }
         }
@@ -480,25 +486,25 @@ class MySQL extends Yadal
      * @access public
      * @author Teye Heimans
      */
-    public function getUniqueFields( $table )
+    public function getUniqueFields($table)
     {
-        $t = strtolower( $table );
+        $t = strtolower($table);
 
         // return the data from the cache if it exists
-        if( isset( $this->_cache['unique'][$t] ) )
+        if (isset($this->_cache['unique'][$t]))
         {
             return $this->_cache['unique'][$t];
         }
 
         // get the keys
-        $sql = $this->query("SHOW KEYS FROM ". $this->quote($table) );
+        $sql = $this->query("SHOW KEYS FROM " . $this->quote($table));
 
         $unique = array();
 
         // save all keys which have to be unique
-        while( $r = $this->getRecord($sql) )
+        while ($r = $this->getRecord($sql))
         {
-            if ( $r['Non_unique'] == 0 )
+            if ($r['Non_unique'] == 0)
             {
                 $unique[$r['Key_name']][] = $r['Column_name'];
             }
@@ -512,5 +518,3 @@ class MySQL extends Yadal
         return $unique;
     }
 }
-
-?>

@@ -11,10 +11,10 @@
  */
 class TextField extends Field
 {
-	protected $_iSize;         // int: the size of the field
-	protected $_iMaxlength;    // int: the maxlength of the field
+    protected $_iSize;         // int: the size of the field
+    protected $_iMaxlength;    // int: the maxlength of the field
 
-	/**
+    /**
      * TextField::TextField()
      *
      * Constructor: Create a new textfield object
@@ -25,16 +25,16 @@ class TextField extends Field
      * @author Teye Heimans
      * @access public
      */
-	public function __construct( &$oForm, $sName )
-	{
-		// call the constructor of the Field class
-		parent::__construct($oForm, $sName);
+    public function __construct(&$oForm, $sName)
+    {
+        // call the constructor of the Field class
+        parent::__construct($oForm, $sName);
 
-		$this->setSize( 20 );
-		$this->setMaxlength( 0 );
-	}
+        $this->setSize(20);
+        $this->setMaxlength(0);
+    }
 
-	/**
+    /**
      * TextField::setSize()
      *
      * Set the new size of the field
@@ -44,54 +44,52 @@ class TextField extends Field
      * @author Teye Heimans
      * @access public
      */
-	public function setSize( $iSize )
-	{
-		$this->_iSize = $iSize;
-	}
+    public function setSize($iSize)
+    {
+        $this->_iSize = $iSize;
+    }
 
-	/**
-	 * TextField::checkMaxLength()
-	 *
-	 * Check the maxlength of the field
-	 *
-	 * @param integer $iLength: the maxlength
-	 * @return void
-	 * @access public
-	 * @author Johan Wiegel
-	 * @since 17-04-2009
-	 */
+    /**
+     * TextField::checkMaxLength()
+     *
+     * Check the maxlength of the field
+     *
+     * @param integer $iLength: the maxlength
+     * @return void
+     * @access public
+     * @author Johan Wiegel
+     * @since 17-04-2009
+     */
 
-	public function checkMaxLength( $iLength )
-	{
-		if( strlen( $this->getValue() ) > $iLength )
-		{
-			$this->_sError = $this->_oForm->_text( 14 );
-			return false;
-		}
-	}
+    public function checkMaxLength($iLength)
+    {
+        if (strlen($this->getValue()) > $iLength)
+        {
+            $this->_sError = $this->_oForm->_text(14);
+        }
+    }
 
-	/**
-	 * TextField::checkMinLength()
-	 *
-	 * Check the minlength of the field
-	 *
-	 * @param integer $iLength: the maxlength
-	 * @return void
-	 * @access public
-	 * @author Johan Wiegel
-	 * @since 17-04-2009
-	 */
+    /**
+     * TextField::checkMinLength()
+     *
+     * Check the minlength of the field
+     *
+     * @param integer $iLength: the maxlength
+     * @return void
+     * @access public
+     * @author Johan Wiegel
+     * @since 17-04-2009
+     */
 
-	public function checkMinLength( $iLength )
-	{
-		if( strlen( $this->getValue() ) < $iLength )
-		{
-			$this->_sError = $this->_oForm->_text( 14 );
-			return false;
-		}
-	}
+    public function checkMinLength($iLength)
+    {
+        if (strlen($this->getValue()) < $iLength)
+        {
+            $this->_sError = $this->_oForm->_text(14);
+        }
+    }
 
-	/**
+    /**
      * TextField::setMaxlength()
      *
      * Set the new maxlength of the field
@@ -101,12 +99,12 @@ class TextField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function setMaxlength( $iMaxlength )
-	{
-		$this->_iMaxlength = $iMaxlength;
-	}
+    public function setMaxlength($iMaxlength)
+    {
+        $this->_iMaxlength = $iMaxlength;
+    }
 
-	/**
+    /**
      * TextField::getField()
      *
      * Return the HTML of the field
@@ -115,26 +113,24 @@ class TextField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function getField()
-	{
-		// view mode enabled ?
-		if( $this -> getViewMode() )
-		{
-			// get the view value..
-			return $this -> _getViewValue();
-		}
+    public function getField()
+    {
+        // view mode enabled ?
+        if ($this->getViewMode())
+        {
+            // get the view value..
+            return $this->_getViewValue();
+        }
 
-		return sprintf(
-		'<input type="text" name="%s" id="%1$s" value="%s" size="%d" %s'. FH_XHTML_CLOSE .'>%s',
-		$this->_sName,
-		(isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING):''),
-		$this->_iSize,
-		(!empty($this->_iMaxlength) ? 'maxlength="'.$this->_iMaxlength.'" ':'').
-		(isset($this->_iTabIndex) ? 'tabindex="'.$this->_iTabIndex.'" ' : '').
-		(isset($this->_sExtra) ? ' '.$this->_sExtra.' ' :''),
-		(isset($this->_sExtraAfter) ? $this->_sExtraAfter :'')
-		);
-	}
+        return sprintf(
+            '<input type="text" name="%s" id="%1$s" value="%s" size="%d" %s' . FH_XHTML_CLOSE . '>%s',
+            $this->_sName,
+            (isset($this->_mValue) ? htmlspecialchars($this->_mValue, ENT_COMPAT | ENT_HTML401, FH_HTML_ENCODING) : ''),
+            $this->_iSize,
+            (!empty($this->_iMaxlength) ? 'maxlength="' . $this->_iMaxlength . '" ' : '') .
+                (isset($this->_iTabIndex) ? 'tabindex="' . $this->_iTabIndex . '" ' : '') .
+                (isset($this->_sExtra) ? ' ' . $this->_sExtra . ' ' : ''),
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '')
+        );
+    }
 }
-
-?>

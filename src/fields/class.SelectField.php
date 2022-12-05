@@ -1,21 +1,22 @@
 <?php
+
 /**
-* class SelectField
-*
-* Create a SelectField
-*
-* @author Teye Heimans
-* @package FormHandler
-* @subpackage Fields
-*/
+ * class SelectField
+ *
+ * Create a SelectField
+ *
+ * @author Teye Heimans
+ * @package FormHandler
+ * @subpackage Fields
+ */
 class SelectField extends Field
 {
-	public $_aOptions;              // array: the options of the selectfield
-	public $_bUseArrayKeyAsValue;   // boolean: if the keys of the array should be used as values
-	private $_iSize;                 // integer: set the size of the field
-	private $_bMultiple;             // boolean: can multiple items be selected or not?
-	private $_classOpt;
-	/**
+    public $_aOptions;              // array: the options of the selectfield
+    public $_bUseArrayKeyAsValue;   // boolean: if the keys of the array should be used as values
+    private $_iSize;                // integer: set the size of the field
+    private $_bMultiple;            // boolean: can multiple items be selected or not?
+    private $_classOpt;
+    /**
      * SelectField::SelectField()
      *
      * Public constructor: Create a selectfield object
@@ -26,17 +27,17 @@ class SelectField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function __construct( &$oForm, $sName )
-	{
-		// call the constructor of the Field class
-		parent::__construct( $oForm, $sName );
+    public function __construct(&$oForm, $sName)
+    {
+        // call the constructor of the Field class
+        parent::__construct($oForm, $sName);
 
-		$this->setSize( 1 );
-		$this->useArrayKeyAsValue( FH_DEFAULT_USEARRAYKEY );
-		$this->setMultiple( false );
-	}
+        $this->setSize(1);
+        $this->useArrayKeyAsValue(FH_DEFAULT_USEARRAYKEY);
+        $this->setMultiple(false);
+    }
 
-	/**
+    /**
      * SelectField::getValue()
      *
      * Return the value of the field
@@ -45,29 +46,29 @@ class SelectField extends Field
      * @access public
      * @author Teye Heimans     
      */
-	public function getValue()
-	{
-		// are multiple selects possible?
-		if( $this->_bMultiple )
-		{
-			// is there a value ?
-			if( isset( $this->_mValue ) )
-			{
-				if( is_string( $this->_mValue) )
-				{
-					return explode(',', $this->_mValue );
-				}
-			}
-			else
-			{
-				return array();
-			}
-		}
+    public function getValue()
+    {
+        // are multiple selects possible?
+        if ($this->_bMultiple)
+        {
+            // is there a value ?
+            if (isset($this->_mValue))
+            {
+                if (is_string($this->_mValue))
+                {
+                    return explode(',', $this->_mValue);
+                }
+            }
+            else
+            {
+                return array();
+            }
+        }
 
-		return parent::getValue();
-	}
+        return parent::getValue();
+    }
 
-	/**
+    /**
      * SelectField::getField()
      *
      * Public: return the HTML of the field
@@ -75,108 +76,112 @@ class SelectField extends Field
      * @return string: the html
      * @access public
      * @author Teye Heimans
-	 * @since 12-08-2008 Altered by Johan Wiegel, repaired valid html </optgroup> thanks to Roland van Wanrooy
+     * @since 12-08-2008 Altered by Johan Wiegel, repaired valid html </optgroup> thanks to Roland van Wanrooy
      */
-	public function getField()
-	{
-		// view mode enabled ?
-		if( $this -> getViewMode() )
-		{
-			// get the view value..
-			return $this -> _getViewValue();
-		}
+    public function getField()
+    {
+        // view mode enabled ?
+        if ($this->getViewMode())
+        {
+            // get the view value..
+            return $this->_getViewValue();
+        }
 
-		// multiple selected items possible?
-		$aSelected = array();
-		if($this->_bMultiple)
-		{
-			if( isset( $this->_mValue ) )
-			{			
-				// when there is a value..
-				if( !is_array( $this->_mValue ) )
-				{
-					// split a string like 1, 4, 6 into an array
-					$aItems = explode(',', $this->_mValue );
-					foreach( $aItems as $mItem )
-					{
-						$aSelected[] = trim( $mItem );
-					}
-				}
-				// the value is an array
-				else
-				{
-					$aSelected[] = $this->_mValue;
-				}
-			}
-		}
-		else if( isset($this->_mValue ) )
-		{
-			$aSelected[] = $this->_mValue;
-		}
+        // multiple selected items possible?
+        $aSelected = array();
+        if ($this->_bMultiple)
+        {
+            if (isset($this->_mValue))
+            {
+                // when there is a value..
+                if (!is_array($this->_mValue))
+                {
+                    // split a string like 1, 4, 6 into an array
+                    $aItems = explode(',', $this->_mValue);
+                    foreach ($aItems as $mItem)
+                    {
+                        $aSelected[] = trim($mItem);
+                    }
+                }
+                // the value is an array
+                else
+                {
+                    $aSelected[] = $this->_mValue;
+                }
+            }
+        }
+        else if (isset($this->_mValue))
+        {
+            $aSelected[] = $this->_mValue;
+        }
 
-		// create the options list
-		$sOptions = '';
+        // create the options list
+        $sOptions = '';
 
-		// added by Roland van Wanrooy: flag to indicate an optgroup, in order to close it properly
-		$bOptgroup = false;
-		// added by Roland van Wanrooy: string with the close tag
-		$sOGclose = "\t</optgroup>\n";
+        // added by Roland van Wanrooy: flag to indicate an optgroup, in order to close it properly
+        $bOptgroup = false;
+        // added by Roland van Wanrooy: string with the close tag
+        $sOGclose = "\t</optgroup>\n";
 
-		foreach ($this->_aOptions as $iKey => $sValue )
-		{
-			// use the array value as field value if wanted
-			if(!$this->_bUseArrayKeyAsValue) $iKey = $sValue;
+        foreach ($this->_aOptions as $iKey => $sValue)
+        {
+            // use the array value as field value if wanted
+            if (!$this->_bUseArrayKeyAsValue) $iKey = $sValue;
 
 
-			if( strpos($iKey, 'LABEL') )
-			{
-				// added by Roland van Wanrooy: close the optgroup if there is one
-				$sOptions .= ($bOptgroup ? $sOGclose : '');
+            if (strpos($iKey, 'LABEL'))
+            {
+                // added by Roland van Wanrooy: close the optgroup if there is one
+                $sOptions .= ($bOptgroup ? $sOGclose : '');
 
-				$sOptions .= "\t<optgroup label=\"". $sValue."\">\n";
+                $sOptions .= "\t<optgroup label=\"" . $sValue . "\">\n";
 
-				// added by Roland van Wanrooy: flag opgroup as true
-				$bOptgroup = true;
-			}
-			else
-			{
-				if( isset( $aSelected[0] ) AND is_array( $aSelected[0] ) ){ $aSelected = $aSelected[0]; }
-				$sOptions .= sprintf(
-				"\t<option %s value=\"%s\" %s>%s</option>\n",
-				isset( $this->_classOpt[$iKey] ) ? $this->_classOpt[$iKey] : '', // added by sid benachenhou for handling styles
-				$iKey,
-				( in_array( $iKey, $aSelected ) ?' selected="selected"':'' ),
-				$sValue
-				);
-			}
-		}
+                // added by Roland van Wanrooy: flag opgroup as true
+                $bOptgroup = true;
+            }
+            else
+            {
+                if (isset($aSelected[0]) and is_array($aSelected[0]))
+                {
+                    $aSelected = $aSelected[0];
+                }
+                $sOptions .= sprintf(
+                    "\t<option %s value=\"%s\" %s>%s</option>\n",
+                    isset($this->_classOpt[$iKey]) ? $this->_classOpt[$iKey] : '', // added by sid benachenhou for handling styles
+                    $iKey,
+                    (in_array($iKey, $aSelected) ? ' selected="selected"' : ''),
+                    $sValue
+                );
+            }
+        }
 
-		// when no options are set, set an empty options for XHML compatibility
-		if( empty($sOptions) )
-		{
-			$sOptions = "\t<option>&nbsp;</option>\n\t";
-		}
-		// added by Roland van Wanrooy:
-		// $sOptions is not empty, so if there was an <opgroup> then close is properly
-		else {
-			$sOptions .= ($bOptgroup ? $sOGclose : '');
-		}
+        // when no options are set, set an empty options for XHML compatibility
+        if (empty($sOptions))
+        {
+            $sOptions = "\t<option>&nbsp;</option>\n\t";
+        }
+        // added by Roland van Wanrooy:
+        // $sOptions is not empty, so if there was an <opgroup> then close is properly
+        else
+        {
+            $sOptions .= ($bOptgroup ? $sOGclose : '');
+        }
 
-		// return the field
-		return sprintf(
-		'<select name="%s" id="%s" size="%d"%s>%s</select>%s',
-		$this->_sName. ( $this->_bMultiple ? '[]':''),
-		$this->_sName,
-		$this->_iSize,
-		($this->_bMultiple ? ' multiple="multiple"' : '' ).
-		(isset($this->_iTabIndex) ? ' tabindex="'.$this->_iTabIndex.'" ' : '').
-		(isset($this->_sExtra) ? ' '.$this->_sExtra :'' ),
-		$sOptions,
-		(isset($this->_sExtraAfter) ? $this->_sExtraAfter :'')
-		);
-	}
+        // return the field
+        return sprintf(
+            '<select name="%s" id="%s" size="%d"%s>%s</select>%s',
+            $this->_sName . ($this->_bMultiple ? '[]' : ''),
+            $this->_sName,
+            $this->_iSize,
+            ($this->_bMultiple ? ' multiple="multiple"' : '') .
+                (isset($this->_iTabIndex) ? ' tabindex="' . $this->_iTabIndex . '" ' : '') .
+                (isset($this->_sExtra) ? ' ' . $this->_sExtra : ''),
+            $sOptions,
+            (isset($this->_sExtraAfter) ? $this->_sExtraAfter : '')
+        );
+    }
 
-	/**
+    /**
      * SelectField::setOptions()
      *
      * Set the options of the field
@@ -186,17 +191,17 @@ class SelectField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function setOptions( $aOptions )
-	{
-		$this->_aOptions = $aOptions;
-	}
-	
-	// added by sid benachenhou for handling styles
-	public function setCOptions( $_classOpt )
-	{
-		$this->_classOpt = $_classOpt;
-	}
-	/**
+    public function setOptions($aOptions)
+    {
+        $this->_aOptions = $aOptions;
+    }
+
+    // added by sid benachenhou for handling styles
+    public function setCOptions($_classOpt)
+    {
+        $this->_classOpt = $_classOpt;
+    }
+    /**
      * SelectField::setMultiple()
      *
      * Set if multiple items can be selected or not
@@ -206,12 +211,12 @@ class SelectField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function setMultiple( $bMultiple )
-	{
-		$this->_bMultiple = $bMultiple;
-	}
+    public function setMultiple($bMultiple)
+    {
+        $this->_bMultiple = $bMultiple;
+    }
 
-	/**
+    /**
      * SelectField::setSize()
      *
      * Set the size of the field
@@ -221,12 +226,12 @@ class SelectField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function setSize( $iSize )
-	{
-		$this->_iSize = $iSize;
-	}
+    public function setSize($iSize)
+    {
+        $this->_iSize = $iSize;
+    }
 
-	/**
+    /**
      * SelectField::useArrayKeyAsValue()
      *
      * Set if the array keys of the options has to be used as values for the field
@@ -236,9 +241,8 @@ class SelectField extends Field
      * @access public
      * @author Teye Heimans
      */
-	public function useArrayKeyAsValue( $bMode )
-	{
-		$this->_bUseArrayKeyAsValue = $bMode;
-	}
+    public function useArrayKeyAsValue($bMode)
+    {
+        $this->_bUseArrayKeyAsValue = $bMode;
+    }
 }
-?>

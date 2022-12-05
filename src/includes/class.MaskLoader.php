@@ -1,4 +1,5 @@
 <?php
+
 /**
  * class MaskLoader
  *
@@ -41,10 +42,9 @@ class MaskLoader
      * @author Teye Heimans
      * @access public
      */
-    public function setMask( $mask )
+    public function setMask($mask)
     {
         $this->_mask = $mask;
-
     }
 
     /**
@@ -58,13 +58,13 @@ class MaskLoader
      * @author Teye Heimans
      * @access public
      */
-    public function fill( $replace = null, $limit = 1 )
-    {    
+    public function fill($replace = null, $limit = 1)
+    {
         // do we have to return a half filled mask ?
-        if( $replace === null )
-        {            
+        if ($replace === null)
+        {
             // dont we have a subject?  return an empty string
-            if( !isset( $this->_subject ) || $this->_subject === null )
+            if (!isset($this->_subject) || $this->_subject === null)
             {
                 return '';
             }
@@ -72,9 +72,9 @@ class MaskLoader
             else
             {
                 // fill the mask with noting and return it
-                if( is_array( $this->_search ) )
+                if (is_array($this->_search))
                 {
-                    $replace = array_fill( 0, count( $this->_search ), '');
+                    $replace = array_fill(0, count($this->_search), '');
                 }
                 else
                 {
@@ -82,26 +82,26 @@ class MaskLoader
                 }
 
                 // return the search strings with nothing
-                return preg_replace( $this->_search, $replace, $this->_subject );
+                return preg_replace($this->_search, $replace, $this->_subject);
             }
         }
 
         // get a fresh copy from the mask if the last
         // subject was completly filled..
-        if( !isset( $this->_subject ) || $this->_subject === null)
+        if (!isset($this->_subject) || $this->_subject === null)
         {
             $this->_subject = $this->_mask;
         }
 
-		/**
+        /**
          * Preg backslash problems! See http://www.formhandler.net/?pg=9&id=3198
          */
-        if( is_array( $replace ) )
+        if (is_array($replace))
         {
-            foreach ( $replace as $key => $value )
+            foreach ($replace as $key => $value)
             {
                 $replace[$key] = str_replace('\\', '\\\\', $value);
-                $replace[$key] = str_replace('$', '\$', $replace[$key] );
+                $replace[$key] = str_replace('$', '\$', $replace[$key]);
             }
         }
         else
@@ -109,12 +109,12 @@ class MaskLoader
             $replace = str_replace('\\', '\\\\', $replace);
             $replace = str_replace('$', '\$', $replace);
         }
-		
-        // do filling here
-        $this->_subject = preg_replace ( $this->_search, $replace, $this->_subject, $limit );
 
-		// check if the mask is not full yet...
-        if( !$this->isFull() )
+        // do filling here
+        $this->_subject = preg_replace($this->_search, $replace, $this->_subject, $limit);
+
+        // check if the mask is not full yet...
+        if (!$this->isFull())
         {
             // The mask is not full yet.
             // Return an empty string
@@ -139,10 +139,9 @@ class MaskLoader
      * @access public
      * @author Teye Heimans
      */
-    public function setSearch( $search )
+    public function setSearch($search)
     {
         $this->_search = $search;
-
     }
 
 
@@ -158,18 +157,18 @@ class MaskLoader
     public function isFull()
     {
         // when there is no subject, it is not full ;-)
-        if( $this->_subject === null )
+        if ($this->_subject === null)
         {
             return false;
         }
 
-        if( is_array( $this->_search ) )
+        if (is_array($this->_search))
         {
             // walk all the search items
-            foreach( $this->_search as $search )
+            foreach ($this->_search as $search)
             {
                 // search string found ?
-                if( preg_match( $search, $this->_subject) )
+                if (preg_match($search, $this->_subject))
                 {
                     // the subject is not full! There are items found!
                     return false;
@@ -182,9 +181,7 @@ class MaskLoader
         else
         {
             // check if the search string is found. If it is, it is not full!
-            return !preg_match( $this->_search, $this->_subject);
+            return !preg_match($this->_search, $this->_subject);
         }
     }
 }
-
-?>
