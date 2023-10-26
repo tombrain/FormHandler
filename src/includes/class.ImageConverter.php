@@ -434,8 +434,8 @@ class ImageConverter
     {
         $procent = $x / 100;
         $scale   = $max / $procent;
-        $x       = $scale * $procent;
-        $y       = $scale * ($y / 100);
+        $x       = intval($scale * $procent);
+        $y       = intval($scale * ($y / 100));
     }
 
     /**
