@@ -27,8 +27,7 @@ final class formhandler_AutocompleteTest extends FormhandlerTestCase
 
         $aOptions = ["first", "second", "third"];
 
-        $this->expectError();
-        $this->expectErrorMessage('You have to declare the textfield first! The field "textfield" does not exists in the form!');
+        $this->expectExceptionMessage('You have to declare the textfield first! The field "textfield" does not exists in the form!');
 
         $form->setAutoComplete("textfield", $aOptions);
     }
@@ -39,8 +38,7 @@ final class formhandler_AutocompleteTest extends FormhandlerTestCase
 
         $form->textField("Textfield", "textfield");
 
-        $this->expectError();
-        $this->expectErrorMessage('You have to give an array as options!');
+        $this->expectExceptionMessage('You have to give an array as options!');
 
         $form->setAutoComplete("textfield", "nooptions");
     }
@@ -68,8 +66,7 @@ final class formhandler_AutocompleteTest extends FormhandlerTestCase
 
         $aOptions = ["first", "second", "third"];
 
-        $this->expectError();
-        $this->expectErrorMessage('You have to declare the textfield first! The field "textfield" does not exists in the form!');
+        $this->expectExceptionMessage('You have to declare the textfield first! The field "textfield" does not exists in the form!');
 
         $form->setAutoCompleteAfter("textfield", "@", $aOptions);
     }
@@ -80,8 +77,7 @@ final class formhandler_AutocompleteTest extends FormhandlerTestCase
 
         $form->textField("Textfield", "textfield");
 
-        $this->expectError();
-        $this->expectErrorMessage('You have to give an array as options!');
+        $this->expectExceptionMessage('You have to give an array as options!');
 
         $form->setAutoCompleteAfter("textfield", "@", "nooptions");
     }

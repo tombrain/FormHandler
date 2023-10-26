@@ -17,6 +17,21 @@ abstract class FormhandlerTestCase extends TestCase
 {
     private ?ReflectionClass $_Reflector = null;
 
+    protected function setUp(): void
+    {
+        set_error_handler(
+            static function ( $errno, $errstr ) {
+                throw new \Exception( $errstr, $errno );
+            },
+            E_ALL
+        );
+    }
+
+    protected function tearDown(): void
+    {
+        restore_error_handler();
+    }
+
     protected function getFormhandlerType(): string
     {
         return "Formhandler";
@@ -85,7 +100,6 @@ abstract class FormhandlerTestCase extends TestCase
     protected function assertFormFlushContains(FormHandler $form, $expected): string
     {
         $t = (string)$form->flush(true);
-
         if (is_array($expected))
         {
             // ordercheck

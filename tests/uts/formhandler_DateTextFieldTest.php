@@ -40,7 +40,6 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
         $this->assertEquals("14-04-2020", $form->getValue("datetextfield4"));  // already parsed into correct presentation!
 
         $this->assertEquals([2020, 4, 14], $form->getAsArray("datetextfield"));
-        $this->expectError();
         $this->expectExceptionMessage("Value is not a valid date [14.04.2020]");
         $form->getAsArray("datetextfield2");
         $this->assertEquals([2020, 4, 14], $form->getAsArray("datetextfield3"));
@@ -174,8 +173,7 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
 
         if ($dataTestGetAsArray['mask'] != FH_DATETEXTFIELD_DEFAULT_DISPLAY)
         {
-            $this->expectError();
-            $this->expectErrorMessage("Value is not a valid date [" . $dataTestGetAsArray['value'] . "]");
+            $this->expectExceptionMessage("Value is not a valid date [" . $dataTestGetAsArray['value'] . "]");
         }
         list($year, $month, $day) = $form->getAsArray('datetextfield');
 

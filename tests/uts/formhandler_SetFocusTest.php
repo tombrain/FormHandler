@@ -60,8 +60,7 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $this->expectError();
-        $this->expectErrorMessage('Could net set focus to unknown field "textfield"');
+        $this->expectExceptionMessage('Could net set focus to unknown field "textfield"');
 
         $form->setFocus("textfield");
     }

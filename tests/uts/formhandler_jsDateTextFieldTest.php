@@ -55,7 +55,6 @@ final class formhandler_jsDateTextFieldTest extends FormhandlerTestCase
         $this->assertEquals("14-04-2020", $form->getValue("jsdatetextfield4"));  // already parsed into correct presentation!
 
         $this->assertEquals([2020, 4, 14], $form->getAsArray("jsdatetextfield"));
-        $this->expectError();
         $this->expectExceptionMessage("Value is not a valid date [14.04.2020]");
         $form->getAsArray("jsdatetextfield2");
         $this->assertEquals([2020, 4, 14], $form->getAsArray("jsdatetextfield3"));

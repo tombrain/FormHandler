@@ -36,8 +36,7 @@ final class formhandler_LookAndFeel_setMaxLengthTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $this->expectError();
-        $this->expectErrorMessage('You have to declare the textarea first! The field "textarea" does not exists in the form!');
+        $this->expectExceptionMessage('You have to declare the textarea first! The field "textarea" does not exists in the form!');
         $form->setMaxLength("textarea", 123);
     }
 
@@ -47,8 +46,7 @@ final class formhandler_LookAndFeel_setMaxLengthTest extends FormhandlerTestCase
 
         $form->textField("Textfield", "textfield");
 
-        $this->expectError();
-        $this->expectErrorMessage('You have to declare the textarea first! The field "textarea" does not exists in the form!');
+        $this->expectExceptionMessage('You have to declare the textarea first! The field "textarea" does not exists in the form!');
         $form->setMaxLength("textarea", 123);
     }
 };

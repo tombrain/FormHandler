@@ -65,8 +65,7 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form->textField("Textfield", "textfield");
 
-        $this->expectError();
-        $this->expectErrorMessage('Error, could not find field "textfield2"! Please define the field first!');
+        $this->expectExceptionMessage('Error, could not find field "textfield2"! Please define the field first!');
 
         $form->setFieldViewMode("textfield2");
     }
@@ -82,8 +81,7 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form->textField("Textfield", "textfield");
 
-        $this->expectError();
-        $this->expectErrorMessage('Error, could not find field "0"! Please define the field first!');
+        $this->expectExceptionMessage('Error, could not find field "0"! Please define the field first!');
 
         $form->isFieldViewMode(0);
     }

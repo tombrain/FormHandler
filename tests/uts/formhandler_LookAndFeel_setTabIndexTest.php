@@ -104,8 +104,7 @@ final class formhandler_LookAndFeel_setTabIndexTest extends FormhandlerTestCase
 
         $form->setTabIndex($tabs);
 
-        $this->expectError();
-        $this->expectErrorMessage('Error, try to set the tabindex of an unknown field "fld4"!');
+        $this->expectExceptionMessage('Error, try to set the tabindex of an unknown field "fld4"!');
 
         $form->flush();
     }

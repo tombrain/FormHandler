@@ -45,8 +45,7 @@ final class dbFormhandler_TextFieldTest extends dbFormhandlerTestCase
             ->query($this->matches("SELECT * FROM test WHERE id = '123'"))
             ->willReturnResultSet([]);
 
-        $this->expectError();
-        $this->expectErrorMessage("Try to edit a none existing record!");
+        $this->expectExceptionMessage("Try to edit a none existing record!");
 
         $this->setConnectedTable($form, "test");
     }
