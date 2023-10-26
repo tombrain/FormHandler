@@ -23,7 +23,7 @@
     	}	    
 	],
     "require": {
-        "phpunit/phpunit": "^9.0.1",
+        "phpunit/phpunit": "9.6.13",
         "czukowski/phpunit-mock-db": "^9.0",
         "jdorn/sql-formatter": "^1.2.17",
         "phan/phan": "^5.1",
