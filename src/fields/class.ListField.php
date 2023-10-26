@@ -230,8 +230,8 @@ class ListField extends Field
                     $this->_oOn->getField(),
                     $this->_oOff->getField(),
                     $this->_sName,
-                    sprintf($this->_oForm->_text(34), htmlentities(strip_tags($this->_sOffTitle), null, FH_HTML_ENCODING)),
-                    sprintf($this->_oForm->_text(34), htmlentities(strip_tags($this->_sOnTitle), null, FH_HTML_ENCODING))
+                    sprintf($this->_oForm->_text(34), htmlentities(strip_tags($this->_sOffTitle), encoding: FH_HTML_ENCODING)),
+                    sprintf($this->_oForm->_text(34), htmlentities(strip_tags($this->_sOnTitle), encoding: FH_HTML_ENCODING))
                 ),
                 (!empty($this->_bVerticalMode) && $this->_bVerticalMode) ? FH_LISTFIELD_VERTICAL_MASK : FH_LISTFIELD_HORIZONTAL_MASK
             ) .

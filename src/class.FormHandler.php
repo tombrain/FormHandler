@@ -1517,13 +1517,13 @@ class FormHandler
         }
 
         // escape the values from dangerous characters
-        $helpTitle = is_null($helpTitle) ? "%title% - " . $this->_text(41) : htmlentities($helpTitle, null, FH_HTML_ENCODING);
+        $helpTitle = is_null($helpTitle) ? "%title% - " . $this->_text(41) : htmlentities($helpTitle, encoding: FH_HTML_ENCODING);
         $helpTitle = preg_replace("/\r?\n/", "\\n", addslashes($helpTitle));
         $helpText  = preg_replace("/\r?\n/", "\\n", addslashes($helpText));
 
         // set the help text
         $this->_help[$field] = array(
-            htmlentities($helpText, null, FH_HTML_ENCODING),
+            htmlentities($helpText, encoding: FH_HTML_ENCODING),
             $helpTitle
         );
     }
@@ -1766,7 +1766,7 @@ class FormHandler
         $js = $field . '_values = [';
         foreach ($options as $option)
         {
-            $js .= '"' . htmlentities($option, null, FH_HTML_ENCODING) . '", ';
+            $js .= '"' . htmlentities($option, encoding: FH_HTML_ENCODING) . '", ';
         }
         $this->_setJS(substr($js, 0, -2) . "];\n");
 
@@ -1823,7 +1823,7 @@ class FormHandler
         $js = $field . '_values = [';
         foreach ($options as $option)
         {
-            $js .= '"' . htmlentities($option, null, FH_HTML_ENCODING) . '", ';
+            $js .= '"' . htmlentities($option, encoding: FH_HTML_ENCODING) . '", ';
         }
         $this->_setJS(substr($js, 0, -2) . "];\n");
 
@@ -3863,12 +3863,12 @@ class FormHandler
                                     FH_HELP_MASK,
                                     $this->_helpIcon,
                                     $this->_help[$name][0],
-                                    str_replace('%title%', addslashes(htmlentities($title, null, FH_HTML_ENCODING)), $this->_help[$name][1])
+                                    str_replace('%title%', addslashes(htmlentities($title, encoding: FH_HTML_ENCODING)), $this->_help[$name][1])
                                 );
                             }
                             else
                             {
-                                $help = str_replace(array('%helpicon%', '%helptext%', '%helptitle%'), array($this->_helpIcon, $this->_help[$name][0], str_replace('%title%',    addslashes(htmlentities($title, null, FH_HTML_ENCODING)), $this->_help[$name][1])), FH_HELP_MASK);
+                                $help = str_replace(array('%helpicon%', '%helptext%', '%helptitle%'), array($this->_helpIcon, $this->_help[$name][0], str_replace('%title%',    addslashes(htmlentities($title, encoding: FH_HTML_ENCODING)), $this->_help[$name][1])), FH_HELP_MASK);
                             }
                         }
 
@@ -3994,7 +3994,7 @@ class FormHandler
             "  This credit MUST stay intact for use\n" .
             "-->\n" .
             $this->getJavascriptCode(true) .
-            '<form id="' . $this->_name . '" method="post" action="' . htmlentities($this->_action, null, FH_HTML_ENCODING) . '"' .
+            '<form id="' . $this->_name . '" method="post" action="' . htmlentities($this->_action, encoding: FH_HTML_ENCODING) . '"' .
             (sizeof($this->_upload) > 0 ? ' enctype="multipart/form-data"' : '') .
             (!empty($this->_extra) ? " " . $this->_extra : "") . ">\n" .
             '<ins>' . $hidden . '</ins>' .
