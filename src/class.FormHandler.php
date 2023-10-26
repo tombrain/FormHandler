@@ -114,6 +114,7 @@ class FormHandler
     protected $_tableSettings;    // array: array with all table settings
     protected $_ajaxValidator;    // boolean: if Ajax validation must be used or not.
     protected $_ajaxValidatorScript;    // boolean: if Ajax validation must include library or not.
+    private $errors = array();
 
     private $_unittestmode = false; // boolean: only for unittesting (can only be set by reflection of uniitest)
 
