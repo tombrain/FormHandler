@@ -1,4 +1,4 @@
-name: php 8.1.x
+name: php 8.2.x
 
 on: [push]
 
@@ -16,8 +16,6 @@ jobs:
         env:
           TEST_NAME: Scarlett
         with:
-          version: 9
-          php_version: 8.1
           php_extensions: gd
           configuration: tests/uts/phpunit.xml
           args: --coverage-text
