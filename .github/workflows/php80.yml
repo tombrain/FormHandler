@@ -17,6 +17,7 @@ jobs:
           TEST_NAME: Scarlett
           XDEBUG_MODE: coverage
         with:
+          version: 9.6.13
           php_version: 8.0.26
           php_extensions: gd
           configuration: tests/uts/phpunit.xml
