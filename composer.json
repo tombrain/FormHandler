@@ -36,6 +36,7 @@
         "tombrain/phpunit-mock-db": "dev-phpunit-9",
         "tombrain/phpunit-sql": "dev-phpunit-9",
         "dibi/dibi": "^4.2.x-dev",
+        "jdorn/sql-formatter": "^1.2.17",
         "phan/phan": "^5.1",
         "phpstan/phpstan": "^1.9.2"
     },
