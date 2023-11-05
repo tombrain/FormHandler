@@ -28,6 +28,15 @@ final class formhandler_DataHandlingTest extends FormhandlerTestCase
         $this->assertEquals("21", $day);
     }
 
+    public function testGetAsArray_expectedError(): void
+    {
+        $form = new FormHandler();
+
+        $this->assertFalse($form->getAsArray('date'));
+
+        $this->assertTriggertError('The datefield "date" does not exists!', E_USER_NOTICE);
+    }
+
     public function testGetValue(): void
     {
         $_POST['FormHandler_submit'] = "1";

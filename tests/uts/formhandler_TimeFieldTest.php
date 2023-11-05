@@ -219,6 +219,18 @@ final class formhandler_TimeFieldTest extends FormhandlerTestCase
         $this->assertFormFlushContains($form, $aExpected);
     }
 
+    public function test_new_format_expected_formaterror(): void
+    {
+        define('FH_TIMEFIELD_SET_CUR_TIME', false);
+        $form = new FormHandler();
+
+        $this->assertFalse($form->isPosted());
+
+        $form->timeField("Timefield", "timefield", null, false, 13);
+
+        $this->assertTriggertError("Invalid value as hour format! Only 12 or 24 are allowed!", E_USER_WARNING);
+    }
+
     /**
      * @dataProvider timeintervall
      */
