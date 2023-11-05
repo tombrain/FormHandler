@@ -60,9 +60,8 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $this->expectExceptionMessage('Could net set focus to unknown field "textfield"');
-
-        $form->setFocus("textfield");
+        static::assertFalse($form->setFocus("textfield"));
+        $this->assertTriggertError('Could net set focus to unknown field "textfield"', E_USER_NOTICE);
     }
 
     public function test_set_specialfield_datefield(): void

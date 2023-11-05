@@ -40,8 +40,8 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
         $this->assertEquals("14-04-2020", $form->getValue("datetextfield4"));  // already parsed into correct presentation!
 
         $this->assertEquals([2020, 4, 14], $form->getAsArray("datetextfield"));
-        $this->expectExceptionMessage("Value is not a valid date [14.04.2020]");
-        $form->getAsArray("datetextfield2");
+        $this->assertNull($form->getAsArray("datetextfield2"));
+        $this->assertTriggertError("Value is not a valid date [14.04.2020]", E_USER_ERROR);
         $this->assertEquals([2020, 4, 14], $form->getAsArray("datetextfield3"));
         $this->assertEquals([2020, 4, 14], $form->getAsArray("datetextfield4"));
 
@@ -173,18 +173,22 @@ final class formhandler_DateTextFieldTest extends FormhandlerTestCase
 
         if ($dataTestGetAsArray['mask'] != FH_DATETEXTFIELD_DEFAULT_DISPLAY)
         {
-            $this->expectExceptionMessage("Value is not a valid date [" . $dataTestGetAsArray['value'] . "]");
+            $this->assertNull($form->getAsArray('datetextfield'));
+            $this->assertTriggertError("Value is not a valid date [" . $dataTestGetAsArray['value'] . "]", E_USER_ERROR);
         }
-        list($year, $month, $day) = $form->getAsArray('datetextfield');
+        else
+        {
+            list($year, $month, $day) = $form->getAsArray('datetextfield');
 
-        $this->assertEquals($dataTestGetAsArray['result']['year'], $year);
-        $this->assertEquals($dataTestGetAsArray['result']['month'], $month);
-        $this->assertEquals($dataTestGetAsArray['result']['day'], $day);
+            $this->assertEquals($dataTestGetAsArray['result']['year'], $year);
+            $this->assertEquals($dataTestGetAsArray['result']['month'], $month);
+            $this->assertEquals($dataTestGetAsArray['result']['day'], $day);
 
-        list($year2, $month2, $day2) = $form->getAsArray('datetextfield2');
+            list($year2, $month2, $day2) = $form->getAsArray('datetextfield2');
 
-        $this->assertEquals($dataTestGetAsArray['result']['year'], $year2);
-        $this->assertEquals($dataTestGetAsArray['result']['month'], $month2);
-        $this->assertEquals($dataTestGetAsArray['result']['day'], $day2);
+            $this->assertEquals($dataTestGetAsArray['result']['year'], $year2);
+            $this->assertEquals($dataTestGetAsArray['result']['month'], $month2);
+            $this->assertEquals($dataTestGetAsArray['result']['day'], $day2);
+        }
     }
 };

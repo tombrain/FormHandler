@@ -17,18 +17,34 @@ abstract class FormhandlerTestCase extends TestCase
 {
     private ?ReflectionClass $_Reflector = null;
 
+    private array $_triggeredErrors = array();
+
+    protected function assertTriggertError(string $message, int $errorlevel): void
+    {
+        static::assertTrue(count($this->_triggeredErrors) > 0, "no errors triggered");
+
+        $triggeredError = array_shift($this->_triggeredErrors);
+        static::assertEquals($triggeredError["level"], $errorlevel, "wrong expected errorlevel");
+        static::assertEquals($triggeredError["message"], $message, "wrong expected errormessage");
+    }
+
+    public function errorHandler(int $errorlevel, string $message)
+    {
+        array_push($this->_triggeredErrors, array("level" => $errorlevel, "message" => $message));
+    }
+
     protected function setUp(): void
     {
-        set_error_handler(
-            static function ( $errno, $errstr ) {
-                throw new \Exception( $errstr, $errno );
-            },
-            E_ALL
-        );
+        set_error_handler(array($this, 'errorhandler'));
     }
 
     protected function tearDown(): void
     {
+        if (count($this->_triggeredErrors) > 0)
+        {
+            $triggeredErrormessage = $this->_triggeredErrors[0]["message"];
+            static::fail("Unexpected triggered error: {$triggeredErrormessage}");
+        }
         restore_error_handler();
     }
 

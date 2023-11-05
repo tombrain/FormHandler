@@ -112,8 +112,9 @@ final class formhandler_ConstructorTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $this->expectExceptionMessage('Try to get the value of an unknown field "notexist"!');
+        $this->assertNull($form->getValue("notexist"));
 
+        $this->assertTriggertError('Try to get the value of an unknown field "notexist"!', E_USER_WARNING);
         $form->getValue("notexist");
     }
 }
