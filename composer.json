@@ -17,19 +17,27 @@
         }
     ],
     "repositories": [
-        	{
-      		"type": "vcs",
-      		"url": "https://github.com/tombrain/phpunit-mock-dibi.git"
-    	}	    
-	],
+        {
+              "type": "vcs",
+              "url": "https://github.com/tombrain/phpunit-mock-dibi.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/tombrain/phpunit-mock-db.git"
+        },
+        {
+            "type": "vcs",
+            "url": "https://github.com/tombrain/phpunit-sql.git"
+        }
+  ],
     "require": {
-        "phpunit/phpunit": "9.6.13",
-        "czukowski/phpunit-mock-db": "^9.0",
-        "jdorn/sql-formatter": "^1.2.17",
+        "phpunit/phpunit": "~9.0",
+        "tombrain/phpunit-mock-dibi": "dev-phpunit-9",
+        "tombrain/phpunit-mock-db": "dev-phpunit-9",
+        "tombrain/phpunit-sql": "dev-phpunit-9",
+        "dibi/dibi": "^4.2.x-dev",
         "phan/phan": "^5.1",
-		"phpstan/phpstan": "^1.9.2",
-		"tombrain/phpunit-mock-dibi" : "dev-master",
-        "dibi/dibi": "^4.2"
+        "phpstan/phpstan": "^1.9.2"
     },
     "autoload": {
         "files": [
