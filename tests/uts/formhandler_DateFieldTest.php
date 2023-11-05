@@ -46,7 +46,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
     }
 
 
-    public function test_new(): void
+    public function test_newX(): void
     {
         $form = new FormHandler();
 
@@ -172,6 +172,44 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $this->assertEquals([2018, 4, 3], $form->getAsArray("datefield4"));
     }
 
+    public function different_masks(): array
+    {
+        return [
+            [["d.m.y", "03.04.2018"]],
+            [["D.M.Y", "03.04.2018"]],
+            [["m.y", "04.2018"]],
+            [["M.Y", "04.2018"]],
+            [["d.y", "03.2018"]],
+            [["D.Y", "03.2018"]],
+            [["d.m", "03.04"]],
+            [["D.M", "03.04"]],
+            [["d", "03"]],
+            [["D", "03"]],
+            [["m", "04"]],
+            [["M", "04"]],
+            [["y", "2018"]],
+            [["Y", "2018"]]
+        ];
+    }
+    /**
+     * @dataProvider different_masks
+     */
+    public function test_getValue($different_masks): void
+    {
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['datefield_day'] = "03";
+        $_POST['datefield_month'] = "04";
+        $_POST['datefield_year'] = "2018";
+
+        $form = new FormHandler();
+
+        $this->assertTrue($form->isPosted());
+
+        $form->dateField("Datefield", "datefield", null, null, $different_masks[0]);
+
+         $this->assertEquals($different_masks[1], $form->getValue("datefield"));
+    }
+
     public function test_new_mask1(): void
     {
         $form = new FormHandler();
@@ -251,7 +289,110 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="03" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
-            ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" /> error_datefield<span id="error_datefield" class="error">forcedError');
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
+            ' error_datefield<span id="error_datefield" class="error">forcedError');
+    }
+
+    public function test_posted_editfields_invalidDate(): void
+    {
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['datefield_day'] = "43";
+        $_POST['datefield_month'] = "04";
+        $_POST['datefield_year'] = "2018";
+
+        $form = new FormHandler();
+
+        $this->assertTrue($form->isPosted());
+
+        $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
+
+        $this->assertEquals("43-04-2018", $form->getValue("datefield"));
+
+        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="43" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
+            ' error_datefield<span id="error_datefield" class="error">The given date is not valid!</span>'
+        );
+    }
+
+    public function test_posted_editfields_invalidDay(): void
+    {
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['datefield_day'] = "A";
+        $_POST['datefield_month'] = "04";
+        $_POST['datefield_year'] = "2018";
+
+        $form = new FormHandler();
+
+        $this->assertTrue($form->isPosted());
+
+        $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
+
+        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="A" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
+            ' error_datefield<span id="error_datefield" class="error"><span id="error_datefield_day" class="error">You did not enter a correct value for this field!</span></span>'
+        );
+    }
+
+    public function test_posted_editfields_invalidMonth(): void
+    {
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['datefield_day'] = "01";
+        $_POST['datefield_month'] = "A";
+        $_POST['datefield_year'] = "2018";
+
+        $form = new FormHandler();
+
+        $this->assertTrue($form->isPosted());
+
+        $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
+
+        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_month" id="datefield_month" value="A" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
+            ' error_datefield<span id="error_datefield" class="error"><span id="error_datefield_month" class="error">You did not enter a correct value for this field!</span>'
+        );
+    }
+
+    public function test_posted_editfields_invalidYear1(): void
+    {
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['datefield_day'] = "01";
+        $_POST['datefield_month'] = "04";
+        $_POST['datefield_year'] = "A";
+
+        $form = new FormHandler();
+
+        $this->assertTrue($form->isPosted());
+
+        $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
+
+        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="A" size="4" maxlength="4" class="error" />' .
+            ' error_datefield<span id="error_datefield" class="error"><span id="error_datefield_year" class="error">You did not enter a correct value for this field!</span></span>'
+        );
+    }
+
+    public function test_posted_editfields_invalidYear2(): void
+    {
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['datefield_day'] = "01";
+        $_POST['datefield_month'] = "04";
+        $_POST['datefield_year'] = "123";
+
+        $form = new FormHandler();
+
+        $this->assertTrue($form->isPosted());
+
+        $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
+
+        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
+            ' - <input type="text" name="datefield_year" id="datefield_year" value="123" size="4" maxlength="4" class="error" />' .
+            ' error_datefield<span id="error_datefield" class="error">The given date is not valid!</span>'
+        );
     }
 
     public function test_new_extra(): void

@@ -40,7 +40,7 @@ class DateField extends Field
         $this->setInterval(!is_null($sInterval) ? $sInterval : FH_DATEFIELD_DEFAULT_DATE_INTERVAL);
 
         // set if the field is required
-        $this->setRequired(!is_null($bRequired) ? $bRequired : FH_DATEFIELD_DEFAULT_REQUIRED);
+        $this->_bRequired = !is_null($bRequired) ? $bRequired : FH_DATEFIELD_DEFAULT_REQUIRED;
 
         // d = selectfield day
         // m = selectfield month
@@ -96,7 +96,7 @@ class DateField extends Field
                     $this->_oYear = new TextField($oForm, $sName . '_year');
                     $this->_oYear->setSize(4);
                     $this->_oYear->setMaxlength(4);
-                    $this->_oYear->setValidator(_FH_DIGIT);
+                    $this->_oYear->setValidator($this->_bRequired ? FH_DIGIT : _FH_DIGIT);
                     break;
 
                     // month selectfield
@@ -132,7 +132,7 @@ class DateField extends Field
                     $this->_oMonth = new TextField($oForm, $sName . '_month');
                     $this->_oMonth->setSize(2);
                     $this->_oMonth->setMaxlength(2);
-                    $this->_oMonth->setValidator(_FH_DIGIT);
+                    $this->_oMonth->setValidator($this->_bRequired ? FH_DIGIT :_FH_DIGIT);
                     break;
 
                     // day selectfield
@@ -155,38 +155,13 @@ class DateField extends Field
                     $this->_oDay = new TextField($oForm, $sName . '_day');
                     $this->_oDay->setSize(2);
                     $this->_oDay->setMaxlength(2);
-                    $this->_oDay->setValidator(_FH_DIGIT);
+                    $this->_oDay->setValidator($this->_bRequired ? FH_DIGIT :_FH_DIGIT);
                     break;
             }
         }
 
         // call the Field constructor
         parent::__construct($oForm, $sName);
-    }
-
-    /**
-     * DateField::setRequired()
-     *
-     * Set if the datefield is required or if we have to give the user
-     * the option to select empty value
-     *
-     * @param boolean $bStatus: the status
-     * @return void
-     * @access public
-     * @author Teye Heimans
-     */
-    public function setRequired($bStatus)
-    {
-        $this->_bRequired = $bStatus;
-
-        if (isset($this->_oYear) && is_object($this->_oYear))
-            $this->_oYear->setValidator($bStatus ? FH_DIGIT : _FH_DIGIT);
-
-        if (isset($this->_oMonth) && is_object($this->_oMonth))
-            $this->_oMonth->setValidator($bStatus ? FH_DIGIT : _FH_DIGIT);
-
-        if (isset($this->_oDay) && is_object($this->_oDay))
-            $this->_oDay->setValidator($bStatus ? FH_DIGIT : _FH_DIGIT);
     }
 
     /**
