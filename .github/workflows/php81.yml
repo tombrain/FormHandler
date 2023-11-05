@@ -16,7 +16,7 @@ jobs:
         env:
           TEST_NAME: Scarlett
         with:
-          version: 9
+          version: 9.6.13
           php_version: 8.1
           php_extensions: gd
           configuration: tests/uts/phpunit.xml
