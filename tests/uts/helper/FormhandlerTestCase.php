@@ -113,7 +113,7 @@ abstract class FormhandlerTestCase extends TestCase
      * @param string|array $expected
      * @return string HTML for additional validation
      */
-    protected function assertFormFlushContains(FormHandler $form, $expected): string
+    protected static function assertFormFlushContains(FormHandler $form, $expected): string
     {
         $t = (string)$form->flush(true);
         if (is_array($expected))
@@ -122,19 +122,19 @@ abstract class FormhandlerTestCase extends TestCase
             $lastPos = -1;
             foreach ($expected as $e)
             {
-                //$this->assertStringContainsString($e, $t);
+                //static::assertStringContainsString($e, $t);
                 $p = strpos($t, $e);
                 if (!$p)
                 {
-                    $this->fail("missing string:\n{$e}");
+                    static::fail("missing string:\n{$e}");
                 }
 
-                $this->assertGreaterThan($lastPos, $p, "wrong order of strings '{$e}'");
+                static::assertGreaterThan($lastPos, $p, "wrong order of strings '{$e}'");
                 $lastPos = $p;
             }
         }
         else
-            $this->assertStringContainsString($expected, $t);
+            static::assertStringContainsString($expected, $t);
 
         return (string)$t;
     }
@@ -145,9 +145,9 @@ abstract class FormhandlerTestCase extends TestCase
      * @param FormHandler $form
      * @return void
      */
-    protected function assertFlush(FormHandler $form): void
+    protected static function assertFlush(FormHandler $form): void
     {
         $t = $form->flush(true);
-        $this->assertEquals("", $t);
+        static::assertEquals("", $t);
     }
 };

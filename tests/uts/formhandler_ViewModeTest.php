@@ -11,18 +11,18 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->textField("Textfield", "textfield");
         $form->textField("Textfield2", "textfield2");
 
-        $this->assertFalse($form->isViewMode());
+        static::assertFalse($form->isViewMode());
 
         $form->enableViewMode();
 
-        $this->assertTrue($form->isViewMode());
+        static::assertTrue($form->isViewMode());
 
-        $this->assertFormFlushContains($form, ['Textfield:textvalueerror_textfieldTextfield2:error_textfield2']);
+        static::assertFormFlushContains($form, ['Textfield:textvalueerror_textfieldTextfield2:error_textfield2']);
     }
 
     public function test_fieldViewMode(): void
@@ -33,22 +33,22 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->textField("Textfield", "textfield");
         $form->textField("Textfield2", "textfield2");
 
-        $this->assertFalse($form->isFieldViewMode("textfield"));
-        $this->assertFalse($form->isFieldViewMode("textfield2"));
+        static::assertFalse($form->isFieldViewMode("textfield"));
+        static::assertFalse($form->isFieldViewMode("textfield2"));
 
         $form->setFieldViewMode("textfield");
 
-        $this->assertTrue($form->isFieldViewMode("textfield"));
-        $this->assertFalse($form->isFieldViewMode("textfield2"));
+        static::assertTrue($form->isFieldViewMode("textfield"));
+        static::assertFalse($form->isFieldViewMode("textfield2"));
 
         $form->setError("textfield", "forcedError");
 
-        $this->assertFormFlushContains($form, [
+        static::assertFormFlushContains($form, [
             'Textfield:textvalueerror_textfield<span id="error_textfield" class="error">forcedError</span>',
             'Textfield2:<input type="text" name="textfield2" id="textfield2" value="textvalue2" size="20" />error_textfield2'
         ]);
@@ -61,7 +61,7 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->textField("Textfield", "textfield");
 
@@ -77,7 +77,7 @@ final class formhandler_ViewModeTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->textField("Textfield", "textfield");
 

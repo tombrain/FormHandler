@@ -10,7 +10,7 @@ final class formhandler_BrowserFieldTest extends FormhandlerTestCase
 
         $form->browserField("BrowserField", "browserfield", "a/path");
 
-        $this->assertFormFlushContains($form, [
+        static::assertFormFlushContains($form, [
             'BrowserField:<input type="text" name="browserfield" id="browserfield" value="" size="20" /> <input type="button" name="Bladeren" id="Bladeren" value="Bladeren"',
             'onclick="window.open(',
             'FHTML/filemanager/browser/default/browser.html?Type=File&naam=browserfield&Connector=../../connectors/php/connector.php?ServerPath=a/path\',\'\',\'modal=yes,width=650,height=400\');" /> error_browserfield'
@@ -24,7 +24,7 @@ final class formhandler_BrowserFieldTest extends FormhandlerTestCase
         $form->browserField("BrowserField", "browserfield", "a/path");
         $form->setFieldViewMode("browserfield");
 
-        $this->assertFormFlushContains($form, [
+        static::assertFormFlushContains($form, [
             'BrowserField:error_browserfield'
         ]);
     }
@@ -38,9 +38,9 @@ final class formhandler_BrowserFieldTest extends FormhandlerTestCase
 
         $form->browserField("BrowserField", "browserfield", "a/path");
 
-        $this->assertEquals("o1", $form->getValue("browserfield"));
+        static::assertEquals("o1", $form->getValue("browserfield"));
 
-        $this->assertTrue($form->isCorrect());
+        static::assertTrue($form->isCorrect());
     }
 
 

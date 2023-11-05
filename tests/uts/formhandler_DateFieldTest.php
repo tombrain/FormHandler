@@ -50,7 +50,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield");
 
@@ -65,14 +65,14 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear, date('Y')));
         $aExpected[] = '</select> error_datefield';
 
-        $this->assertFormFlushContains($form, $aExpected);
+        static::assertFormFlushContains($form, $aExpected);
     }
 
     public function test_new_required(): void
     {
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, true);
 
@@ -87,8 +87,8 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear, date('Y')));
         $aExpected[] = '</select> error_datefield';
 
-        $t = $this->assertFormFlushContains($form, $aExpected);
-        $this->assertFalse(strpos($t, '<option  value="" ></option>'));
+        $t = static::assertFormFlushContains($form, $aExpected);
+        static::assertFalse(strpos($t, '<option  value="" ></option>'));
     }
 
     public function test_new_no_default(): void
@@ -96,7 +96,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         define('FH_DATEFIELD_SET_CUR_DATE', false);
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield");
 
@@ -111,14 +111,14 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear));
         $aExpected[] = '</select> error_datefield';
 
-        $this->assertFormFlushContains($form, $aExpected);
+        static::assertFormFlushContains($form, $aExpected);
     }
 
     public function test_interval(): void
     {
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, null, '20:20');
 
@@ -133,7 +133,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear, date('Y')));
         $aExpected[] = '</select> error_datefield';
 
-        $this->assertFormFlushContains($form, $aExpected);
+        static::assertFormFlushContains($form, $aExpected);
     }
 
     public function test_posted(): void
@@ -154,22 +154,22 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield");
         $form->dateField("Datefield2", "datefield2", null, null, "d.m.y");
         $form->dateField("Datefield3", "datefield3", null, null, "y/m/d");
         $form->dateField("Datefield4", "datefield4", null, null, "D-M-Y");
 
-        $this->assertEquals("03-04-2018", $form->getValue("datefield"));
-        $this->assertEquals("03.04.2018", $form->getValue("datefield2"));
-        $this->assertEquals("2018/04/03", $form->getValue("datefield3"));
-        $this->assertEquals("03-04-2018", $form->getValue("datefield4"));
+        static::assertEquals("03-04-2018", $form->getValue("datefield"));
+        static::assertEquals("03.04.2018", $form->getValue("datefield2"));
+        static::assertEquals("2018/04/03", $form->getValue("datefield3"));
+        static::assertEquals("03-04-2018", $form->getValue("datefield4"));
 
-        $this->assertEquals([2018, 4, 3], $form->getAsArray("datefield"));
-        $this->assertEquals([2018, 4, 3], $form->getAsArray("datefield2"));
-        $this->assertEquals([2018, 4, 3], $form->getAsArray("datefield3"));
-        $this->assertEquals([2018, 4, 3], $form->getAsArray("datefield4"));
+        static::assertEquals([2018, 4, 3], $form->getAsArray("datefield"));
+        static::assertEquals([2018, 4, 3], $form->getAsArray("datefield2"));
+        static::assertEquals([2018, 4, 3], $form->getAsArray("datefield3"));
+        static::assertEquals([2018, 4, 3], $form->getAsArray("datefield4"));
     }
 
     public function different_masks(): array
@@ -203,18 +203,18 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, $different_masks[0]);
 
-         $this->assertEquals($different_masks[1], $form->getValue("datefield"));
+         static::assertEquals($different_masks[1], $form->getValue("datefield"));
     }
 
     public function test_new_mask1(): void
     {
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "y-m-d");
 
@@ -229,14 +229,14 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getDays(31, date('d')));
         $aExpected[] = '</select> error_datefield';
 
-        $this->assertFormFlushContains($form, $aExpected);
+        static::assertFormFlushContains($form, $aExpected);
     }
 
     public function test_new_mask2(): void
     {
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "d.m.y");
 
@@ -251,7 +251,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear, date('Y')));
         $aExpected[] = '</select> error_datefield';
 
-        $this->assertFormFlushContains($form, $aExpected);
+        static::assertFormFlushContains($form, $aExpected);
     }
 
     public function test_new_editfields(): void
@@ -259,12 +259,12 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         define('FH_DATEFIELD_SET_CUR_DATE', false);
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
         $form->dateField("Datefield2", "datefield2", null, null, "Y.M-D");
 
-        $this->assertFormFlushContains($form, [
+        static::assertFormFlushContains($form, [
             'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="" size="2" maxlength="2" /> - <input type="text" name="datefield_month" id="datefield_month" value="" size="2" maxlength="2" /> - <input type="text" name="datefield_year" id="datefield_year" value="" size="4" maxlength="4" /> error_datefield',
             'Datefield2: <input type="text" name="datefield2_year" id="datefield2_year" value="" size="4" maxlength="4" /> . <input type="text" name="datefield2_month" id="datefield2_month" value="" size="2" maxlength="2" /> - <input type="text" name="datefield2_day" id="datefield2_day" value="" size="2" maxlength="2" /> error_datefield2'
         ]);
@@ -279,15 +279,15 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
 
-        $this->assertEquals("03-04-2018", $form->getValue("datefield"));
+        static::assertEquals("03-04-2018", $form->getValue("datefield"));
 
         $form->setError("datefield", "forcedError");
 
-        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="03" size="2" maxlength="2" class="error" />' .
+        static::assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="03" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
             ' error_datefield<span id="error_datefield" class="error">forcedError');
@@ -302,13 +302,13 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
 
-        $this->assertEquals("43-04-2018", $form->getValue("datefield"));
+        static::assertEquals("43-04-2018", $form->getValue("datefield"));
 
-        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="43" size="2" maxlength="2" class="error" />' .
+        static::assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="43" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
             ' error_datefield<span id="error_datefield" class="error">The given date is not valid!</span>'
@@ -324,11 +324,11 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
 
-        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="A" size="2" maxlength="2" class="error" />' .
+        static::assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="A" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
             ' error_datefield<span id="error_datefield" class="error"><span id="error_datefield_day" class="error">You did not enter a correct value for this field!</span></span>'
@@ -344,11 +344,11 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
 
-        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
+        static::assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="A" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_year" id="datefield_year" value="2018" size="4" maxlength="4" class="error" />' .
             ' error_datefield<span id="error_datefield" class="error"><span id="error_datefield_month" class="error">You did not enter a correct value for this field!</span>'
@@ -364,11 +364,11 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
 
-        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
+        static::assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_year" id="datefield_year" value="A" size="4" maxlength="4" class="error" />' .
             ' error_datefield<span id="error_datefield" class="error"><span id="error_datefield_year" class="error">You did not enter a correct value for this field!</span></span>'
@@ -384,11 +384,11 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
 
         $form = new FormHandler();
 
-        $this->assertTrue($form->isPosted());
+        static::assertTrue($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, "D-M-Y");
 
-        $this->assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
+        static::assertFormFlushContains($form, 'Datefield: <input type="text" name="datefield_day" id="datefield_day" value="01" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_month" id="datefield_month" value="04" size="2" maxlength="2" class="error" />' .
             ' - <input type="text" name="datefield_year" id="datefield_year" value="123" size="4" maxlength="4" class="error" />' .
             ' error_datefield<span id="error_datefield" class="error">The given date is not valid!</span>'
@@ -399,7 +399,7 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
     {
         $form = new FormHandler();
 
-        $this->assertFalse($form->isPosted());
+        static::assertFalse($form->isPosted());
 
         $form->dateField("Datefield", "datefield", null, null, null, null, 'data-old="123"');
 
@@ -414,6 +414,6 @@ final class formhandler_DateFieldTest extends FormhandlerTestCase
         $aExpected = array_merge($aExpected, $this->getYears($startYear, $endYear, date('Y')));
         $aExpected[] = '</select> error_datefield';
 
-        $this->assertFormFlushContains($form, $aExpected);
+        static::assertFormFlushContains($form, $aExpected);
     }
 };
