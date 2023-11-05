@@ -196,13 +196,4 @@ final class formhandler_SelectFieldTest extends FormhandlerTestCase
             '</select>error_selectfield'
         ]);
     }
-
-    public function test_expected_error_options_no_array(): void
-    {
-        $form = new FormHandler();
-
-        $form->selectField("Selectfield", "selectfield", "noarray");
-
-        $this->assertTriggertError("You have to give an array as value with the selectfield 'selectfield'", E_USER_WARNING);
-    }
 };

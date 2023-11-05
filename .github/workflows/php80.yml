@@ -1,0 +1,24 @@
+name: php 8.0.x
+
+on: [push]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - uses: php-actions/composer@v6
+
+      - name: PHPUnit Tests
+        uses: php-actions/phpunit@master
+        env:
+          TEST_NAME: Scarlett
+          XDEBUG_MODE: coverage
+        with:
+          version: 9.6.13
+          php_version: 8.0.26
+          php_extensions: gd
+          configuration: tests/uts/phpunit.xml
+          args: --coverage-text

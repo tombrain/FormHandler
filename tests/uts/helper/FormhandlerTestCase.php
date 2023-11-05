@@ -116,10 +116,6 @@ abstract class FormhandlerTestCase extends TestCase
     protected function assertFormFlushContains(FormHandler $form, $expected): string
     {
         $t = (string)$form->flush(true);
-
-        file_put_contents("d:\\form.txt", $t);
-        file_put_contents("d:\\exp.txt", $expected);
-        
         if (is_array($expected))
         {
             // ordercheck

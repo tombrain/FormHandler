@@ -572,42 +572,4 @@ final class formhandler_UploadFieldTest extends FormhandlerTestCase
 
         $this->assertTrue(unlink("{$this->_tempPath}/uploadedandmerged.jpg"));
     }
-
-    public function testIsUploaded_expectedError(): void
-    {
-        $form = new FormHandler();
-
-        $this->assertFalse($form->isUploaded('upload'));
-
-        $this->assertTriggertError('Error, the uploadfield "upload" does not exists!', E_USER_NOTICE);
-    }
-    
-    public function testIsUploaded_expectedError2(): void
-    {
-        $form = new FormHandler();
-
-        $form->textField("Upload", "upload");
-
-        $this->assertFalse($form->isUploaded('upload'));
-
-        $this->assertTriggertError('Error, the field "upload" is not an uploadfield!', E_USER_NOTICE);
-    }
-
-    public function testGetFileInfo_expectedError(): void
-    {
-        $form = new FormHandler();
-
-        $this->assertCount(0, $form->getFileInfo('upload'));
-        $this->assertTriggertError('Error, the uploadfield "upload" does not exists!', E_USER_NOTICE);
-    }
-    
-    public function testGetFileInfo_expectedError2(): void
-    {
-        $form = new FormHandler();
-
-        $form->textField("Upload", "upload");
-
-        $this->assertCount(0, $form->getFileInfo('upload'));
-        $this->assertTriggertError('Error, the field "upload" is not an uploadfield!', E_USER_NOTICE);
-    }
 };

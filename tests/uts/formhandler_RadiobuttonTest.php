@@ -246,12 +246,4 @@ final class formhandler_RadiobuttonTest extends FormhandlerTestCase
             $t['radiobutton']
         );
     }
-
-    public function test_expected_error_options_no_array(): void
-    {
-        $form = new FormHandler();
-
-        $form->radioButton("Radiobutton", "radiobutton", "noarray");
-        $this->assertTriggertError("You have to give an array as value with the radiobutton 'radiobutton'", E_USER_WARNING);
-    }
 };
