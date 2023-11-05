@@ -129,7 +129,10 @@ class DateTextField extends TextField
             return array("", "", "");
         }
         if (preg_match($this->_sValParseRegExpr, $this->getValue(), $data) == 0)
+        {
             trigger_error("Value is not a valid date [" . $this->getValue() . "]", E_USER_ERROR);
+            return null;
+        }
         if ($data[$this->_iYearPos] <= 50)
             $data[$this->_iYearPos] = $data[$this->_iYearPos] + 2000;
         if ($data[$this->_iYearPos] <= 100)
