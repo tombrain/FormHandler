@@ -144,7 +144,7 @@ final class formhandler_SetFocusTest extends FormhandlerTestCase
         );
     }
 
-    public function test_np_focus_possible(): void
+    public function test_no_focus_possible(): void
     {
         $form = new FormHandler();
 
