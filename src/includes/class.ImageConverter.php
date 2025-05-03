@@ -149,7 +149,18 @@ class ImageConverter
                     imagealphablending($rImgResized, false);
                     imagesavealpha($rImgResized, true);
                 }
-
+                else if ($this->_getExtension($sDestination) == 'gif') 
+                {
+                    $transparentIndex = imagecolortransparent($rOrg);
+                    if ($transparentIndex >= 0) 
+                    {
+                        $transparentColor = imagecolorsforindex($rOrg, $transparentIndex);
+                        $transparentIndex = imagecolorallocate($rImgResized, $transparentColor['red'], $transparentColor['green'], $transparentColor['blue']);
+                        imagefill($rImgResized, 0, 0, $transparentIndex);
+                        imagecolortransparent($rImgResized, $transparentIndex);
+                    }
+                }
+                
                 ImageCopyResampled($rImgResized, $rOrg, 0, 0, 0, 0, $iNewWidth, $iNewHeight, $iOrgWidth, $iOrgHeight);
             }
             else
