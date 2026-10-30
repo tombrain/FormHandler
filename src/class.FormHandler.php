@@ -3146,6 +3146,14 @@ class FormHandler
         if (is_null($maxWidth))  $maxWidth  = FH_DEFAULT_RESIZE_WIDTH;
         if (is_null($maxHeight)) $maxHeight = $maxWidth;
 
+        // {id}: the id of the record, only known by a dbFormHandler (which replaces it)
+        if (is_string($saveAs) && strpos($saveAs, '{id}') !== false && !($this instanceof dbFormHandler))
+        {
+            throw new FormHandlerException(
+                'resizeImage() of the field "' . $field . '" uses {id} in its filename, which needs a dbFormHandler!'
+            );
+        }
+
         // save the settings
         $this->_convert[$field]['resize'][] = array($saveAs, $maxWidth, $maxHeight, $quality, $constrainProportions);
     }
@@ -3677,6 +3685,33 @@ class FormHandler
     }
 
     /**
+     * FormHandler::_waitsForId()
+     *
+     * Does the uploadfield wait for the id of the record? ({id} in its filename or in the
+     * filename of resizeImage())
+     *
+     * @param string $name: the name of the uploadfield
+     * @return bool
+     */
+    protected function _waitsForId(string $name): bool
+    {
+        if ($this->_fields[$name][1]->hasIdPlaceholder())
+        {
+            return true;
+        }
+
+        foreach ($this->_convert[$name]['resize'] ?? array() as $info)
+        {
+            if (is_string($info[0]) && strpos($info[0], '{id}') !== false)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * FormHandler::_handleUploads()
      *
      * Private: method to handle the uploads and image convertions
@@ -3696,7 +3731,7 @@ class FormHandler
             $names = array();
             foreach ($this->_upload as $name)
             {
-                if (!$this->_fields[$name][1]->hasIdPlaceholder())
+                if (!$this->_waitsForId($name))
                 {
                     $names[] = $name;
                 }

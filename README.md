@@ -180,6 +180,9 @@ function spielerSaved($id, $data, $form)
   `mergeImage()` of the field run. If the table has a column with the name of the field,
   FormHandler saves the filename there with an UPDATE. When the INSERT fails, no file is
   moved.
+- `{id}` also works in the filename of `resizeImage()`, e.g.
+  `$form->resizeImage('bild', __DIR__ . '/images/spieler/klein_{id}.jpg', 200)`. On a new
+  record the field then waits for the INSERT, even when its own filename has no `{id}`.
 - `onCorrect` runs before the INSERT: for a new record the filename is still empty there,
   `onSaved` gets it. `isUploaded()` and `getFileInfo()` work before the INSERT too.
 - After saving, `$form->getRecordId()` returns the id of the record, of a new one as well

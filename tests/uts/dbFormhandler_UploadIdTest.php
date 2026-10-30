@@ -293,7 +293,7 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
         $form->textField("Page 2", "page2");
 
         $this->expectException(FormHandlerException::class);
-        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename and has to be on the last page of the form!');
+        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename or in resizeImage() and has to be on the last page of the form!');
 
         $form->flush(true);
     }
@@ -308,9 +308,111 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
         ]);
 
         $this->expectException(FormHandlerException::class);
-        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename, which needs a database table!');
+        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename or in resizeImage(), which needs a database table!');
 
         $form->flush(true);
+    }
+
+    /**
+     * a form whose upload keeps its name ("upload.jpg") and whose resizeImage() uses {id}
+     */
+    private function createResizeForm(): uploadIdTest_dbFormHandler
+    {
+        $form = $this->createForm(['name' => 'upload']);
+        $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30, 30);
+
+        return $form;
+    }
+
+    private function assertResized(string $file): void
+    {
+        $info = getimagesize($this->_tempPath . '/' . $file);
+        static::assertIsArray($info, "$file is no image");
+        static::assertEquals(30, $info[0]);
+    }
+
+    public function test_resize_insert(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 7, 'name' => 'old']);
+        $_POST['name'] = "new";
+
+        $form = $this->createResizeForm();
+
+        static::assertFlush($form);
+
+        // the upload without {id} waited for the INSERT too
+        static::assertSame('upload.jpg', $this->getBild(8));
+        $this->assertFiles(['spieler_8.jpg', 'upload.jpg']);
+        $this->assertResized('spieler_8.jpg');
+    }
+
+    public function test_resize_edit(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 5, 'name' => 'old']);
+        $_GET['id'] = "5";
+        $_POST['name'] = "new";
+
+        $form = $this->createResizeForm();
+
+        static::assertFlush($form);
+
+        static::assertSame('upload.jpg', $this->getBild(5));
+        $this->assertFiles(['spieler_5.jpg', 'upload.jpg']);
+        $this->assertResized('spieler_5.jpg');
+    }
+
+    public function test_resize_copy(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old']);
+        $_GET['id'] = "100";
+        $_GET['funktion'] = "copy";
+        $_POST['name'] = "copy";
+
+        $form = $this->createResizeForm();
+
+        static::assertFlush($form);
+
+        $this->assertFiles(['spieler_101.jpg', 'upload.jpg']);
+        $this->assertResized('spieler_101.jpg');
+    }
+
+    public function test_resize_insert_failed(): void
+    {
+        // no name: the NOT NULL column makes the INSERT fail
+
+        $errors = array();
+        set_error_handler(function (int $level, string $message) use (&$errors)
+        {
+            $errors[] = $message;
+            return true;
+        });
+
+        $form = new uploadIdTest_dbFormHandler();
+        $form->setConnectionResource($this->getConnection(), 'spieler');
+        $form->uploadField("Bild", "bild", [
+            "type" => "jpg",
+            "name" => "upload",
+            "path" => $this->_tempPath
+        ]);
+        $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30, 30);
+
+        $r = $form->flush(true);
+        restore_error_handler();
+
+        static::assertCount(1, $errors);
+        static::assertStringStartsWith('Error, query failed!', $errors[0]);
+        static::assertNotEmpty($r);
+        $this->assertFiles([]);
+    }
+
+    public function test_resize_formHandler(): void
+    {
+        $form = new FormHandler();
+
+        $this->expectException(FormHandlerException::class);
+        $this->expectExceptionMessage('resizeImage() of the field "bild" uses {id} in its filename, which needs a dbFormHandler!');
+
+        $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30);
     }
 
     public function test_formHandler(): void

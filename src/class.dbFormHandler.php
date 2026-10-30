@@ -889,7 +889,7 @@ class dbFormHandler extends FormHandler
         {
             foreach ($this->_getIdUploads() as $name)
             {
-                $this->_fields[$name][1]->resolveIdPlaceholder($this->getEditId());
+                $this->_resolveIdUpload($name, $this->getEditId());
             }
         }
 
@@ -918,7 +918,7 @@ class dbFormHandler extends FormHandler
                 if ($this->_fields[$name][1]->isUploaded())
                 {
                     throw new FormHandlerException(
-                        'The uploadfield "' . $name . '" uses {id} in its filename and has to be on the last page of the form!'
+                        'The uploadfield "' . $name . '" uses {id} in its filename or in resizeImage() and has to be on the last page of the form!'
                     );
                 }
             }
@@ -941,7 +941,7 @@ class dbFormHandler extends FormHandler
                     if ($this->_fields[$name][1]->isUploaded())
                     {
                         throw new FormHandlerException(
-                            'The uploadfield "' . $name . '" uses {id} in its filename, which needs a database table!'
+                            'The uploadfield "' . $name . '" uses {id} in its filename or in resizeImage(), which needs a database table!'
                         );
                     }
                 }
@@ -1652,7 +1652,8 @@ class dbFormHandler extends FormHandler
     /**
      * dbFormHandler::_getIdUploads()
      *
-     * Get the uploadfields whose filename waits for the id of the new record ({id})
+     * Get the uploadfields which wait for the id of the new record ({id} in the filename
+     * or in resizeImage())
      *
      * @return array<int, string> the names of the fields
      */
@@ -1661,13 +1662,37 @@ class dbFormHandler extends FormHandler
         $names = array();
         foreach ($this->_upload as $name)
         {
-            if ($this->_fields[$name][1]->hasIdPlaceholder())
+            if ($this->_waitsForId($name))
             {
                 $names[] = $name;
             }
         }
 
         return $names;
+    }
+
+    /**
+     * dbFormHandler::_resolveIdUpload()
+     *
+     * Replace {id} by the id of the record in the filename of the uploadfield and in the
+     * filenames of its resizeImage()
+     *
+     * @param string $name: the name of the uploadfield
+     * @param mixed $id: the id of the record
+     * @return void
+     */
+    private function _resolveIdUpload(string $name, mixed $id): void
+    {
+        // checks the id too
+        $this->_fields[$name][1]->resolveIdPlaceholder($id);
+
+        foreach ($this->_convert[$name]['resize'] ?? array() as $i => $info)
+        {
+            if (is_string($info[0]))
+            {
+                $this->_convert[$name]['resize'][$i][0] = str_replace('{id}', (string) $id, $info[0]);
+            }
+        }
     }
 
     /**
@@ -1702,7 +1727,7 @@ class dbFormHandler extends FormHandler
 
         foreach ($names as $name)
         {
-            $this->_fields[$name][1]->resolveIdPlaceholder($id);
+            $this->_resolveIdUpload($name, $id);
         }
         $this->_handleUploads($names);
 

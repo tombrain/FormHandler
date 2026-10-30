@@ -16,6 +16,10 @@ and the project follows [Semantic Versioning](https://semver.org/).
   needs a `dbFormHandler` with a table and a single primary key; otherwise it throws a
   `FormHandlerException`, as well as for an id with other characters than letters, digits,
   `_` and `-`, and for a file posted on an earlier page of a form with more pages.
+- `{id}` in the filename of `resizeImage()` (`$saveAs`) is replaced by the same id, e.g.
+  `resizeImage('bild', $dir . 'spieler_{id}.jpg', 200)`. On a new record the upload of the
+  field waits for the INSERT then, also when its own filename has no `{id}`. `FormHandler`
+  throws a `FormHandlerException` for it.
 - `dbFormHandler::getEditId()` returns the id of the edited record (`null` for a new one).
 - `dbFormHandler::getNewId()` returns the id the INSERT gave a new record (an array with
   more primary keys; `null` before the INSERT, on an edit form and when the INSERT failed).
