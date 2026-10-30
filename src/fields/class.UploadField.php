@@ -101,6 +101,14 @@ class UploadField extends Field
         $this->_oForm = $oForm;
         $this->_sName = $sName;
 
+        // {id} in the filename: the id of the record, only known by a dbFormHandler (which replaces it)
+        if ($this->hasIdPlaceholder() && !($oForm instanceof dbFormHandler))
+        {
+            throw new FormHandlerException(
+                'The uploadfield "' . $sName . '" uses {id} in its filename, which needs a dbFormHandler!'
+            );
+        }
+
         // get the value of the field
         if ($oForm->isPosted())
         {
@@ -127,8 +135,8 @@ class UploadField extends Field
                 // save the uploaded file data
                 $this->_mValue = $_FILES[$sName];
 
-                // check if there is a file uploaded...
-                if ($this->isUploaded())
+                // check if there is a file uploaded... (a filename with {id} is known later)
+                if ($this->isUploaded() && !$this->hasIdPlaceholder())
                 {
                     $this->setValue($this->_getFilename());
                 }
@@ -239,6 +247,48 @@ class UploadField extends Field
     public function getSavePath()
     {
         return $this->_aConfig['path'];
+    }
+
+    /**
+     * UploadField::hasIdPlaceholder()
+     *
+     * Does the filename (config "name") still contain {id}? Then the file waits for the id
+     * of the new record.
+     *
+     * @return bool
+     * @access public
+     */
+    public function hasIdPlaceholder(): bool
+    {
+        return is_string($this->_aConfig['name']) && strpos($this->_aConfig['name'], '{id}') !== false;
+    }
+
+    /**
+     * UploadField::resolveIdPlaceholder()
+     *
+     * Replace {id} in the filename with the id of the record (used by dbFormHandler)
+     *
+     * @param mixed $id: the id of the record
+     * @return void
+     * @access public
+     */
+    public function resolveIdPlaceholder(mixed $id): void
+    {
+        // the id can come from the URL: it must not change the path
+        if (!is_scalar($id) || !preg_match('/^[A-Za-z0-9_-]+$/', (string) $id))
+        {
+            throw new FormHandlerException(
+                'The id "' . (is_scalar($id) ? $id : gettype($id)) . '" can not be used in the filename of the uploadfield "' . $this->_sName . '"!'
+            );
+        }
+
+        $this->_aConfig['name'] = str_replace('{id}', (string) $id, $this->_aConfig['name']);
+
+        // the filename is known now
+        if ($this->isUploaded())
+        {
+            $this->setValue($this->_getFilename());
+        }
     }
 
     /**

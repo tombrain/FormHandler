@@ -113,6 +113,18 @@ class dbFormHandler extends FormHandler
         }
     }
 
+    /**
+     * dbFormHandler::getEditId()
+     *
+     * Return the id of the record which is edited (the first one when the URL has more)
+     *
+     * @return mixed the id, or null on a new record
+     */
+    public function getEditId(): mixed
+    {
+        return $this->edit && sizeof($this->_id) > 0 ? reset($this->_id) : null;
+    }
+
     /********************************************************/
     /************* FIELDS ***********************************/
     /********************************************************/
@@ -843,6 +855,16 @@ class dbFormHandler extends FormHandler
             $oAjaxValidator->CreateObservers($this, $this->_fields, $this->_customMsg);
         }
 
+        // {id} in the filename of an edit form: the id is known (not before the flush, a copy
+        // of a record changes to an insert form here). A new record gets it after the INSERT.
+        if ($this->edit)
+        {
+            foreach ($this->_getIdUploads() as $name)
+            {
+                $this->_fields[$name][1]->resolveIdPlaceholder($this->getEditId());
+            }
+        }
+
         // when the form is not posted or the form is not valid
         if (!$this->isPosted() || !$this->isCorrect())
         {
@@ -862,6 +884,17 @@ class dbFormHandler extends FormHandler
         // when the form is not totaly completed yet (multiple pages)
         else if ($this->_curPage < $this->_pageCounter)
         {
+            // a file waiting for {id} can not be kept until the last page
+            foreach ($this->_getIdUploads() as $name)
+            {
+                if ($this->_fields[$name][1]->isUploaded())
+                {
+                    throw new FormHandlerException(
+                        'The uploadfield "' . $name . '" uses {id} in its filename and has to be on the last page of the form!'
+                    );
+                }
+            }
+
             // upload and convert uploads
             $this->_handleUploads();
 
@@ -871,7 +904,22 @@ class dbFormHandler extends FormHandler
         // when the form is valid
         else
         {
-            // upload and convert uploads
+            // a file waiting for {id} needs the INSERT
+            $idUploads = $this->_getIdUploads();
+            if (is_null($this->_db) || empty($this->_table))
+            {
+                foreach ($idUploads as $name)
+                {
+                    if ($this->_fields[$name][1]->isUploaded())
+                    {
+                        throw new FormHandlerException(
+                            'The uploadfield "' . $name . '" uses {id} in its filename, which needs a database table!'
+                        );
+                    }
+                }
+            }
+
+            // upload and convert uploads (the ones waiting for {id} after the INSERT)
             $this->_handleUploads();
 
             // generate the data array
@@ -921,6 +969,12 @@ class dbFormHandler extends FormHandler
                     if (is_array($id) && sizeof($id) == 1) // @phpstan-ignore-line (Call to function is_array() with int<min, -2>|int<0, max> will always evaluate to false.)
                     {
                         $id = $id[0];
+                    }
+
+                    // the filenames with {id} are known now
+                    foreach ($idUploads as $name)
+                    {
+                        $data[$name] = $this->_fields[$name][1]->getValue();
                     }
 
                     // call the onsaved function
@@ -1538,6 +1592,9 @@ class dbFormHandler extends FormHandler
                     $size = sizeof($result);
                     $return = ($size > 1) ? $result : ($size == 1 ? $result[0] : null);
                 }
+
+                // the id of the new record is known: upload the files with {id} in their filename
+                $this->_handleIdUploads($return);
             }
         }
 
@@ -1559,6 +1616,101 @@ class dbFormHandler extends FormHandler
         unset($this->_db);
 
         return $return;
+    }
+
+    /**
+     * dbFormHandler::_getIdUploads()
+     *
+     * Get the uploadfields whose filename waits for the id of the new record ({id})
+     *
+     * @return array<int, string> the names of the fields
+     */
+    private function _getIdUploads(): array
+    {
+        $names = array();
+        foreach ($this->_upload as $name)
+        {
+            if ($this->_fields[$name][1]->hasIdPlaceholder())
+            {
+                $names[] = $name;
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * dbFormHandler::_handleIdUploads()
+     *
+     * Replace {id} by the id of the new record, upload and convert these files and save
+     * their filenames in the record
+     *
+     * @param mixed $id: the id of the new record
+     * @return void
+     */
+    private function _handleIdUploads(mixed $id): void
+    {
+        $names = $this->_getIdUploads();
+        if (sizeof($names) == 0)
+        {
+            return;
+        }
+
+        // one primary key is needed
+        if (is_array($id))
+        {
+            $id = sizeof($id) == 1 ? reset($id) : null;
+        }
+        if (is_null($id) || $id === '' || $id === 0 || $id === '0')
+        {
+            throw new FormHandlerException(
+                'The id of the new record is unknown, {id} can not be used in the filename of the uploadfield "' .
+                    implode('", "', $names) . '"!'
+            );
+        }
+
+        foreach ($names as $name)
+        {
+            $this->_fields[$name][1]->resolveIdPlaceholder($id);
+        }
+        $this->_handleUploads($names);
+
+        // the INSERT did not know the filenames: save them in their columns
+        $fieldNames = $this->_db->getFieldNames($this->_table);
+        $set = array();
+        foreach ($names as $name)
+        {
+            $fld = $this->_fields[$name][1];
+            if ($fld->isUploaded() && in_array($name, $fieldNames) && !in_array($name, $this->_dontSave) && !$fld->getViewMode())
+            {
+                $set[] = $this->_db->quote($name) . " = '" . $this->_db->escapeString($fld->getValue()) . "'";
+            }
+        }
+        if (sizeof($set) == 0)
+        {
+            return;
+        }
+
+        $keys = $this->_db->getPrKeys($this->_table);
+        if (sizeof($keys) == 0)
+        {
+            trigger_error('Could not save the filename: the table ' . $this->_table . ' has no primary key', E_USER_WARNING);
+            return;
+        }
+
+        $query =
+            'UPDATE ' . $this->_db->quote($this->_table) . ' SET ' . implode(', ', $set) .
+            ' WHERE ' . $this->_db->quote($keys[0]) . " = '" . $this->_db->escapeString((string) $id) . "'";
+
+        if (!$this->_db->query($query))
+        {
+            trigger_error(
+                "Error, query failed!<br />\n" .
+                    "<b>Error message:</b> " . $this->_db->getError() . "<br />\n" .
+                    "<b>Query:</b> " . $query,
+                E_USER_WARNING
+            );
+        }
     }
 
     /**

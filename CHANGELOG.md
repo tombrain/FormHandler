@@ -4,6 +4,20 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [4.8.0] - unreleased
+
+### Added
+
+- `{id}` in the `name` of the upload config of `uploadField()` is replaced by the id of the
+  record, e.g. `'name' => 'spieler_{id}'`. An edit form uses the id from the URL. A new
+  record uploads the file after the INSERT with the id from `getInsertId()` and then saves
+  the filename in the column of the field (an UPDATE); when the INSERT fails, no file is
+  moved. `onCorrect` gets an empty filename for a new record, `onSaved` the real one. It
+  needs a `dbFormHandler` with a table and a single primary key; otherwise it throws a
+  `FormHandlerException`, as well as for an id with other characters than letters, digits,
+  `_` and `-`, and for a file posted on an earlier page of a form with more pages.
+- `dbFormHandler::getEditId()` returns the id of the edited record (`null` for a new one).
+
 ## [4.7.0] - 2026-10-30
 
 ### Added

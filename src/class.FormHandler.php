@@ -3681,14 +3681,30 @@ class FormHandler
      *
      * Private: method to handle the uploads and image convertions
      *
+     * @param array<int, string>|null $names: only upload and convert these uploadfields
+     *                                        (null: all, except the ones waiting for {id})
      * @return void
      * @access public
      * @author Teye Heimans
      */
-    protected function _handleUploads()
+    protected function _handleUploads($names = null)
     {
+        $all = is_null($names);
+        if ($all)
+        {
+            // a filename with {id} waits for the id of the new record (see dbFormHandler)
+            $names = array();
+            foreach ($this->_upload as $name)
+            {
+                if (!$this->_fields[$name][1]->hasIdPlaceholder())
+                {
+                    $names[] = $name;
+                }
+            }
+        }
+
         // upload the uploaded files
-        foreach ($this->_upload as $name)
+        foreach ($names as $name)
         {
             $this->_fields[$name][1]->doUpload();
         }
@@ -3696,6 +3712,12 @@ class FormHandler
         // walk all convert actions for the upload fields
         foreach ($this->_convert as $field => $convertions)
         {
+            // only the convertions of the handled uploadfields (and of files, when all are handled)
+            if (in_array($field, $this->_upload) ? !in_array($field, $names) : !$all)
+            {
+                continue;
+            }
+
             // walk all convertions for this field
             foreach ($convertions as $action => $data)
             {
