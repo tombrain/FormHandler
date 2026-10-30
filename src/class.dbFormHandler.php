@@ -33,6 +33,8 @@ class dbFormHandler extends FormHandler
     protected $_table;
     /** name of the primary key to edit (set by setEditName() in the constructor) */
     private string $_editName = '';
+    /** the id the INSERT gave the new record (an array with more primary keys) */
+    private mixed $_newId = null;
 
     // public
     /** @var bool if the form is an insert-form */
@@ -123,6 +125,32 @@ class dbFormHandler extends FormHandler
     public function getEditId(): mixed
     {
         return $this->edit && sizeof($this->_id) > 0 ? reset($this->_id) : null;
+    }
+
+    /**
+     * dbFormHandler::getNewId()
+     *
+     * Return the id the INSERT gave the new record
+     *
+     * @return mixed the id (an array with more primary keys), or null before the INSERT,
+     *               on an edit form and when the INSERT failed
+     */
+    public function getNewId(): mixed
+    {
+        return $this->_newId;
+    }
+
+    /**
+     * dbFormHandler::getRecordId()
+     *
+     * Return the id of the record the form works on: the new one after the INSERT,
+     * otherwise the edited one
+     *
+     * @return mixed the id, or null for a new record which is not saved yet
+     */
+    public function getRecordId(): mixed
+    {
+        return $this->getNewId() ?? $this->getEditId();
     }
 
     /********************************************************/
@@ -1592,6 +1620,9 @@ class dbFormHandler extends FormHandler
                     $size = sizeof($result);
                     $return = ($size > 1) ? $result : ($size == 1 ? $result[0] : null);
                 }
+
+                // remember the id for getNewId(), already for what is called from here on
+                $this->_newId = $return;
 
                 // the id of the new record is known: upload the files with {id} in their filename
                 $this->_handleIdUploads($return);

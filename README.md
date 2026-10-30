@@ -182,6 +182,8 @@ function spielerSaved($id, $data, $form)
   moved.
 - `onCorrect` runs before the INSERT: for a new record the filename is still empty there,
   `onSaved` gets it. `isUploaded()` and `getFileInfo()` work before the INSERT too.
+- After saving, `$form->getRecordId()` returns the id of the record, of a new one as well
+  as of an edited one (`getNewId()` only the id of the INSERT).
 - `'exists'` is used for the filename with the id. `'alert'` (the default) can not warn
   on a new record, the filename is not known while the form is checked; use `'overwrite'`
   or `'rename'`.

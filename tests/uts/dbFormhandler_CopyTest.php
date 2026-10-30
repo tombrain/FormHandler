@@ -78,4 +78,24 @@ final class dbFormhandler_CopyTest extends dbFormhandlerTestCase
         $this->assertRecord(100, ['textNullable' => 'text1', 'textNotNullable' => 'text2']);
         $this->assertRecord(101, ['textNullable' => 'copy1', 'textNotNullable' => 'copy2']);
     }
+
+    public function test_copy_newId(): void
+    {
+        $this->insertRecord(['id' => 100, 'textNullable' => 'text1', 'textNotNullable' => 'text2']);
+
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['textNullable'] = "copy1";
+        $_GET['id'] = "100";
+        $_GET['funktion'] = "copy";
+
+        $form = new copyTest_dbFormHandler();
+        $this->setConnectedTable($form, "test");
+
+        $form->textField("TextNullable", "textNullable");
+
+        static::assertFlush($form);
+
+        static::assertEquals(101, $form->getNewId());
+        static::assertEquals(101, $form->getRecordId());
+    }
 }

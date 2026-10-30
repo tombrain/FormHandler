@@ -17,6 +17,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
   `FormHandlerException`, as well as for an id with other characters than letters, digits,
   `_` and `-`, and for a file posted on an earlier page of a form with more pages.
 - `dbFormHandler::getEditId()` returns the id of the edited record (`null` for a new one).
+- `dbFormHandler::getNewId()` returns the id the INSERT gave a new record (an array with
+  more primary keys; `null` before the INSERT, on an edit form and when the INSERT failed).
+  It is set right after the INSERT, so `onSaved` can use it already. `getRecordId()`
+  returns the id of the record the form works on: `getNewId() ?? getEditId()`. Projects
+  no longer have to override `_saveDbData()` to remember the id.
 
 ## [4.7.0] - 2026-10-30
 
