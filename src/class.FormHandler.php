@@ -1317,13 +1317,8 @@ class FormHandler
             $name = $this->_getNewButtonName();
         }
 
-        if (!$url)
-        {
-            $url = 'history.back(-1)';
-        }
-
         // where to go when the button is clicked...
-        $extra .= preg_match('/history/', $url) ? ' onclick="' . $url . '"' : ' onclick="document.location.href=\'' . $url . '\'"';
+        $extra .= ' onclick="' . htmlspecialchars($this->_getCancelScript($url), ENT_QUOTES) . '"';
 
         // if no caption is given, get our own caption
         if (is_null($caption))
@@ -1338,6 +1333,44 @@ class FormHandler
 
         // register the button
         $this->_registerField($name, $btn);
+    }
+
+    /**
+     * FormHandler::_getCancelScript()
+     *
+     * Get the javascript of a cancelButton: go to the URL, or one page back
+     *
+     * @param string|null $url: the URL, or a history call like "history.back(-1)"
+     * @return string the javascript (not escaped for the HTML attribute yet)
+     */
+    private function _getCancelScript(?string $url): string
+    {
+        $back = 'history.back(-1)';
+        if (empty($url))
+        {
+            return $back;
+        }
+
+        // a history call is javascript
+        if (preg_match('/^history\.(back|go)\(\s*-?\d*\s*\);?$/', trim($url)))
+        {
+            return trim($url);
+        }
+
+        // the URL from a HTML link: &amp; is &
+        $url = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // only http and https (javascript:, data:, ... go back); the browser ignores
+        // whitespace and control characters, e.g. in "java\tscript:"
+        if (preg_match('/^([a-z][a-z0-9+.\-]*):/i', preg_replace('/[\x00-\x20]+/', '', $url), $match) &&
+            !in_array(strtolower($match[1]), array('http', 'https'))
+        )
+        {
+            return $back;
+        }
+
+        return 'document.location.href=' .
+            json_encode($url, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**

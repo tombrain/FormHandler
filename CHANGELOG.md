@@ -27,6 +27,15 @@ and the project follows [Semantic Versioning](https://semver.org/).
   returns the id of the record the form works on: `getNewId() ?? getEditId()`. Projects
   no longer have to override `_saveDbData()` to remember the id.
 
+### Security
+
+- `cancelButton()` escapes its URL: it is put into the javascript as a JSON string and the
+  `onclick` attribute is HTML escaped, so a URL from the request with `'` or `"` can not
+  break out any more. `&amp;` (from a HTML link) is decoded first. A URL with another
+  scheme than `http`/`https` (e.g. `javascript:`, `data:`) goes back in the history, like a
+  button without a URL. Only a history call such as `history.back(-1)` or `history.go(-2)`
+  is used as javascript; before, every URL containing "history" was (e.g. `/history/x.php`).
+
 ## [4.7.0] - 2026-10-30
 
 ### Added

@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+use PHPUnit\Framework\Attributes\DataProvider;
+
 final class formhandler_ButtonsTest extends FormhandlerTestCase
 {
     public function test_button(): void
@@ -109,10 +111,45 @@ final class formhandler_ButtonsTest extends FormhandlerTestCase
         static::assertFormFlushContains($form, [
             '<input type="button" name="button1" id="button1" value="Cancel"  onclick="history.back(-1)" />error_button1',
             '<input type="button" name="button2" id="button2" value="CancelButton"  onclick="history.back(-1)" />error_button2',
-            '<input type="button" name="button3" id="button3" value="Cancel"  onclick="document.location.href=\'backurl\'" />error_button3',
+            '<input type="button" name="button3" id="button3" value="Cancel"  onclick="document.location.href=&quot;backurl&quot;" />error_button3',
             '<input type="button" name="cancelbutton" id="cancelbutton" value="Cancel"  onclick="history.back(-1)" />error_cancelbutton',
             '<input type="button" name="button4" id="button4" value="Cancel" data-old="123" onclick="history.back(-1)" />error_button4'
         ]);
+    }
+
+    /**
+     * @return array<string, array{0: string|null, 1: string}>
+     */
+    public static function cancelUrlProvider(): array
+    {
+        return [
+            'no url'           => [null, 'history.back(-1)'],
+            'relative url'     => ['list.php', 'document.location.href=&quot;list.php&quot;'],
+            'absolute url'     => ['https://example.com/a/b', 'document.location.href=&quot;https://example.com/a/b&quot;'],
+            'apostrophe'       => ["list.php?q=it's", 'document.location.href=&quot;list.php?q=it\u0027s&quot;'],
+            'quote'            => ['list.php?q="x"', 'document.location.href=&quot;list.php?q=\u0022x\u0022&quot;'],
+            'html link'        => ['list.php?id=1&amp;page=2', 'document.location.href=&quot;list.php?id=1\u0026page=2&quot;'],
+            'tag'              => ['list.php?q=</script>', 'document.location.href=&quot;list.php?q=\u003C/script\u003E&quot;'],
+            'javascript'       => ['javascript:alert(1)', 'history.back(-1)'],
+            'javascript upper' => [' JavaScript:alert(1)', 'history.back(-1)'],
+            'javascript tab'   => ["java\tscript:alert(1)", 'history.back(-1)'],
+            'data'             => ['data:text/html,<script>alert(1)</script>', 'history.back(-1)'],
+            'history call'     => ['history.go(-2)', 'history.go(-2)'],
+            'history in path'  => ['/history/list.php', 'document.location.href=&quot;/history/list.php&quot;'],
+        ];
+    }
+
+    #[DataProvider('cancelUrlProvider')]
+    public function test_cancelButton_url(?string $url, string $onclick): void
+    {
+        $form = new FormHandler();
+
+        $form->cancelButton(null, $url);
+
+        static::assertFormFlushContains(
+            $form,
+            '<input type="button" name="button1" id="button1" value="Cancel"  onclick="' . $onclick . '" />error_button1'
+        );
     }
 
     public function test_backButton(): void
