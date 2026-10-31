@@ -27,6 +27,16 @@ and the project follows [Semantic Versioning](https://semver.org/).
   returns the id of the record the form works on: `getNewId() ?? getEditId()`. Projects
   no longer have to override `_saveDbData()` to remember the id.
 - `dbFormHandler::getDatabaseAdapter()` returns the database adapter of the form.
+- `dbFormHandler::setCopyOf($id)` copies a record: the form shows the record with this id
+  and saves it as a new record (an INSERT). Call it before `dbInfo()`,
+  `setConnectionResource()` and `setDatabaseAdapter()`, on every request of the form.
+  The primary keys and the files of the uploadfields are not copied (both records would
+  use the same file), the values of the junction tables are. `isCopy()` and
+  `getCopyOfId()` tell if and which record is copied; `getEditId()` is `null` for a copy,
+  `getNewId()` and `getRecordId()` return the id of the new record after saving. Unique
+  fields are checked like on a new record. A record which does not exist throws a
+  `FormHandlerException`. Projects no longer have to change `$insert`, `$edit` and `$_id`
+  themselves.
 
 ### Changed
 

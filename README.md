@@ -150,6 +150,22 @@ this page".
   with `fh_conf('FH_CSRF_PROTECTION', false)` before the first form is created (the
   `fh_conf()` values become constants then).
 
+**Copy a record** (4.8). `setCopyOf()` shows a record and saves it as a new one:
+
+```php
+$form = new dbFormHandler();
+if (($_GET['funktion'] ?? '') == 'copy')
+{
+    $form->setCopyOf($_GET['id']);   // before dbInfo() / setConnectionResource()
+}
+$form->setConnectionResource($conn, 'news');
+```
+
+Call it on every request of the form, also when it is posted. The primary key and the
+files of the uploadfields are not copied, the values of the junction tables are.
+`isCopy()` and `getCopyOfId()` tell if and which record is copied, `getEditId()` is
+`null`, and after saving `getRecordId()` returns the id of the new record.
+
 **The database after saving** (4.8). `$form->getDatabaseAdapter()` returns the
 `DatabaseAdapter` of a `dbFormHandler`, also after `flush()` saved the record; before 4.8
 it was unset after saving.

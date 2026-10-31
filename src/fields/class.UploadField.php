@@ -144,7 +144,7 @@ class UploadField extends Field
                 {
                     // if this is an edit form and no value is given to the field,
                     // keep the existing value thats in the database
-                    if (isset($oForm->edit) && $oForm->edit && isset($oForm->_dbData[$sName]))
+                    if ($this->_loadsRecord() && isset($oForm->_dbData[$sName]))
                     {
                         $this->setValue($oForm->_dbData[$sName]);
                     }
@@ -156,7 +156,7 @@ class UploadField extends Field
                 $this->setValue($_POST[$sName]);
             }
             // edit form?
-            elseif ((isset($oForm->edit) && $oForm->edit))
+            elseif ($this->_loadsRecord())
             {
                 // value known from the database?
                 if (isset($oForm->_dbData[$sName]))
@@ -166,7 +166,7 @@ class UploadField extends Field
             }
         }
         // load database value if exists
-        elseif ((isset($oForm->edit) && $oForm->edit))
+        elseif ($this->_loadsRecord())
         {
             if (isset($oForm->_dbData[$sName]))
             {
@@ -175,7 +175,7 @@ class UploadField extends Field
         }
 
         // if no file is uploaded and it is a edit form, dont overwrite the current value
-        if (!$this->isUploaded() && (isset($oForm->edit) && $oForm->edit) && $oForm->isPosted())
+        if (!$this->isUploaded() && $this->_loadsRecord() && $oForm->isPosted())
         {
             if (property_exists($this->_oForm, '_dontSave'))
             {
@@ -233,6 +233,20 @@ class UploadField extends Field
     public function setValue($sFilename)
     {
         $this->_sFilename = $sFilename;
+    }
+
+    /**
+     * UploadField::_loadsRecord()
+     *
+     * Return if the field keeps the filename of the record: on an edit form, but not on a
+     * copy of a record (both records would use the same file)
+     *
+     * @return bool
+     */
+    private function _loadsRecord(): bool
+    {
+        return isset($this->_oForm->edit) && $this->_oForm->edit &&
+            !($this->_oForm instanceof dbFormHandler && $this->_oForm->isCopy());
     }
 
     /**

@@ -19,20 +19,10 @@ class uploadIdTest_UploadField extends UploadField
 }
 
 /**
- * A form whose uploadField() creates an uploadIdTest_UploadField, and which copies a
- * record like the projects do (?id=...&funktion=copy, see dbFormhandler_CopyTest)
+ * A form whose uploadField() creates an uploadIdTest_UploadField
  */
 class uploadIdTest_dbFormHandler extends dbFormHandler
 {
-    private bool $_isCopy = false;
-
-    public function __construct($name = null, $action = null, $extra = null)
-    {
-        parent::__construct($name, $action, $extra);
-
-        $this->_isCopy = isset($_GET['funktion']) && $_GET['funktion'] == "copy";
-    }
-
     public function uploadField($title, $name, $config = array(), $validator = null, $extra = null, $alertOverwrite = null)
     {
         $fld = new uploadIdTest_UploadField($this, $name, $config);
@@ -43,18 +33,6 @@ class uploadIdTest_dbFormHandler extends dbFormHandler
 
         $this->_registerField($name, $fld, $title);
         $this->_upload[] = $name;
-    }
-
-    public function flush($return = false)
-    {
-        if ($this->_isCopy)
-        {
-            $this->_id = array();
-            $this->insert = true;
-            $this->edit = false;
-        }
-
-        return parent::flush($return);
     }
 }
 
@@ -108,9 +86,13 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
     /**
      * a form for the table "spieler" with the uploadfield "bild" (posted with test.jpg)
      */
-    private function createForm(array $config = array()): uploadIdTest_dbFormHandler
+    private function createForm(array $config = array(), mixed $copyOf = null): uploadIdTest_dbFormHandler
     {
         $form = new uploadIdTest_dbFormHandler();
+        if (!is_null($copyOf))
+        {
+            $form->setCopyOf($copyOf);
+        }
         $form->setConnectionResource($this->getConnection(), 'spieler');
 
         $form->textField("Name", "name");
@@ -259,11 +241,9 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
     {
         $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'spieler_100.jpg']);
         static::assertTrue(file_put_contents("{$this->_tempPath}/spieler_100.jpg", 'original') > 0);
-        $_GET['id'] = "100";
-        $_GET['funktion'] = "copy";
         $_POST['name'] = "copy";
 
-        $form = $this->createForm();
+        $form = $this->createForm(array(), 100);
 
         static::assertFlush($form);
 
@@ -272,6 +252,37 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
         static::assertSame('spieler_100.jpg', $this->getBild(100));
         static::assertSame('original', file_get_contents("{$this->_tempPath}/spieler_100.jpg"));
         $this->assertFiles(['spieler_100.jpg', 'spieler_101.jpg']);
+    }
+
+    public function test_copy_withoutFile(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'spieler_100.jpg']);
+        static::assertTrue(file_put_contents("{$this->_tempPath}/spieler_100.jpg", 'original') > 0);
+        $_POST['name'] = "copy";
+        $_FILES['bild'] = ['error' => UPLOAD_ERR_NO_FILE, 'name' => '', 'size' => 0, 'tmp_name' => '', 'type' => ''];
+
+        $form = $this->createForm(array('name' => 'spieler'), 100);
+
+        // the copy does not take the file of the original (both records would use it)
+        static::assertSame('', $form->getValue('bild'));
+
+        static::assertFlush($form);
+
+        static::assertNull($this->getBild(101));
+        static::assertSame('spieler_100.jpg', $this->getBild(100));
+        $this->assertFiles(['spieler_100.jpg']);
+    }
+
+    public function test_copy_showsNoFile(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'spieler_100.jpg']);
+        unset($_POST['FormHandler_submit']);
+        $_FILES = array();
+
+        $form = $this->createForm(array(), 100);
+
+        static::assertSame('', $form->getValue('bild'));
+        static::assertStringNotContainsString('spieler_100.jpg', (string) $form->flush(true));
     }
 
     public function test_invalidId(): void
@@ -316,9 +327,9 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
     /**
      * a form whose upload keeps its name ("upload.jpg") and whose resizeImage() uses {id}
      */
-    private function createResizeForm(): uploadIdTest_dbFormHandler
+    private function createResizeForm(mixed $copyOf = null): uploadIdTest_dbFormHandler
     {
-        $form = $this->createForm(['name' => 'upload']);
+        $form = $this->createForm(['name' => 'upload'], $copyOf);
         $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30, 30);
 
         return $form;
@@ -364,11 +375,9 @@ final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
     public function test_resize_copy(): void
     {
         $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old']);
-        $_GET['id'] = "100";
-        $_GET['funktion'] = "copy";
         $_POST['name'] = "copy";
 
-        $form = $this->createResizeForm();
+        $form = $this->createResizeForm(100);
 
         static::assertFlush($form);
 

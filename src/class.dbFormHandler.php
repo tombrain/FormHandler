@@ -35,6 +35,8 @@ class dbFormHandler extends FormHandler
     private string $_editName = '';
     /** the id the INSERT gave the new record (an array with more primary keys) */
     private mixed $_newId = null;
+    /** @var array<int, mixed>|null the id(s) of the record which is copied (setCopyOf()) */
+    private ?array $_copyOf = null;
 
     // public
     /** @var bool if the form is an insert-form */
@@ -78,6 +80,12 @@ class dbFormHandler extends FormHandler
      */
     private function initFHEditName(): void
     {
+        // a copy does not use the id from the URL
+        if ($this->isCopy())
+        {
+            return;
+        }
+
         // initialisation
         $this->insert = !isset($_GET[$this->_editName]);
         $this->edit   = !$this->insert;
@@ -124,7 +132,66 @@ class dbFormHandler extends FormHandler
      */
     public function getEditId(): mixed
     {
-        return $this->edit && sizeof($this->_id) > 0 ? reset($this->_id) : null;
+        return $this->edit && !$this->isCopy() && sizeof($this->_id) > 0 ? reset($this->_id) : null;
+    }
+
+    /**
+     * dbFormHandler::setCopyOf()
+     *
+     * Copy a record: the form shows the record with the given id and saves it as a new
+     * record. The primary keys and the files of the uploadfields are not copied, the
+     * values of the junction tables are. Until flush() the form loads the values like an
+     * edit form ($edit is true), flush() saves them with an INSERT.
+     *
+     * Call it before dbInfo(), setConnectionResource() and setDatabaseAdapter(), on every
+     * request of the form (also when it is posted).
+     *
+     * @param mixed $id the id of the record (an array with more primary keys)
+     * @return void
+     */
+    public function setCopyOf(mixed $id): void
+    {
+        if (isset($this->_table) || isset($this->_db))
+        {
+            throw new FormHandlerException(
+                'setCopyOf() has to be called before dbInfo(), setConnectionResource() and setDatabaseAdapter()!'
+            );
+        }
+
+        $ids = is_array($id) ? array_values($id) : array($id);
+        if (sizeof($ids) == 0 || in_array(null, $ids, true) || in_array('', $ids, true))
+        {
+            throw new FormHandlerException('setCopyOf() needs the id of the record to copy!');
+        }
+
+        $this->_copyOf = $ids;
+        $this->_id     = $ids;
+        $this->insert  = true;
+        $this->edit    = true;
+    }
+
+    /**
+     * dbFormHandler::isCopy()
+     *
+     * Return if the form copies a record (setCopyOf())
+     *
+     * @return bool
+     */
+    public function isCopy(): bool
+    {
+        return !is_null($this->_copyOf);
+    }
+
+    /**
+     * dbFormHandler::getCopyOfId()
+     *
+     * Return the id of the record which is copied (the first one when it has more)
+     *
+     * @return mixed the id, or null when the form does not copy a record
+     */
+    public function getCopyOfId(): mixed
+    {
+        return $this->isCopy() ? reset($this->_copyOf) : null;
     }
 
     /**
@@ -895,8 +962,15 @@ class dbFormHandler extends FormHandler
             $oAjaxValidator->CreateObservers($this, $this->_fields, $this->_customMsg);
         }
 
-        // {id} in the filename of an edit form: the id is known (not before the flush, a copy
-        // of a record changes to an insert form here). A new record gets it after the INSERT.
+        // a copy has loaded the record like an edit form, it is saved as a new record
+        if ($this->isCopy())
+        {
+            $this->_id  = array();
+            $this->edit = false;
+        }
+
+        // {id} in the filename of an edit form: the id is known. A new record (and a copy)
+        // gets it after the INSERT.
         if ($this->edit)
         {
             foreach ($this->_getIdUploads() as $name)
@@ -1243,7 +1317,8 @@ class dbFormHandler extends FormHandler
                         continue;
                     }
 
-                    $where = $this->_getWhereClause('<>', $extra);
+                    // a copy (before flush()) is a new record: no record is excluded
+                    $where = $this->_getWhereClause('<>', $extra, '=', $this->isCopy() ? array() : null);
 
                     // is there a selection filter ?
                     if (sizeof($extra) > 0)
@@ -1393,6 +1468,15 @@ class dbFormHandler extends FormHandler
                 if (count($this->_dbData) == 0)
                 {
                     $this->_dbData = $this->_db->getRecord($sql);
+
+                    // a copy gets its own primary key
+                    if ($this->isCopy())
+                    {
+                        foreach ($this->_db->getPrKeys($this->_table) as $key)
+                        {
+                            unset($this->_dbData[$key]);
+                        }
+                    }
                 }
 
                 if ($this->edit)
@@ -1413,6 +1497,11 @@ class dbFormHandler extends FormHandler
                         $this->setValue($fields[0], $values);
                     }
                 }
+            }
+            // the record to copy has to exist
+            else if ($this->isCopy())
+            {
+                throw new FormHandlerException('Try to copy a none existing record!');
             }
             // no records found, auto insert ?
             else if (FH_AUTO_INSERT)
@@ -1905,17 +1994,18 @@ class dbFormHandler extends FormHandler
      * @param string $operator The operator used for the primary key's and their values
      * @param array<string, mixed> $extra: extra where clause arguments
      * @param string $extraOperator: operator used for the extra arguments
+     * @param array<int, mixed>|null $record: the primary key values (default the ones of the record)
      * @return string
      * @access public
      * @author Teye Heimans
      */
-    private function _getWhereClause(string $operator = '=', array $extra = array(), string $extraOperator = '='): string
+    private function _getWhereClause(string $operator = '=', array $extra = array(), string $extraOperator = '=', ?array $record = null): string
     {
         // get the primary key fields from the table
         $keys = $this->_db->getPrKeys($this->_table);
 
         // get the values for the key fields
-        $record = $this->_id;
+        $record = $record ?? $this->_id;
 
         // walk untill the field's or values are all handled
         $size1 = sizeof($record);
