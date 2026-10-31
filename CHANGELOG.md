@@ -37,6 +37,13 @@ and the project follows [Semantic Versioning](https://semver.org/).
   fields are checked like on a new record. A record which does not exist throws a
   `FormHandlerException`. Projects no longer have to change `$insert`, `$edit` and `$_id`
   themselves.
+- `FormHandler::joinNextFields($count, $separator = ' ')` shows the next fields in one row
+  of the mask, e.g. a select field and a text field. The title, help and value of the
+  first field fill the mask, the fields are put together with the separator (HTML), and
+  the error messages of all of them are shown. Hidden fields are not counted; HTML, a
+  line, a fieldset, a new mask or page ends the row earlier. The row uses the mask once,
+  so a mask set with `setMask()` applies to the fields after it as before. Projects no
+  longer have to change `%field%` in the mask themselves.
 
 ### Changed
 

@@ -1753,6 +1753,29 @@ class FormHandler
     }
 
     /**
+     * FormHandler::joinNextFields()
+     *
+     * Show the next fields in one row of the mask: the title, help and value of the
+     * first field are used, the fields are put together with the separator and the error
+     * messages of all of them are shown. Hidden fields are not counted. HTML, a line, a
+     * fieldset, a new mask or page ends the row earlier. The mask is used once for the
+     * row, so the mask of the fields after it is the same as without joined fields.
+     *
+     * @param int $count: the number of fields (at least 2)
+     * @param string $separator: the HTML between the fields
+     * @return void
+     */
+    public function joinNextFields(int $count, string $separator = ' '): void
+    {
+        if ($count < 2)
+        {
+            throw new FormHandlerException('joinNextFields() needs at least 2 fields!');
+        }
+
+        $this->_fields[] = array('__JOIN__', array($count, $separator));
+    }
+
+    /**
      * Get the file contents by including it, to enable parsing of php files
      *
      * @param string $sFilename : the file to get/parse
@@ -3884,6 +3907,53 @@ class FormHandler
     }
 
     /**
+     * FormHandler::_fillRow()
+     *
+     * Fill the mask with the values of a field (or of joined fields) and return the HTML
+     * when the mask is full
+     *
+     * @param MaskLoader $mask: the mask loader
+     * @param array<int, mixed> $replace: the values for the search strings of the mask
+     * @param bool $hasError: if the field has an error message
+     * @param bool|int $repeat: if the mask is repeated (an integer is counted down)
+     * @return string the HTML, empty when the mask is not full yet
+     */
+    private function _fillRow(MaskLoader $mask, array $replace, bool $hasError, bool|int &$repeat): string
+    {
+        // fill the mask
+        $html = $mask->fill($replace);
+
+        // added 07-01-2009 in order to specify which element should get the error class
+        if ($this->isPosted() == true and $hasError)
+        {
+            $html = $this->parse_error_style($html);
+        }
+        else
+        {
+            $html = str_replace('%error_style%', '', $html);
+        }
+
+        // is the mask filled ?
+        if (!$html)
+        {
+            return '';
+        }
+
+        // if we don't have to repeat the current mask, use the original
+        if (!$repeat)
+        {
+            $this->_mask = FH_DEFAULT_ROW_MASK;
+        }
+        // if we have to repeat the mask, repeat it and countdown
+        else if (is_numeric($repeat))
+        {
+            $repeat--;
+        }
+
+        return str_replace('____FH-percent____', '%', $html);
+    }
+
+    /**
      * FormHandler::_getForm()
      *
      * Private: get the form
@@ -3957,6 +4027,7 @@ class FormHandler
         $buffer = array();
         $repeat = true;
         $page   = 1;
+        $join   = null;
 
         // start a new mask loader
         $mask   = new MaskLoader();
@@ -3978,8 +4049,31 @@ class FormHandler
         // walk trought the fields array
         foreach ($this->_fields as $id => $field)
         {
+            // HTML, a fieldset, a new mask or page ends a row of joined fields
+            if (!is_null($join) && in_array($field[0], array('__PAGE__', '__MASK__', '__JOIN__', '__HTML__', '__LINE__', '__FIELDSET__', '__FIELDSET-END__'), true))
+            {
+                if (!is_null($join['replace']))
+                {
+                    $form .= $this->_fillRow($mask, $join['replace'], $join['error'], $repeat);
+                }
+                $join = null;
+            }
+
             switch ($field[0])
             {
+                    // the next fields share a row
+                case '__JOIN__':
+                    if ($page == $iDisplayPage)
+                    {
+                        $join = array(
+                            'count'     => $field[1][0],
+                            'separator' => $field[1][1],
+                            'replace'   => null,
+                            'error'     => false
+                        );
+                    }
+                    break;
+
                     // multiple pages in this form
                 case '__PAGE__':
                     # why did we stop at the current page ?
@@ -4191,39 +4285,42 @@ class FormHandler
                             /* %help%      */ $help
                         );
 
-                        // fill the mask
-                        $html = $mask->fill($replace);
-
-                        // added 07-01-2009 in order to specify which element should get the error class
-                        if ($this->isPosted() == true and $error != '')
+                        // joined fields (joinNextFields()): the first one fills the mask,
+                        // the others only add their field and error message
+                        if (!is_null($join))
                         {
-                            $html = $this->parse_error_style($html);
-                        }
-                        else
-                        {
-                            $html = str_replace('%error_style%', '', $html);
-                        }
-
-                        // is the mask filled ?
-                        if ($html)
-                        {
-                            // add it the the form HTML
-                            $form .= str_replace('____FH-percent____', '%', $html);
-
-                            // if we don't have to repeat the current mask, use the original
-                            if (!$repeat)
+                            if (is_null($join['replace']))
                             {
-                                $this->_mask = FH_DEFAULT_ROW_MASK;
+                                $join['replace'] = $replace;
                             }
-                            // if we have to repeat the mask, repeat it and countdown
-                            else if (is_numeric($repeat))
+                            else
                             {
-                                $repeat--;
+                                $join['replace'][0] .= str_replace('%', '____FH-percent____', $join['separator']) . $fld;
+                                $join['replace'][1] .= ($join['replace'][1] != '' && $error != '' ? ' ' : '') . $error;
                             }
+                            $join['error'] = $join['error'] || $error != '';
+
+                            // wait for the next field of the row
+                            if (--$join['count'] > 0)
+                            {
+                                break;
+                            }
+
+                            $form .= $this->_fillRow($mask, $join['replace'], $join['error'], $repeat);
+                            $join = null;
+                            break;
                         }
+
+                        $form .= $this->_fillRow($mask, $replace, $error != '', $repeat);
                     }
                     break;
             }
+        }
+
+        // a row of joined fields with fewer fields than said
+        if (!is_null($join) && !is_null($join['replace']))
+        {
+            $form .= $this->_fillRow($mask, $join['replace'], $join['error'], $repeat);
         }
 
         // add the page number to the forms HTML

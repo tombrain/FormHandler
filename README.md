@@ -166,6 +166,15 @@ files of the uploadfields are not copied, the values of the junction tables are.
 `isCopy()` and `getCopyOfId()` tell if and which record is copied, `getEditId()` is
 `null`, and after saving `getRecordId()` returns the id of the new record.
 
+**More fields in one row** (4.8). `joinNextFields()` puts the next fields into one row of
+the mask, with the title and help of the first one and the error messages of all:
+
+```php
+$form->joinNextFields(2, ' / ');
+$form->selectField('Opponent', 'gegner', $gegner);
+$form->textField('Team', 'team');
+```
+
 **The database after saving** (4.8). `$form->getDatabaseAdapter()` returns the
 `DatabaseAdapter` of a `dbFormHandler`, also after `flush()` saved the record; before 4.8
 it was unset after saving.
