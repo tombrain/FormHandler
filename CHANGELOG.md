@@ -26,6 +26,13 @@ and the project follows [Semantic Versioning](https://semver.org/).
   It is set right after the INSERT, so `onSaved` can use it already. `getRecordId()`
   returns the id of the record the form works on: `getNewId() ?? getEditId()`. Projects
   no longer have to override `_saveDbData()` to remember the id.
+- `dbFormHandler::getDatabaseAdapter()` returns the database adapter of the form.
+
+### Changed
+
+- `dbFormHandler` keeps its database adapter after saving the record (it was unset), so
+  `onSaved` and the code after `flush()` can still query the database, e.g. to compare
+  the old and the new values. Projects no longer have to remember the connection.
 
 ### Security
 

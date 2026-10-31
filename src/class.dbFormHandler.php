@@ -668,6 +668,18 @@ class dbFormHandler extends FormHandler
     }
 
     /**
+     * dbFormHandler::getDatabaseAdapter()
+     *
+     * Return the database adapter of the form, also after the record is saved
+     *
+     * @return DatabaseAdapter|null the adapter, or null when no database is set
+     */
+    public function getDatabaseAdapter(): ?DatabaseAdapter
+    {
+        return $this->_db;
+    }
+
+    /**
      * dbFormHandler::dbInfo()
      *
      * Set the DBInfo.
@@ -1643,9 +1655,7 @@ class dbFormHandler extends FormHandler
             }
         }
 
-        // unset the database object (we dont need it anymore)
-        unset($this->_db);
-
+        // the database object is kept: onSaved and the code after flush() may still need it
         return $return;
     }
 

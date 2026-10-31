@@ -150,6 +150,10 @@ this page".
   with `fh_conf('FH_CSRF_PROTECTION', false)` before the first form is created (the
   `fh_conf()` values become constants then).
 
+**The database after saving** (4.8). `$form->getDatabaseAdapter()` returns the
+`DatabaseAdapter` of a `dbFormHandler`, also after `flush()` saved the record; before 4.8
+it was unset after saving.
+
 ### Uploads with the id of the record in the filename
 
 `{id}` in the `name` of the upload config is replaced by the id of the record (4.8). A new
