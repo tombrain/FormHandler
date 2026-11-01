@@ -540,12 +540,12 @@ class UploadField extends Field
                 // does build in function exists for retrieving the mime type of the file?
                 // if so, get the type of the mime from that function (more secure)
                 // otherwise, use the one from the browser
-                // as of php 5.3 mime_content_type is deprecated, use finfo_open instead
-                if (function_exists('finfo_open'))
+                // as of php 5.3 mime_content_type is deprecated, use finfo instead
+                // (the object is freed by itself, finfo_close() is deprecated as of php 8.5)
+                if (class_exists('finfo'))
                 {
-                    $finfo = finfo_open(FILEINFO_MIME);
-                    $sTypeRaw = finfo_file($finfo, $aFile['tmp_name']);
-                    finfo_close($finfo);
+                    $finfo = new finfo(FILEINFO_MIME);
+                    $sTypeRaw = $finfo->file($aFile['tmp_name']);
                     list($sType) = preg_split('/;/', $sTypeRaw);
                 }
                 else

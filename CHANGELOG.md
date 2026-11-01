@@ -4,6 +4,13 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [4.8.1] - unreleased
+
+### Fixed
+
+- `UploadField` uses `finfo` as an object to get the mime type of the file. `finfo_close()`
+  is deprecated as of PHP 8.5, so every upload with a type check gave a deprecation notice.
+
 ## [4.8.0] - 2026-11-01
 
 ### Added
