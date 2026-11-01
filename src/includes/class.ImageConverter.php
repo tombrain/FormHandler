@@ -185,9 +185,9 @@ class ImageConverter
                 $this->_aSize[1] = $iNewHeight;
             }
 
-            // clean up
-            ImageDestroy($rOrg);
-            ImageDestroy($rImgResized);
+            // clean up (GD images are objects since php 8.0, imagedestroy() is deprecated as of php 8.5)
+            unset($rOrg);
+            unset($rImgResized);
         }
     }
 
@@ -251,7 +251,7 @@ class ImageConverter
 
             // Copy the current file to the new one
             ImageCopy($rImgDest, $rImgSrc, 0, 0, 0, 0, $this->_aSize[0], $this->_aSize[1]);
-            ImageDestroy($rImgSrc);
+            unset($rImgSrc);
 
             // get the new position for the stamp
             $x = ImageSX($rImgStamp);
@@ -264,11 +264,11 @@ class ImageConverter
             //ImageCopy( $rImgDest, $rImgStamp, $posX, $posY, 0, 0, $x, $y );  # transparant isnt working!
             //ImageCopyResampled( $rImgDest, $rImgStamp, 0, 0, $x, $y, $x, $y ); # transparant isnt working!
 
-            ImageDestroy($rImgStamp);
+            unset($rImgStamp);
 
             // Save the new image
             $this->_saveImage($rImgDest, $this->_sImage, 100);
-            ImageDestroy($rImgDest);
+            unset($rImgDest);
         }
         else
         {
