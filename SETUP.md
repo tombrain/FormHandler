@@ -1,7 +1,7 @@
 # FormHandler – Development setup
 
 FormHandler is developed and tested with **PHP 8.2 in a Docker container**. You do
-not need a local PHP installation. GitHub Actions runs the tests on PHP 8.2, 8.3 and 8.4.
+not need a local PHP installation. GitHub Actions runs the tests on PHP 8.2, 8.3, 8.4 and 8.5.
 
 ## Requirements
 
@@ -82,7 +82,7 @@ Then open <http://localhost:8088/examples/>. Another port: `FH_WEB_PORT=8090 doc
 
 | Workflow | File | Runs |
 |---|---|---|
-| PHPUnit | `.github/workflows/phpunit.yml` | tests with coverage on PHP 8.2, 8.3 and 8.4 |
+| PHPUnit | `.github/workflows/phpunit.yml` | tests with coverage on PHP 8.2, 8.3, 8.4 and 8.5 |
 | PHPStan | `.github/workflows/phpstan.yml` | static analysis on PHP 8.2 |
 | Examples | `.github/workflows/examples.yml` | requests every example page on the PHP built-in server |
 

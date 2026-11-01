@@ -11,6 +11,11 @@ and the project follows [Semantic Versioning](https://semver.org/).
 - `UploadField` uses `finfo` as an object to get the mime type of the file. `finfo_close()`
   is deprecated as of PHP 8.5, so every upload with a type check gave a deprecation notice.
 
+### Changed
+
+- GitHub Actions runs the tests on PHP 8.5 too, and the job with the latest dependencies
+  on PHP 8.5 instead of 8.4.
+
 ## [4.8.0] - 2026-11-01
 
 ### Added
