@@ -10,6 +10,9 @@ and the project follows [Semantic Versioning](https://semver.org/).
 
 - `UploadField` uses `finfo` as an object to get the mime type of the file. `finfo_close()`
   is deprecated as of PHP 8.5, so every upload with a type check gave a deprecation notice.
+- `ImageConverter` (`resizeImage()`, `mergeImage()`) frees its images with `unset()`.
+  `imagedestroy()` is deprecated as of PHP 8.5; it has no effect since PHP 8.0, when GD
+  images became objects.
 
 ### Changed
 
