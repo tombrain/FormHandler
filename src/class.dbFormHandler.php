@@ -33,6 +33,10 @@ class dbFormHandler extends FormHandler
     protected $_table;
     /** name of the primary key to edit (set by setEditName() in the constructor) */
     private string $_editName = '';
+    /** the id the INSERT gave the new record (an array with more primary keys) */
+    private mixed $_newId = null;
+    /** @var array<int, mixed>|null the id(s) of the record which is copied (setCopyOf()) */
+    private ?array $_copyOf = null;
 
     // public
     /** @var bool if the form is an insert-form */
@@ -76,6 +80,12 @@ class dbFormHandler extends FormHandler
      */
     private function initFHEditName(): void
     {
+        // a copy does not use the id from the URL
+        if ($this->isCopy())
+        {
+            return;
+        }
+
         // initialisation
         $this->insert = !isset($_GET[$this->_editName]);
         $this->edit   = !$this->insert;
@@ -111,6 +121,103 @@ class dbFormHandler extends FormHandler
             $this->_editName = $sEditName;
             $this->initFHEditName();
         }
+    }
+
+    /**
+     * dbFormHandler::getEditId()
+     *
+     * Return the id of the record which is edited (the first one when the URL has more)
+     *
+     * @return mixed the id, or null on a new record
+     */
+    public function getEditId(): mixed
+    {
+        return $this->edit && !$this->isCopy() && sizeof($this->_id) > 0 ? reset($this->_id) : null;
+    }
+
+    /**
+     * dbFormHandler::setCopyOf()
+     *
+     * Copy a record: the form shows the record with the given id and saves it as a new
+     * record. The primary keys and the files of the uploadfields are not copied, the
+     * values of the junction tables are. Until flush() the form loads the values like an
+     * edit form ($edit is true), flush() saves them with an INSERT.
+     *
+     * Call it before dbInfo(), setConnectionResource() and setDatabaseAdapter(), on every
+     * request of the form (also when it is posted).
+     *
+     * @param mixed $id the id of the record (an array with more primary keys)
+     * @return void
+     */
+    public function setCopyOf(mixed $id): void
+    {
+        if (isset($this->_table) || isset($this->_db))
+        {
+            throw new FormHandlerException(
+                'setCopyOf() has to be called before dbInfo(), setConnectionResource() and setDatabaseAdapter()!'
+            );
+        }
+
+        $ids = is_array($id) ? array_values($id) : array($id);
+        if (sizeof($ids) == 0 || in_array(null, $ids, true) || in_array('', $ids, true))
+        {
+            throw new FormHandlerException('setCopyOf() needs the id of the record to copy!');
+        }
+
+        $this->_copyOf = $ids;
+        $this->_id     = $ids;
+        $this->insert  = true;
+        $this->edit    = true;
+    }
+
+    /**
+     * dbFormHandler::isCopy()
+     *
+     * Return if the form copies a record (setCopyOf())
+     *
+     * @return bool
+     */
+    public function isCopy(): bool
+    {
+        return !is_null($this->_copyOf);
+    }
+
+    /**
+     * dbFormHandler::getCopyOfId()
+     *
+     * Return the id of the record which is copied (the first one when it has more)
+     *
+     * @return mixed the id, or null when the form does not copy a record
+     */
+    public function getCopyOfId(): mixed
+    {
+        return $this->isCopy() ? reset($this->_copyOf) : null;
+    }
+
+    /**
+     * dbFormHandler::getNewId()
+     *
+     * Return the id the INSERT gave the new record
+     *
+     * @return mixed the id (an array with more primary keys), or null before the INSERT,
+     *               on an edit form and when the INSERT failed
+     */
+    public function getNewId(): mixed
+    {
+        return $this->_newId;
+    }
+
+    /**
+     * dbFormHandler::getRecordId()
+     *
+     * Return the id of the record the form works on: the new one after the INSERT,
+     * otherwise the edited one
+     *
+     * @return mixed the id, or null for a new record which is not saved yet
+     */
+    public function getRecordId(): mixed
+    {
+        return $this->getNewId() ?? $this->getEditId();
     }
 
     /********************************************************/
@@ -628,6 +735,18 @@ class dbFormHandler extends FormHandler
     }
 
     /**
+     * dbFormHandler::getDatabaseAdapter()
+     *
+     * Return the database adapter of the form, also after the record is saved
+     *
+     * @return DatabaseAdapter|null the adapter, or null when no database is set
+     */
+    public function getDatabaseAdapter(): ?DatabaseAdapter
+    {
+        return $this->_db;
+    }
+
+    /**
      * dbFormHandler::dbInfo()
      *
      * Set the DBInfo.
@@ -843,6 +962,23 @@ class dbFormHandler extends FormHandler
             $oAjaxValidator->CreateObservers($this, $this->_fields, $this->_customMsg);
         }
 
+        // a copy has loaded the record like an edit form, it is saved as a new record
+        if ($this->isCopy())
+        {
+            $this->_id  = array();
+            $this->edit = false;
+        }
+
+        // {id} in the filename of an edit form: the id is known. A new record (and a copy)
+        // gets it after the INSERT.
+        if ($this->edit)
+        {
+            foreach ($this->_getIdUploads() as $name)
+            {
+                $this->_resolveIdUpload($name, $this->getEditId());
+            }
+        }
+
         // when the form is not posted or the form is not valid
         if (!$this->isPosted() || !$this->isCorrect())
         {
@@ -862,6 +998,17 @@ class dbFormHandler extends FormHandler
         // when the form is not totaly completed yet (multiple pages)
         else if ($this->_curPage < $this->_pageCounter)
         {
+            // a file waiting for {id} can not be kept until the last page
+            foreach ($this->_getIdUploads() as $name)
+            {
+                if ($this->_fields[$name][1]->isUploaded())
+                {
+                    throw new FormHandlerException(
+                        'The uploadfield "' . $name . '" uses {id} in its filename or in resizeImage() and has to be on the last page of the form!'
+                    );
+                }
+            }
+
             // upload and convert uploads
             $this->_handleUploads();
 
@@ -871,7 +1018,22 @@ class dbFormHandler extends FormHandler
         // when the form is valid
         else
         {
-            // upload and convert uploads
+            // a file waiting for {id} needs the INSERT
+            $idUploads = $this->_getIdUploads();
+            if (is_null($this->_db) || empty($this->_table))
+            {
+                foreach ($idUploads as $name)
+                {
+                    if ($this->_fields[$name][1]->isUploaded())
+                    {
+                        throw new FormHandlerException(
+                            'The uploadfield "' . $name . '" uses {id} in its filename or in resizeImage(), which needs a database table!'
+                        );
+                    }
+                }
+            }
+
+            // upload and convert uploads (the ones waiting for {id} after the INSERT)
             $this->_handleUploads();
 
             // generate the data array
@@ -921,6 +1083,12 @@ class dbFormHandler extends FormHandler
                     if (is_array($id) && sizeof($id) == 1) // @phpstan-ignore-line (Call to function is_array() with int<min, -2>|int<0, max> will always evaluate to false.)
                     {
                         $id = $id[0];
+                    }
+
+                    // the filenames with {id} are known now
+                    foreach ($idUploads as $name)
+                    {
+                        $data[$name] = $this->_fields[$name][1]->getValue();
                     }
 
                     // call the onsaved function
@@ -1149,7 +1317,8 @@ class dbFormHandler extends FormHandler
                         continue;
                     }
 
-                    $where = $this->_getWhereClause('<>', $extra);
+                    // a copy (before flush()) is a new record: no record is excluded
+                    $where = $this->_getWhereClause('<>', $extra, '=', $this->isCopy() ? array() : null);
 
                     // is there a selection filter ?
                     if (sizeof($extra) > 0)
@@ -1299,6 +1468,15 @@ class dbFormHandler extends FormHandler
                 if (count($this->_dbData) == 0)
                 {
                     $this->_dbData = $this->_db->getRecord($sql);
+
+                    // a copy gets its own primary key
+                    if ($this->isCopy())
+                    {
+                        foreach ($this->_db->getPrKeys($this->_table) as $key)
+                        {
+                            unset($this->_dbData[$key]);
+                        }
+                    }
                 }
 
                 if ($this->edit)
@@ -1319,6 +1497,11 @@ class dbFormHandler extends FormHandler
                         $this->setValue($fields[0], $values);
                     }
                 }
+            }
+            // the record to copy has to exist
+            else if ($this->isCopy())
+            {
+                throw new FormHandlerException('Try to copy a none existing record!');
             }
             // no records found, auto insert ?
             else if (FH_AUTO_INSERT)
@@ -1538,6 +1721,12 @@ class dbFormHandler extends FormHandler
                     $size = sizeof($result);
                     $return = ($size > 1) ? $result : ($size == 1 ? $result[0] : null);
                 }
+
+                // remember the id for getNewId(), already for what is called from here on
+                $this->_newId = $return;
+
+                // the id of the new record is known: upload the files with {id} in their filename
+                $this->_handleIdUploads($return);
             }
         }
 
@@ -1555,10 +1744,128 @@ class dbFormHandler extends FormHandler
             }
         }
 
-        // unset the database object (we dont need it anymore)
-        unset($this->_db);
-
+        // the database object is kept: onSaved and the code after flush() may still need it
         return $return;
+    }
+
+    /**
+     * dbFormHandler::_getIdUploads()
+     *
+     * Get the uploadfields which wait for the id of the new record ({id} in the filename
+     * or in resizeImage())
+     *
+     * @return array<int, string> the names of the fields
+     */
+    private function _getIdUploads(): array
+    {
+        $names = array();
+        foreach ($this->_upload as $name)
+        {
+            if ($this->_waitsForId($name))
+            {
+                $names[] = $name;
+            }
+        }
+
+        return $names;
+    }
+
+    /**
+     * dbFormHandler::_resolveIdUpload()
+     *
+     * Replace {id} by the id of the record in the filename of the uploadfield and in the
+     * filenames of its resizeImage()
+     *
+     * @param string $name: the name of the uploadfield
+     * @param mixed $id: the id of the record
+     * @return void
+     */
+    private function _resolveIdUpload(string $name, mixed $id): void
+    {
+        // checks the id too
+        $this->_fields[$name][1]->resolveIdPlaceholder($id);
+
+        foreach ($this->_convert[$name]['resize'] ?? array() as $i => $info)
+        {
+            if (is_string($info[0]))
+            {
+                $this->_convert[$name]['resize'][$i][0] = str_replace('{id}', (string) $id, $info[0]);
+            }
+        }
+    }
+
+    /**
+     * dbFormHandler::_handleIdUploads()
+     *
+     * Replace {id} by the id of the new record, upload and convert these files and save
+     * their filenames in the record
+     *
+     * @param mixed $id: the id of the new record
+     * @return void
+     */
+    private function _handleIdUploads(mixed $id): void
+    {
+        $names = $this->_getIdUploads();
+        if (sizeof($names) == 0)
+        {
+            return;
+        }
+
+        // one primary key is needed
+        if (is_array($id))
+        {
+            $id = sizeof($id) == 1 ? reset($id) : null;
+        }
+        if (is_null($id) || $id === '' || $id === 0 || $id === '0')
+        {
+            throw new FormHandlerException(
+                'The id of the new record is unknown, {id} can not be used in the filename of the uploadfield "' .
+                    implode('", "', $names) . '"!'
+            );
+        }
+
+        foreach ($names as $name)
+        {
+            $this->_resolveIdUpload($name, $id);
+        }
+        $this->_handleUploads($names);
+
+        // the INSERT did not know the filenames: save them in their columns
+        $fieldNames = $this->_db->getFieldNames($this->_table);
+        $set = array();
+        foreach ($names as $name)
+        {
+            $fld = $this->_fields[$name][1];
+            if ($fld->isUploaded() && in_array($name, $fieldNames) && !in_array($name, $this->_dontSave) && !$fld->getViewMode())
+            {
+                $set[] = $this->_db->quote($name) . " = '" . $this->_db->escapeString($fld->getValue()) . "'";
+            }
+        }
+        if (sizeof($set) == 0)
+        {
+            return;
+        }
+
+        $keys = $this->_db->getPrKeys($this->_table);
+        if (sizeof($keys) == 0)
+        {
+            trigger_error('Could not save the filename: the table ' . $this->_table . ' has no primary key', E_USER_WARNING);
+            return;
+        }
+
+        $query =
+            'UPDATE ' . $this->_db->quote($this->_table) . ' SET ' . implode(', ', $set) .
+            ' WHERE ' . $this->_db->quote($keys[0]) . " = '" . $this->_db->escapeString((string) $id) . "'";
+
+        if (!$this->_db->query($query))
+        {
+            trigger_error(
+                "Error, query failed!<br />\n" .
+                    "<b>Error message:</b> " . $this->_db->getError() . "<br />\n" .
+                    "<b>Query:</b> " . $query,
+                E_USER_WARNING
+            );
+        }
     }
 
     /**
@@ -1687,17 +1994,18 @@ class dbFormHandler extends FormHandler
      * @param string $operator The operator used for the primary key's and their values
      * @param array<string, mixed> $extra: extra where clause arguments
      * @param string $extraOperator: operator used for the extra arguments
+     * @param array<int, mixed>|null $record: the primary key values (default the ones of the record)
      * @return string
      * @access public
      * @author Teye Heimans
      */
-    private function _getWhereClause(string $operator = '=', array $extra = array(), string $extraOperator = '='): string
+    private function _getWhereClause(string $operator = '=', array $extra = array(), string $extraOperator = '=', ?array $record = null): string
     {
         // get the primary key fields from the table
         $keys = $this->_db->getPrKeys($this->_table);
 
         // get the values for the key fields
-        $record = $this->_id;
+        $record = $record ?? $this->_id;
 
         // walk untill the field's or values are all handled
         $size1 = sizeof($record);

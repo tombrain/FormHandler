@@ -4,6 +4,62 @@ All notable changes to this project are documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/)
 and the project follows [Semantic Versioning](https://semver.org/).
 
+## [4.8.0] - unreleased
+
+### Added
+
+- `{id}` in the `name` of the upload config of `uploadField()` is replaced by the id of the
+  record, e.g. `'name' => 'spieler_{id}'`. An edit form uses the id from the URL. A new
+  record uploads the file after the INSERT with the id from `getInsertId()` and then saves
+  the filename in the column of the field (an UPDATE); when the INSERT fails, no file is
+  moved. `onCorrect` gets an empty filename for a new record, `onSaved` the real one. It
+  needs a `dbFormHandler` with a table and a single primary key; otherwise it throws a
+  `FormHandlerException`, as well as for an id with other characters than letters, digits,
+  `_` and `-`, and for a file posted on an earlier page of a form with more pages.
+- `{id}` in the filename of `resizeImage()` (`$saveAs`) is replaced by the same id, e.g.
+  `resizeImage('bild', $dir . 'spieler_{id}.jpg', 200)`. On a new record the upload of the
+  field waits for the INSERT then, also when its own filename has no `{id}`. `FormHandler`
+  throws a `FormHandlerException` for it.
+- `dbFormHandler::getEditId()` returns the id of the edited record (`null` for a new one).
+- `dbFormHandler::getNewId()` returns the id the INSERT gave a new record (an array with
+  more primary keys; `null` before the INSERT, on an edit form and when the INSERT failed).
+  It is set right after the INSERT, so `onSaved` can use it already. `getRecordId()`
+  returns the id of the record the form works on: `getNewId() ?? getEditId()`. Projects
+  no longer have to override `_saveDbData()` to remember the id.
+- `dbFormHandler::getDatabaseAdapter()` returns the database adapter of the form.
+- `dbFormHandler::setCopyOf($id)` copies a record: the form shows the record with this id
+  and saves it as a new record (an INSERT). Call it before `dbInfo()`,
+  `setConnectionResource()` and `setDatabaseAdapter()`, on every request of the form.
+  The primary keys and the files of the uploadfields are not copied (both records would
+  use the same file), the values of the junction tables are. `isCopy()` and
+  `getCopyOfId()` tell if and which record is copied; `getEditId()` is `null` for a copy,
+  `getNewId()` and `getRecordId()` return the id of the new record after saving. Unique
+  fields are checked like on a new record. A record which does not exist throws a
+  `FormHandlerException`. Projects no longer have to change `$insert`, `$edit` and `$_id`
+  themselves.
+- `FormHandler::joinNextFields($count, $separator = ' ')` shows the next fields in one row
+  of the mask, e.g. a select field and a text field. The title, help and value of the
+  first field fill the mask, the fields are put together with the separator (HTML), and
+  the error messages of all of them are shown. Hidden fields are not counted; HTML, a
+  line, a fieldset, a new mask or page ends the row earlier. The row uses the mask once,
+  so a mask set with `setMask()` applies to the fields after it as before. Projects no
+  longer have to change `%field%` in the mask themselves.
+
+### Changed
+
+- `dbFormHandler` keeps its database adapter after saving the record (it was unset), so
+  `onSaved` and the code after `flush()` can still query the database, e.g. to compare
+  the old and the new values. Projects no longer have to remember the connection.
+
+### Security
+
+- `cancelButton()` escapes its URL: it is put into the javascript as a JSON string and the
+  `onclick` attribute is HTML escaped, so a URL from the request with `'` or `"` can not
+  break out any more. `&amp;` (from a HTML link) is decoded first. A URL with another
+  scheme than `http`/`https` (e.g. `javascript:`, `data:`) goes back in the history, like a
+  button without a URL. Only a history call such as `history.back(-1)` or `history.go(-2)`
+  is used as javascript; before, every URL containing "history" was (e.g. `/history/x.php`).
+
 ## [4.7.0] - 2026-10-30
 
 ### Added

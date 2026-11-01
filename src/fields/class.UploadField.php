@@ -101,6 +101,14 @@ class UploadField extends Field
         $this->_oForm = $oForm;
         $this->_sName = $sName;
 
+        // {id} in the filename: the id of the record, only known by a dbFormHandler (which replaces it)
+        if ($this->hasIdPlaceholder() && !($oForm instanceof dbFormHandler))
+        {
+            throw new FormHandlerException(
+                'The uploadfield "' . $sName . '" uses {id} in its filename, which needs a dbFormHandler!'
+            );
+        }
+
         // get the value of the field
         if ($oForm->isPosted())
         {
@@ -127,8 +135,8 @@ class UploadField extends Field
                 // save the uploaded file data
                 $this->_mValue = $_FILES[$sName];
 
-                // check if there is a file uploaded...
-                if ($this->isUploaded())
+                // check if there is a file uploaded... (a filename with {id} is known later)
+                if ($this->isUploaded() && !$this->hasIdPlaceholder())
                 {
                     $this->setValue($this->_getFilename());
                 }
@@ -136,7 +144,7 @@ class UploadField extends Field
                 {
                     // if this is an edit form and no value is given to the field,
                     // keep the existing value thats in the database
-                    if (isset($oForm->edit) && $oForm->edit && isset($oForm->_dbData[$sName]))
+                    if ($this->_loadsRecord() && isset($oForm->_dbData[$sName]))
                     {
                         $this->setValue($oForm->_dbData[$sName]);
                     }
@@ -148,7 +156,7 @@ class UploadField extends Field
                 $this->setValue($_POST[$sName]);
             }
             // edit form?
-            elseif ((isset($oForm->edit) && $oForm->edit))
+            elseif ($this->_loadsRecord())
             {
                 // value known from the database?
                 if (isset($oForm->_dbData[$sName]))
@@ -158,7 +166,7 @@ class UploadField extends Field
             }
         }
         // load database value if exists
-        elseif ((isset($oForm->edit) && $oForm->edit))
+        elseif ($this->_loadsRecord())
         {
             if (isset($oForm->_dbData[$sName]))
             {
@@ -167,7 +175,7 @@ class UploadField extends Field
         }
 
         // if no file is uploaded and it is a edit form, dont overwrite the current value
-        if (!$this->isUploaded() && (isset($oForm->edit) && $oForm->edit) && $oForm->isPosted())
+        if (!$this->isUploaded() && $this->_loadsRecord() && $oForm->isPosted())
         {
             if (property_exists($this->_oForm, '_dontSave'))
             {
@@ -228,6 +236,20 @@ class UploadField extends Field
     }
 
     /**
+     * UploadField::_loadsRecord()
+     *
+     * Return if the field keeps the filename of the record: on an edit form, but not on a
+     * copy of a record (both records would use the same file)
+     *
+     * @return bool
+     */
+    private function _loadsRecord(): bool
+    {
+        return isset($this->_oForm->edit) && $this->_oForm->edit &&
+            !($this->_oForm instanceof dbFormHandler && $this->_oForm->isCopy());
+    }
+
+    /**
      * UploadField::getSavePath()
      *
      * Return the path were we are going to save the file
@@ -239,6 +261,48 @@ class UploadField extends Field
     public function getSavePath()
     {
         return $this->_aConfig['path'];
+    }
+
+    /**
+     * UploadField::hasIdPlaceholder()
+     *
+     * Does the filename (config "name") still contain {id}? Then the file waits for the id
+     * of the new record.
+     *
+     * @return bool
+     * @access public
+     */
+    public function hasIdPlaceholder(): bool
+    {
+        return is_string($this->_aConfig['name']) && strpos($this->_aConfig['name'], '{id}') !== false;
+    }
+
+    /**
+     * UploadField::resolveIdPlaceholder()
+     *
+     * Replace {id} in the filename with the id of the record (used by dbFormHandler)
+     *
+     * @param mixed $id: the id of the record
+     * @return void
+     * @access public
+     */
+    public function resolveIdPlaceholder(mixed $id): void
+    {
+        // the id can come from the URL: it must not change the path
+        if (!is_scalar($id) || !preg_match('/^[A-Za-z0-9_-]+$/', (string) $id))
+        {
+            throw new FormHandlerException(
+                'The id "' . (is_scalar($id) ? $id : gettype($id)) . '" can not be used in the filename of the uploadfield "' . $this->_sName . '"!'
+            );
+        }
+
+        $this->_aConfig['name'] = str_replace('{id}', (string) $id, $this->_aConfig['name']);
+
+        // the filename is known now
+        if ($this->isUploaded())
+        {
+            $this->setValue($this->_getFilename());
+        }
     }
 
     /**

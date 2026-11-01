@@ -1317,13 +1317,8 @@ class FormHandler
             $name = $this->_getNewButtonName();
         }
 
-        if (!$url)
-        {
-            $url = 'history.back(-1)';
-        }
-
         // where to go when the button is clicked...
-        $extra .= preg_match('/history/', $url) ? ' onclick="' . $url . '"' : ' onclick="document.location.href=\'' . $url . '\'"';
+        $extra .= ' onclick="' . htmlspecialchars($this->_getCancelScript($url), ENT_QUOTES) . '"';
 
         // if no caption is given, get our own caption
         if (is_null($caption))
@@ -1338,6 +1333,44 @@ class FormHandler
 
         // register the button
         $this->_registerField($name, $btn);
+    }
+
+    /**
+     * FormHandler::_getCancelScript()
+     *
+     * Get the javascript of a cancelButton: go to the URL, or one page back
+     *
+     * @param string|null $url: the URL, or a history call like "history.back(-1)"
+     * @return string the javascript (not escaped for the HTML attribute yet)
+     */
+    private function _getCancelScript(?string $url): string
+    {
+        $back = 'history.back(-1)';
+        if (empty($url))
+        {
+            return $back;
+        }
+
+        // a history call is javascript
+        if (preg_match('/^history\.(back|go)\(\s*-?\d*\s*\);?$/', trim($url)))
+        {
+            return trim($url);
+        }
+
+        // the URL from a HTML link: &amp; is &
+        $url = html_entity_decode($url, ENT_QUOTES | ENT_HTML5, 'UTF-8');
+
+        // only http and https (javascript:, data:, ... go back); the browser ignores
+        // whitespace and control characters, e.g. in "java\tscript:"
+        if (preg_match('/^([a-z][a-z0-9+.\-]*):/i', preg_replace('/[\x00-\x20]+/', '', $url), $match) &&
+            !in_array(strtolower($match[1]), array('http', 'https'))
+        )
+        {
+            return $back;
+        }
+
+        return 'document.location.href=' .
+            json_encode($url, JSON_HEX_TAG | JSON_HEX_APOS | JSON_HEX_QUOT | JSON_HEX_AMP | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -1717,6 +1750,29 @@ class FormHandler
 
         // save the mask
         $this->_fields[] = array('__MASK__', array($mask, $repeat));
+    }
+
+    /**
+     * FormHandler::joinNextFields()
+     *
+     * Show the next fields in one row of the mask: the title, help and value of the
+     * first field are used, the fields are put together with the separator and the error
+     * messages of all of them are shown. Hidden fields are not counted. HTML, a line, a
+     * fieldset, a new mask or page ends the row earlier. The mask is used once for the
+     * row, so the mask of the fields after it is the same as without joined fields.
+     *
+     * @param int $count: the number of fields (at least 2)
+     * @param string $separator: the HTML between the fields
+     * @return void
+     */
+    public function joinNextFields(int $count, string $separator = ' '): void
+    {
+        if ($count < 2)
+        {
+            throw new FormHandlerException('joinNextFields() needs at least 2 fields!');
+        }
+
+        $this->_fields[] = array('__JOIN__', array($count, $separator));
     }
 
     /**
@@ -3146,6 +3202,14 @@ class FormHandler
         if (is_null($maxWidth))  $maxWidth  = FH_DEFAULT_RESIZE_WIDTH;
         if (is_null($maxHeight)) $maxHeight = $maxWidth;
 
+        // {id}: the id of the record, only known by a dbFormHandler (which replaces it)
+        if (is_string($saveAs) && strpos($saveAs, '{id}') !== false && !($this instanceof dbFormHandler))
+        {
+            throw new FormHandlerException(
+                'resizeImage() of the field "' . $field . '" uses {id} in its filename, which needs a dbFormHandler!'
+            );
+        }
+
         // save the settings
         $this->_convert[$field]['resize'][] = array($saveAs, $maxWidth, $maxHeight, $quality, $constrainProportions);
     }
@@ -3677,18 +3741,61 @@ class FormHandler
     }
 
     /**
+     * FormHandler::_waitsForId()
+     *
+     * Does the uploadfield wait for the id of the record? ({id} in its filename or in the
+     * filename of resizeImage())
+     *
+     * @param string $name: the name of the uploadfield
+     * @return bool
+     */
+    protected function _waitsForId(string $name): bool
+    {
+        if ($this->_fields[$name][1]->hasIdPlaceholder())
+        {
+            return true;
+        }
+
+        foreach ($this->_convert[$name]['resize'] ?? array() as $info)
+        {
+            if (is_string($info[0]) && strpos($info[0], '{id}') !== false)
+            {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
      * FormHandler::_handleUploads()
      *
      * Private: method to handle the uploads and image convertions
      *
+     * @param array<int, string>|null $names: only upload and convert these uploadfields
+     *                                        (null: all, except the ones waiting for {id})
      * @return void
      * @access public
      * @author Teye Heimans
      */
-    protected function _handleUploads()
+    protected function _handleUploads($names = null)
     {
+        $all = is_null($names);
+        if ($all)
+        {
+            // a filename with {id} waits for the id of the new record (see dbFormHandler)
+            $names = array();
+            foreach ($this->_upload as $name)
+            {
+                if (!$this->_waitsForId($name))
+                {
+                    $names[] = $name;
+                }
+            }
+        }
+
         // upload the uploaded files
-        foreach ($this->_upload as $name)
+        foreach ($names as $name)
         {
             $this->_fields[$name][1]->doUpload();
         }
@@ -3696,6 +3803,12 @@ class FormHandler
         // walk all convert actions for the upload fields
         foreach ($this->_convert as $field => $convertions)
         {
+            // only the convertions of the handled uploadfields (and of files, when all are handled)
+            if (in_array($field, $this->_upload) ? !in_array($field, $names) : !$all)
+            {
+                continue;
+            }
+
             // walk all convertions for this field
             foreach ($convertions as $action => $data)
             {
@@ -3794,6 +3907,53 @@ class FormHandler
     }
 
     /**
+     * FormHandler::_fillRow()
+     *
+     * Fill the mask with the values of a field (or of joined fields) and return the HTML
+     * when the mask is full
+     *
+     * @param MaskLoader $mask: the mask loader
+     * @param array<int, mixed> $replace: the values for the search strings of the mask
+     * @param bool $hasError: if the field has an error message
+     * @param bool|int $repeat: if the mask is repeated (an integer is counted down)
+     * @return string the HTML, empty when the mask is not full yet
+     */
+    private function _fillRow(MaskLoader $mask, array $replace, bool $hasError, bool|int &$repeat): string
+    {
+        // fill the mask
+        $html = $mask->fill($replace);
+
+        // added 07-01-2009 in order to specify which element should get the error class
+        if ($this->isPosted() == true and $hasError)
+        {
+            $html = $this->parse_error_style($html);
+        }
+        else
+        {
+            $html = str_replace('%error_style%', '', $html);
+        }
+
+        // is the mask filled ?
+        if (!$html)
+        {
+            return '';
+        }
+
+        // if we don't have to repeat the current mask, use the original
+        if (!$repeat)
+        {
+            $this->_mask = FH_DEFAULT_ROW_MASK;
+        }
+        // if we have to repeat the mask, repeat it and countdown
+        else if (is_numeric($repeat))
+        {
+            $repeat--;
+        }
+
+        return str_replace('____FH-percent____', '%', $html);
+    }
+
+    /**
      * FormHandler::_getForm()
      *
      * Private: get the form
@@ -3867,6 +4027,7 @@ class FormHandler
         $buffer = array();
         $repeat = true;
         $page   = 1;
+        $join   = null;
 
         // start a new mask loader
         $mask   = new MaskLoader();
@@ -3888,8 +4049,31 @@ class FormHandler
         // walk trought the fields array
         foreach ($this->_fields as $id => $field)
         {
+            // HTML, a fieldset, a new mask or page ends a row of joined fields
+            if (!is_null($join) && in_array($field[0], array('__PAGE__', '__MASK__', '__JOIN__', '__HTML__', '__LINE__', '__FIELDSET__', '__FIELDSET-END__'), true))
+            {
+                if (!is_null($join['replace']))
+                {
+                    $form .= $this->_fillRow($mask, $join['replace'], $join['error'], $repeat);
+                }
+                $join = null;
+            }
+
             switch ($field[0])
             {
+                    // the next fields share a row
+                case '__JOIN__':
+                    if ($page == $iDisplayPage)
+                    {
+                        $join = array(
+                            'count'     => $field[1][0],
+                            'separator' => $field[1][1],
+                            'replace'   => null,
+                            'error'     => false
+                        );
+                    }
+                    break;
+
                     // multiple pages in this form
                 case '__PAGE__':
                     # why did we stop at the current page ?
@@ -4101,39 +4285,42 @@ class FormHandler
                             /* %help%      */ $help
                         );
 
-                        // fill the mask
-                        $html = $mask->fill($replace);
-
-                        // added 07-01-2009 in order to specify which element should get the error class
-                        if ($this->isPosted() == true and $error != '')
+                        // joined fields (joinNextFields()): the first one fills the mask,
+                        // the others only add their field and error message
+                        if (!is_null($join))
                         {
-                            $html = $this->parse_error_style($html);
-                        }
-                        else
-                        {
-                            $html = str_replace('%error_style%', '', $html);
-                        }
-
-                        // is the mask filled ?
-                        if ($html)
-                        {
-                            // add it the the form HTML
-                            $form .= str_replace('____FH-percent____', '%', $html);
-
-                            // if we don't have to repeat the current mask, use the original
-                            if (!$repeat)
+                            if (is_null($join['replace']))
                             {
-                                $this->_mask = FH_DEFAULT_ROW_MASK;
+                                $join['replace'] = $replace;
                             }
-                            // if we have to repeat the mask, repeat it and countdown
-                            else if (is_numeric($repeat))
+                            else
                             {
-                                $repeat--;
+                                $join['replace'][0] .= str_replace('%', '____FH-percent____', $join['separator']) . $fld;
+                                $join['replace'][1] .= ($join['replace'][1] != '' && $error != '' ? ' ' : '') . $error;
                             }
+                            $join['error'] = $join['error'] || $error != '';
+
+                            // wait for the next field of the row
+                            if (--$join['count'] > 0)
+                            {
+                                break;
+                            }
+
+                            $form .= $this->_fillRow($mask, $join['replace'], $join['error'], $repeat);
+                            $join = null;
+                            break;
                         }
+
+                        $form .= $this->_fillRow($mask, $replace, $error != '', $repeat);
                     }
                     break;
             }
+        }
+
+        // a row of joined fields with fewer fields than said
+        if (!is_null($join) && !is_null($join['replace']))
+        {
+            $form .= $this->_fillRow($mask, $join['replace'], $join['error'], $repeat);
         }
 
         // add the page number to the forms HTML

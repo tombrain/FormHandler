@@ -1,0 +1,436 @@
+<?php
+
+declare(strict_types=1);
+
+/**
+ * PHPUnit has no real upload: copy the test file instead of moving it
+ */
+class uploadIdTest_UploadField extends UploadField
+{
+    protected function _isUploadedFile($sFile)
+    {
+        return is_file($sFile);
+    }
+
+    protected function _moveUploadedFile($sFrom, $sTo)
+    {
+        return copy($sFrom, $sTo);
+    }
+}
+
+/**
+ * A form whose uploadField() creates an uploadIdTest_UploadField
+ */
+class uploadIdTest_dbFormHandler extends dbFormHandler
+{
+    public function uploadField($title, $name, $config = array(), $validator = null, $extra = null, $alertOverwrite = null)
+    {
+        $fld = new uploadIdTest_UploadField($this, $name, $config);
+
+        if (!empty($validator))        $fld->setValidator($validator);
+        if (!empty($extra))            $fld->setExtra($extra);
+        if (!is_null($alertOverwrite)) $fld->setAlertOverwrite($alertOverwrite);
+
+        $this->_registerField($name, $fld, $title);
+        $this->_upload[] = $name;
+    }
+}
+
+final class dbFormhandler_UploadIdTest extends dbFormhandlerTestCase
+{
+    private string $_tempPath = '';
+
+    /** @var array<int, mixed> the values given to onCorrect */
+    private array $_onCorrectData = array();
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+
+        $this->getConnection()->executeStatement(
+            "CREATE TABLE spieler (
+                id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+                name VARCHAR(50) NOT NULL,
+                bild VARCHAR(255) NULL
+            )"
+        );
+
+        $this->_tempPath = sys_get_temp_dir() . "/uploadidtest";
+        if (is_dir($this->_tempPath))
+        {
+            array_map('unlink', glob($this->_tempPath . '/*'));
+        }
+        else
+        {
+            mkdir($this->_tempPath);
+        }
+
+        $_POST['FormHandler_submit'] = "1";
+        $_FILES = [
+            'bild' => [
+                'error'    => UPLOAD_ERR_OK,
+                'name'     => 'test.jpg',
+                'size'     => 8009,
+                'tmp_name' => dirname(__FILE__) . "/test.jpg",
+                'type'     => 'image/jpeg'
+            ]
+        ];
+    }
+
+    public function callback_onCorrect(array $data, FormHandler $form): bool
+    {
+        $this->_onCorrectData = $data;
+        return true;
+    }
+
+    /**
+     * a form for the table "spieler" with the uploadfield "bild" (posted with test.jpg)
+     */
+    private function createForm(array $config = array(), mixed $copyOf = null): uploadIdTest_dbFormHandler
+    {
+        $form = new uploadIdTest_dbFormHandler();
+        if (!is_null($copyOf))
+        {
+            $form->setCopyOf($copyOf);
+        }
+        $form->setConnectionResource($this->getConnection(), 'spieler');
+
+        $form->textField("Name", "name");
+        $form->uploadField("Bild", "bild", array_merge(array(
+            "type"   => "jpg",
+            "name"   => "spieler_{id}",
+            "path"   => $this->_tempPath,
+            "exists" => "overwrite"
+        ), $config));
+
+        return $form;
+    }
+
+    private function assertFiles(array $expected): void
+    {
+        $files = array_map('basename', glob($this->_tempPath . '/*'));
+        sort($files);
+
+        static::assertSame($expected, $files);
+    }
+
+    private function getBild(int $id): mixed
+    {
+        return $this->getConnection()->fetchOne('SELECT bild FROM spieler WHERE id = ?', [$id]);
+    }
+
+    public function test_insert(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 7, 'name' => 'old']);
+        $_POST['name'] = "new";
+
+        $form = $this->createForm();
+        $form->onCorrect(array($this, "callback_onCorrect"));
+        $this->setCallbackOnSaved($form);
+
+        // before the INSERT: the file is uploaded, its name is not known yet
+        static::assertTrue($form->isUploaded("bild"));
+        static::assertEquals($_FILES['bild'], $form->getFileInfo("bild"));
+        static::assertSame('', $form->getValue("bild"));
+
+        static::assertFlush($form);
+
+        static::assertSame('', $this->_onCorrectData['bild']);
+        $this->assertSavedId(8);
+        $this->assertSavedValue('spieler_8.jpg', 'bild');
+        static::assertSame('spieler_8.jpg', $this->getBild(8));
+        static::assertSame('spieler_8.jpg', $form->getValue("bild"));
+        $this->assertFiles(['spieler_8.jpg']);
+    }
+
+    public function test_insert_noFile(): void
+    {
+        $_POST['name'] = "new";
+        $_FILES['bild'] = ['error' => UPLOAD_ERR_NO_FILE, 'name' => '', 'size' => 0, 'tmp_name' => '', 'type' => ''];
+
+        $form = $this->createForm();
+        $this->setCallbackOnSaved($form);
+
+        static::assertFlush($form);
+
+        $this->assertSavedId(1);
+        $this->assertSavedValueEmtpy('bild');
+        static::assertNull($this->getBild(1));
+        $this->assertFiles([]);
+    }
+
+    public function test_insert_rename(): void
+    {
+        static::assertTrue(copy(dirname(__FILE__) . "/test.jpg", "{$this->_tempPath}/spieler_1.jpg"));
+        $_POST['name'] = "new";
+
+        $form = $this->createForm(['exists' => 'rename']);
+
+        static::assertFlush($form);
+
+        static::assertSame('spieler_1(1).jpg', $this->getBild(1));
+        $this->assertFiles(['spieler_1(1).jpg', 'spieler_1.jpg']);
+    }
+
+    public function test_insert_fieldNotInTable(): void
+    {
+        $_POST['name'] = "new";
+        $_FILES['foto'] = $_FILES['bild'];
+
+        $form = $this->createForm();
+        $form->uploadField("Foto", "foto", [
+            "type" => "jpg",
+            "name" => "foto_{id}",
+            "path" => $this->_tempPath
+        ]);
+        $this->setCallbackOnSaved($form);
+
+        static::assertFlush($form);
+
+        $this->assertSavedValue('foto_1.jpg', 'foto');
+        $this->assertFiles(['foto_1.jpg', 'spieler_1.jpg']);
+    }
+
+    public function test_insert_failed(): void
+    {
+        // no name: the NOT NULL column makes the INSERT fail
+
+        $errors = array();
+        set_error_handler(function (int $level, string $message) use (&$errors)
+        {
+            $errors[] = $message;
+            return true;
+        });
+
+        $form = new uploadIdTest_dbFormHandler();
+        $form->setConnectionResource($this->getConnection(), 'spieler');
+        $form->uploadField("Bild", "bild", [
+            "type" => "jpg",
+            "name" => "spieler_{id}",
+            "path" => $this->_tempPath
+        ]);
+
+        $r = $form->flush(true);
+        restore_error_handler();
+
+        static::assertCount(1, $errors);
+        static::assertStringStartsWith('Error, query failed!', $errors[0]);
+        static::assertNotEmpty($r);
+        static::assertEquals(0, $this->getConnection()->fetchOne('SELECT COUNT(*) FROM spieler'));
+        $this->assertFiles([]);
+    }
+
+    public function test_edit(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'old.jpg']);
+        $_GET['id'] = "100";
+        $_POST['name'] = "new";
+
+        $form = $this->createForm();
+        $this->setCallbackOnSaved($form);
+
+        static::assertFlush($form);
+
+        $this->assertSavedId(100);
+        $this->assertSavedValue('spieler_100.jpg', 'bild');
+        static::assertSame('spieler_100.jpg', $this->getBild(100));
+        $this->assertFiles(['spieler_100.jpg']);
+    }
+
+    public function test_copy(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'spieler_100.jpg']);
+        static::assertTrue(file_put_contents("{$this->_tempPath}/spieler_100.jpg", 'original') > 0);
+        $_POST['name'] = "copy";
+
+        $form = $this->createForm(array(), 100);
+
+        static::assertFlush($form);
+
+        // the copy gets its own file, the one of the original is kept
+        static::assertSame('spieler_101.jpg', $this->getBild(101));
+        static::assertSame('spieler_100.jpg', $this->getBild(100));
+        static::assertSame('original', file_get_contents("{$this->_tempPath}/spieler_100.jpg"));
+        $this->assertFiles(['spieler_100.jpg', 'spieler_101.jpg']);
+    }
+
+    public function test_copy_withoutFile(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'spieler_100.jpg']);
+        static::assertTrue(file_put_contents("{$this->_tempPath}/spieler_100.jpg", 'original') > 0);
+        $_POST['name'] = "copy";
+        $_FILES['bild'] = ['error' => UPLOAD_ERR_NO_FILE, 'name' => '', 'size' => 0, 'tmp_name' => '', 'type' => ''];
+
+        $form = $this->createForm(array('name' => 'spieler'), 100);
+
+        // the copy does not take the file of the original (both records would use it)
+        static::assertSame('', $form->getValue('bild'));
+
+        static::assertFlush($form);
+
+        static::assertNull($this->getBild(101));
+        static::assertSame('spieler_100.jpg', $this->getBild(100));
+        $this->assertFiles(['spieler_100.jpg']);
+    }
+
+    public function test_copy_showsNoFile(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old', 'bild' => 'spieler_100.jpg']);
+        unset($_POST['FormHandler_submit']);
+        $_FILES = array();
+
+        $form = $this->createForm(array(), 100);
+
+        static::assertSame('', $form->getValue('bild'));
+        static::assertStringNotContainsString('spieler_100.jpg', (string) $form->flush(true));
+    }
+
+    public function test_invalidId(): void
+    {
+        $form = $this->createForm();
+
+        $this->expectException(FormHandlerException::class);
+        $this->expectExceptionMessage('The id "../x" can not be used in the filename of the uploadfield "bild"!');
+
+        $form->getField('bild')->resolveIdPlaceholder('../x');
+    }
+
+    public function test_multiplePages(): void
+    {
+        $_POST['name'] = "new";
+
+        $form = $this->createForm();
+        $form->newPage();
+        $form->textField("Page 2", "page2");
+
+        $this->expectException(FormHandlerException::class);
+        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename or in resizeImage() and has to be on the last page of the form!');
+
+        $form->flush(true);
+    }
+
+    public function test_noTable(): void
+    {
+        $form = new uploadIdTest_dbFormHandler();
+        $form->uploadField("Bild", "bild", [
+            "type" => "jpg",
+            "name" => "spieler_{id}",
+            "path" => $this->_tempPath
+        ]);
+
+        $this->expectException(FormHandlerException::class);
+        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename or in resizeImage(), which needs a database table!');
+
+        $form->flush(true);
+    }
+
+    /**
+     * a form whose upload keeps its name ("upload.jpg") and whose resizeImage() uses {id}
+     */
+    private function createResizeForm(mixed $copyOf = null): uploadIdTest_dbFormHandler
+    {
+        $form = $this->createForm(['name' => 'upload'], $copyOf);
+        $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30, 30);
+
+        return $form;
+    }
+
+    private function assertResized(string $file): void
+    {
+        $info = getimagesize($this->_tempPath . '/' . $file);
+        static::assertIsArray($info, "$file is no image");
+        static::assertEquals(30, $info[0]);
+    }
+
+    public function test_resize_insert(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 7, 'name' => 'old']);
+        $_POST['name'] = "new";
+
+        $form = $this->createResizeForm();
+
+        static::assertFlush($form);
+
+        // the upload without {id} waited for the INSERT too
+        static::assertSame('upload.jpg', $this->getBild(8));
+        $this->assertFiles(['spieler_8.jpg', 'upload.jpg']);
+        $this->assertResized('spieler_8.jpg');
+    }
+
+    public function test_resize_edit(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 5, 'name' => 'old']);
+        $_GET['id'] = "5";
+        $_POST['name'] = "new";
+
+        $form = $this->createResizeForm();
+
+        static::assertFlush($form);
+
+        static::assertSame('upload.jpg', $this->getBild(5));
+        $this->assertFiles(['spieler_5.jpg', 'upload.jpg']);
+        $this->assertResized('spieler_5.jpg');
+    }
+
+    public function test_resize_copy(): void
+    {
+        $this->getConnection()->insert('spieler', ['id' => 100, 'name' => 'old']);
+        $_POST['name'] = "copy";
+
+        $form = $this->createResizeForm(100);
+
+        static::assertFlush($form);
+
+        $this->assertFiles(['spieler_101.jpg', 'upload.jpg']);
+        $this->assertResized('spieler_101.jpg');
+    }
+
+    public function test_resize_insert_failed(): void
+    {
+        // no name: the NOT NULL column makes the INSERT fail
+
+        $errors = array();
+        set_error_handler(function (int $level, string $message) use (&$errors)
+        {
+            $errors[] = $message;
+            return true;
+        });
+
+        $form = new uploadIdTest_dbFormHandler();
+        $form->setConnectionResource($this->getConnection(), 'spieler');
+        $form->uploadField("Bild", "bild", [
+            "type" => "jpg",
+            "name" => "upload",
+            "path" => $this->_tempPath
+        ]);
+        $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30, 30);
+
+        $r = $form->flush(true);
+        restore_error_handler();
+
+        static::assertCount(1, $errors);
+        static::assertStringStartsWith('Error, query failed!', $errors[0]);
+        static::assertNotEmpty($r);
+        $this->assertFiles([]);
+    }
+
+    public function test_resize_formHandler(): void
+    {
+        $form = new FormHandler();
+
+        $this->expectException(FormHandlerException::class);
+        $this->expectExceptionMessage('resizeImage() of the field "bild" uses {id} in its filename, which needs a dbFormHandler!');
+
+        $form->resizeImage('bild', $this->_tempPath . '/spieler_{id}.jpg', 30);
+    }
+
+    public function test_formHandler(): void
+    {
+        $form = new FormHandler();
+
+        $this->expectException(FormHandlerException::class);
+        $this->expectExceptionMessage('The uploadfield "bild" uses {id} in its filename, which needs a dbFormHandler!');
+
+        $form->uploadField("Bild", "bild", ["name" => "spieler_{id}"]);
+    }
+}

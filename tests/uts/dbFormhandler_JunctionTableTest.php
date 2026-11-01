@@ -17,9 +17,13 @@ final class dbFormhandler_JunctionTableTest extends dbFormhandlerTestCase
         );
     }
 
-    private function createForm(): dbFormHandler
+    private function createForm(mixed $copyOf = null): dbFormHandler
     {
         $form = new dbFormHandler();
+        if (!is_null($copyOf))
+        {
+            $form->setCopyOf($copyOf);
+        }
         $this->setConnectedTable($form, "test");
 
         $form->textField("TextNullable", "textNullable");
@@ -75,6 +79,31 @@ final class dbFormhandler_JunctionTableTest extends dbFormhandlerTestCase
 
         // the rows of record 5 are replaced, record 6 is untouched
         static::assertEquals([[5, '1'], [6, '1']], $this->getJunction());
+    }
+
+    public function test_copy(): void
+    {
+        $this->insertRecord(['id' => 5, 'textNullable' => 'text']);
+        $this->getConnection()->executeStatement("INSERT INTO test_options VALUES (5, '2'), (5, '3')");
+
+        // the copy shows the values of the original
+        static::assertEquals(['2', '3'], $this->createForm(5)->getValue("option_id"));
+    }
+
+    public function test_copy_save(): void
+    {
+        $this->insertRecord(['id' => 5, 'textNullable' => 'text']);
+        $this->getConnection()->executeStatement("INSERT INTO test_options VALUES (5, '2'), (5, '3')");
+
+        $_POST['FormHandler_submit'] = "1";
+        $_POST['textNullable'] = "copy";
+        $_POST['option_id'] = ['2', '3'];
+
+        static::assertEmpty($this->createForm(5)->flush(true));
+
+        // the copy gets its own rows, the ones of the original are kept
+        $this->assertSavedId(6);
+        static::assertEquals([[5, '2'], [5, '3'], [6, '2'], [6, '3']], $this->getJunction());
     }
 
     public function test_insert_quotesInValue(): void

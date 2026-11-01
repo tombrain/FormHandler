@@ -150,6 +150,81 @@ this page".
   with `fh_conf('FH_CSRF_PROTECTION', false)` before the first form is created (the
   `fh_conf()` values become constants then).
 
+**Copy a record** (4.8). `setCopyOf()` shows a record and saves it as a new one:
+
+```php
+$form = new dbFormHandler();
+if (($_GET['funktion'] ?? '') == 'copy')
+{
+    $form->setCopyOf($_GET['id']);   // before dbInfo() / setConnectionResource()
+}
+$form->setConnectionResource($conn, 'news');
+```
+
+Call it on every request of the form, also when it is posted. The primary key and the
+files of the uploadfields are not copied, the values of the junction tables are.
+`isCopy()` and `getCopyOfId()` tell if and which record is copied, `getEditId()` is
+`null`, and after saving `getRecordId()` returns the id of the new record.
+
+**More fields in one row** (4.8). `joinNextFields()` puts the next fields into one row of
+the mask, with the title and help of the first one and the error messages of all:
+
+```php
+$form->joinNextFields(2, ' / ');
+$form->selectField('Opponent', 'gegner', $gegner);
+$form->textField('Team', 'team');
+```
+
+**The database after saving** (4.8). `$form->getDatabaseAdapter()` returns the
+`DatabaseAdapter` of a `dbFormHandler`, also after `flush()` saved the record; before 4.8
+it was unset after saving.
+
+### Uploads with the id of the record in the filename
+
+`{id}` in the `name` of the upload config is replaced by the id of the record (4.8). A new
+record does not have an id while the form is checked, so FormHandler uploads the file after
+the INSERT; there is no need to guess the next id with `SHOW TABLE STATUS`.
+
+```php
+$form = new dbFormHandler();
+$form->setConnectionResource($conn, 'spieler');
+$form->textField('Name', 'name', FH_NOT_EMPTY);
+$form->uploadField('Picture', 'bild', [
+    'path'   => __DIR__ . '/images/spieler/',
+    'type'   => 'jpg jpeg png',
+    'name'   => 'spieler_{id}',   // spieler_42.jpg
+    'exists' => 'overwrite',      // a new picture replaces the old one
+]);
+$form->onSaved('spielerSaved');
+$form->flush();
+
+function spielerSaved($id, $data, $form)
+{
+    // $data['bild'] is "spieler_42.jpg"
+}
+```
+
+- **Edit form** (`?id=42`): the file is uploaded as before, with the id from the URL.
+- **New record**: the file is uploaded after the INSERT, then `imageResize()` and
+  `mergeImage()` of the field run. If the table has a column with the name of the field,
+  FormHandler saves the filename there with an UPDATE. When the INSERT fails, no file is
+  moved.
+- `{id}` also works in the filename of `resizeImage()`, e.g.
+  `$form->resizeImage('bild', __DIR__ . '/images/spieler/klein_{id}.jpg', 200)`. On a new
+  record the field then waits for the INSERT, even when its own filename has no `{id}`.
+- `onCorrect` runs before the INSERT: for a new record the filename is still empty there,
+  `onSaved` gets it. `isUploaded()` and `getFileInfo()` work before the INSERT too.
+- After saving, `$form->getRecordId()` returns the id of the record, of a new one as well
+  as of an edited one (`getNewId()` only the id of the INSERT).
+- `'exists'` is used for the filename with the id. `'alert'` (the default) can not warn
+  on a new record, the filename is not known while the form is checked; use `'overwrite'`
+  or `'rename'`.
+- It needs a `dbFormHandler` with a table and a single primary key. `FormHandler` throws a
+  `FormHandlerException`, as well as an id with other characters than letters, digits,
+  `_` and `-`.
+- On a form with more pages the field has to be on the last page: the uploaded file of an
+  earlier page is gone when the record is saved.
+
 ### Images and files in the editor
 
 The bundled file manager is removed (4.7): it had no login. Uploading or choosing files
